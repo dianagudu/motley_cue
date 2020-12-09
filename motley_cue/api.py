@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from .mapper import mapper
 from .user import user
 from .admin import admin
@@ -34,5 +34,6 @@ async def info():
 
 
 @api.get('/verify_user')
-async def verify_user(token: str, username: str):
-    return mapper.verify_user(token, username)
+@mapper.authorized_login_required()
+async def verify_user(request: Request, username: str):
+    return mapper.verify_user(request, username)

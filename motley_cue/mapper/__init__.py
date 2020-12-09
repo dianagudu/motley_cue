@@ -6,7 +6,6 @@
 # pylint: disable=bad-whitespace
 
 import logging
-import hashlib
 from enum import Enum
 from flaat import Flaat
 from ldf_adapter import User
@@ -37,6 +36,7 @@ class Mapper:
         self.__admin_security = HTTPBearer()
         self.__flaat = FlaatWrapper(CONFIG)
         self.__lum = LUM()
+        self.__db = MapperDB()
 
     @property
     def user_security(self):
@@ -55,19 +55,33 @@ class Mapper:
         return self.__flaat.authorized_login_required()
 
     def get(self, request: Request):
-        return self.__lum.reach_state(
-            self.__flaat.userinfo_from_request(request),
-            States.deployed
+        return self.__db.get(
+            self.__flaat.uid_from_request(request)
         )
 
     def reach_state(self, request: Request, state_target: States):
-        return self.__lum.reach_state(
+        result = self.__lum.reach_state(
             self.__flaat.userinfo_from_request(request),
             state_target
         )
+        logger.info(result)
+        unique_id = self.__flaat.uid_from_request(request)
+        if state_target == States.deployed and result['state'] == 'deployed':
+            local_username = result['credentials']['ssh_user']
+            logger.info(
+                f"Adding mapping for remote id {unique_id} to local id {local_username}")
+            self.__db.add(unique_id, local_username)
+        elif state_target == States.not_deployed and result['state'] == 'not_deployed':
+            logger.info(f"Removing local user {self.__db.get(unique_id)}")
+            self.__db.remove(unique_id)
+        else:
+            pass
+        return result
 
-    def verify_user(self, token: str, username: str):
-        return {"message": "Not implemented"}
+    def verify_user(self, request: Request, username: str):
+        return self.__db.get(
+            self.__flaat.uid_from_request(request)
+        ) == username
 
 
 class FlaatWrapper(Flaat):
@@ -155,6 +169,12 @@ class FlaatWrapper(Flaat):
         userinfo["iss"] = userinfo["body"]["iss"]
         return userinfo
 
+    def uid_from_request(self, request: Request):
+        userinfo = self._get_all_info_from_request(request)
+        iss = userinfo["body"]["iss"]
+        sub = userinfo["body"]["sub"]
+        return iss+sub
+
 
 class LUM:
     def __init__(self):
@@ -184,6 +204,29 @@ class LUM:
             result = result.attributes
             logger.debug("Reached state '{state}': {message}".format(**result))
             return result
+
+
+# Dummy DB to store all mappings from remote to local identity
+class MapperDB:
+    def __init__(self):
+        self.__mappings = {}
+
+    def get(self, unique_id):
+        try:
+            return self.__mappings[unique_id]
+        except Exception:
+            logger.warning(f"No mapping found for {unique_id}.")
+            return None
+
+    def add(self, unique_id, local_username):
+        self.__mappings[unique_id] = local_username
+
+    def remove(self, unique_id):
+        try:
+            del self.__mappings[unique_id]
+        except Exception:
+            logger.warning(
+                f"No mapping found for {unique_id}, cannot be removed.")
 
 
 mapper = Mapper()
