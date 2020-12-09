@@ -23,9 +23,10 @@ export MOTLEY_CUE_CONFIG=$PWD/config_template.conf
 ```
 
 ### Running
-For quick testing, simply run with uvicorn:
+For quick testing, simply run with uvicorn (as user with permissions to add users):
 
 ```sh
 motley_cue_uvicorn
 ```
 
+With docker: [moteley_cue_docker](https://github.com/dianagudu/motley_cue_docker) image.
