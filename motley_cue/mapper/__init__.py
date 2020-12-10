@@ -63,9 +63,19 @@ class Mapper:
         return self.__flaat.authorized_login_required()
 
     def get(self, request: Request):
-        return self.__db.get(
+        local_username = self.__db.get(
             self.__flaat.uid_from_request(request)
         )
+        # FIXME: get actual state
+        if local_username is None:
+            return {
+                "state": "not_deployed"
+            }
+        else:
+            return {
+                "username": local_username,
+                "state": "deployed"
+            }
 
     def reach_state(self, request: Request, state_target: States):
         result = self.__lum.reach_state(
@@ -87,9 +97,21 @@ class Mapper:
         return result
 
     def verify_user(self, request: Request, username: str):
-        return self.__db.get(
+        local_username = self.__db.get(
             self.__flaat.uid_from_request(request)
-        ) == username
+        )
+        # FIXME: get actual state
+        if local_username is None:
+            return {
+                "verified": False,
+                "state": "not_deployed"
+            }
+        else:
+            verified = (local_username == username)
+            return {
+                "verified": verified,
+                "state": "deployed"
+            }
 
 
 class FlaatWrapper(Flaat):
