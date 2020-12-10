@@ -14,6 +14,12 @@ from fastapi import Request
 from fastapi.security import HTTPBearer
 from .config import CONFIG, to_list, to_bool
 
+if CONFIG['mapper']['db'] == 'file':
+    import json
+    import pathlib
+elif CONFIG['mapper']['db'] == 'redis':
+    import redis
+
 logger = logging.getLogger(__name__)
 
 
@@ -34,9 +40,11 @@ class Mapper:
     def __init__(self):
         self.__user_security = HTTPBearer()
         self.__admin_security = HTTPBearer()
-        self.__flaat = FlaatWrapper(CONFIG)
+        self.__flaat = FlaatWrapper()
         self.__lum = LUM()
-        self.__db = MapperDB()
+        self.__db = RedisMapperDB(**CONFIG['mapper.redis'])\
+            if CONFIG['mapper']['db'] == 'redis' \
+            else FileMapperDB(CONFIG['mapper.file']['location'])
 
     @property
     def user_security(self):
@@ -89,7 +97,7 @@ class FlaatWrapper(Flaat):
     FLAAT configured with given parameters in config file
     """
 
-    def __init__(self, CONFIG):
+    def __init__(self):
         super().__init__()
         super().set_web_framework("fastapi")
         super().set_cache_lifetime(120)  # seconds; default is 300
@@ -206,27 +214,85 @@ class LUM:
             return result
 
 
-# Dummy DB to store all mappings from remote to local identity
+# Simple Redis DB to store all mappings from remote to local identity
 class MapperDB:
     def __init__(self):
-        self.__mappings = {}
+        pass
+
+    def get(self, unique_id):
+        return None
+
+    def add(self, unique_id, local_username):
+        pass
+
+    def remove(self, unique_id):
+        pass
+
+
+class FileMapperDB(MapperDB):
+    def __init__(self, filename):
+        super().__init__()
+        self.__filename = filename
+
+    def read_mappings(self):
+        if pathlib.Path(self.__filename).exists():
+            with open(self.__filename) as file:
+                mappings = json.load(file)
+        else:
+            mappings = {}
+        return mappings
+
+    def write_mappings(self, mappings):
+        with open(self.__filename, "w+") as file:
+            json.dump(mappings, file)
 
     def get(self, unique_id):
         try:
-            return self.__mappings[unique_id]
+            mappings = self.read_mappings()
+            return mappings[unique_id]
         except Exception:
             logger.warning(f"No mapping found for {unique_id}.")
             return None
 
     def add(self, unique_id, local_username):
-        self.__mappings[unique_id] = local_username
+        try:
+            # these operations have to be atomic
+            mappings = self.read_mappings()
+            mappings[unique_id] = local_username
+            self.write_mappings(mappings)
+        except Exception:
+            logger.warning(
+                f"Something wentwrong when adding mapping {unique_id} to {local_username}.")
 
     def remove(self, unique_id):
         try:
-            del self.__mappings[unique_id]
+            # these operations have to be atomic
+            mappings = self.read_mappings()
+            del mappings[unique_id]
+            self.write_mappings(mappings)
         except Exception:
             logger.warning(
                 f"No mapping found for {unique_id}, cannot be removed.")
+
+
+class RedisMapperDB(MapperDB):
+    def __init__(self, endpoint='localhost', db=0, port=6379, password=''):
+        super().__init__()
+        self.__mappings = redis.StrictRedis(
+            host=endpoint,
+            db=db,
+            port=port,
+            password=password,
+            decode_responses=True)
+
+    def get(self, unique_id):
+        return self.__mappings.get(unique_id)
+
+    def add(self, unique_id, local_username):
+        self.__mappings.set(unique_id, local_username)
+
+    def remove(self, unique_id):
+        self.__mappings.delete(unique_id)
 
 
 mapper = Mapper()

@@ -23,10 +23,11 @@ export MOTLEY_CUE_CONFIG=$PWD/config_template.conf
 ```
 
 ### Running
-For quick testing, simply run with uvicorn (as user with permissions to add users):
+For quick testing, simply run with uvicorn (as user with permissions to add users) without SSL:
 
 ```sh
 motley_cue_uvicorn
 ```
 
-With docker: [moteley_cue_docker](https://github.com/dianagudu/motley_cue_docker) image.
+### Docker
+The full setup with docker: [motley_cue_docker](https://github.com/dianagudu/motley_cue_docker) image.

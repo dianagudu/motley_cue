@@ -1,3 +1,4 @@
 flaat
 fastapi
 uvicorn
+redis
