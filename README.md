@@ -5,8 +5,10 @@ Mapper Oidc To Local idEntitY with loCal User managEment
 ### Installation
 
 - Install ldf_adapter: `pip install ldf_adapter-dist/ldf_adapter-0.1.2.dev1.tar.gz`
-- Build package: `./setup.py sdist`
-- Install package: `pip install dist/motley_cue-$version.tar.gz`
+- Install motley_cue from pypi: `pip install motley_cue`
+- Alternatively, install motley_cue from source:
+    - Build package: `./setup.py sdist`
+    - Install package: `pip install dist/motley_cue-$version.tar.gz`
 
 ### Configuration
 See [mapper/config.py:reload](motley_cue/mapper/config.py) for a list of config file locations.
@@ -23,11 +25,12 @@ export MOTLEY_CUE_CONFIG=$PWD/config_template.conf
 ```
 
 ### Running
-For quick testing, simply run with uvicorn (as user with permissions to add users) without SSL:
+For quick testing, simply run with uvicorn (as user with permissions to add users) without TLS:
 
 ```sh
 motley_cue_uvicorn
 ```
+The API will then be available at http://localhost:8080.
 
 ### Docker
 The full setup with docker: [motley_cue_docker](https://github.com/dianagudu/motley_cue_docker) image.
