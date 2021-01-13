@@ -10,10 +10,10 @@ def reload():
     """Reload configuration from disk.
 
     Config locations, by priority:
-    /etc/motley/motley.conf
+    /etc/motley_cue/motley_cue.conf
     $MOTLEY_CUE_CONFIG
-    ./motley.conf
-    ~/.config/motley/motley.conf
+    ./motley_cue.conf
+    ~/.config/motley_cue/motley_cue.conf
 
     processing is stopped, once a give file is found
     """
@@ -25,18 +25,21 @@ def reload():
     files = []
 
     # FIXME: hardcoded path for config file
-    files += [Path("/etc/motley/motley.conf")]
+    files += [Path("/etc/motley_cue/motley_cue.conf")]
     filename = os.environ.get("MOTLEY_CUE_CONFIG")
     if filename:
         files += [Path(filename)]
 
     files += [
-        Path('motley.conf'),
-        Path.home()/'.config'/'motley'/'motley.conf'
+        Path('motley_cue.conf'),
+        Path.home()/'.config'/'motley_cue'/'motley_cue.conf'
     ]
+
+    print(files)
 
     for f in files:
         if f.exists():
+            print(f)
             files_read = CONFIG.read(f)
             logger.debug(F"Read config from {files_read}")
             break

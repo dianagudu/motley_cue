@@ -18,18 +18,21 @@ api.include_router(admin.api,
 
 @api.get("/")
 async def read_root():
-    text = '''This is an API for mapping remote identities to local identities.
-    These endpoints are available:
-    /info           Service-specific information
-    /user           User API; requires valid access token of an authorized user
-    /admin          Admin API; available via admin credentials
-    /verify_user    Verifies if a given token belongs to a given local username
-    '''
-    return {"info": text}
+    return {
+        "description": "This is the user API for mapping remote identities to local identities.",
+        "usage": "All endpoints are available via a bearer token.",
+        "endpoints": {
+            "/info": "Service-specific information.",
+            "/user": "User API; requires valid access token of an authorised user.",
+            "/admin": "Admin API; requires valid access token of an authorised user with admin role.",
+            "/verify_user": "Verifies if a given token belongs to a given local account via 'username'."
+        }
+    }
 
 
-@api.get('/info')
-async def info():
+@api.get('/info', dependencies=[Depends(mapper.user_security)])
+@mapper.login_required()
+async def info(request: Request):
     return mapper.info()
 
 

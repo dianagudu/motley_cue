@@ -7,18 +7,13 @@
 
 import logging
 from enum import Enum
-from flaat import Flaat
+from flaat import Flaat, tokentools
 from ldf_adapter import User
 from ldf_adapter.results import ExceptionalResult
 from fastapi import Request
 from fastapi.security import HTTPBearer
 from .config import CONFIG, to_list, to_bool
 
-if CONFIG['mapper']['db'] == 'file':
-    import json
-    import pathlib
-elif CONFIG['mapper']['db'] == 'redis':
-    import redis
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +24,8 @@ class States(Enum):
     pending = 2,
     suspended = 3,
     expired = 4,
-    failed = 5
+    failed = 5,
+    get_status = 6
 
 
 class Mapper:
@@ -42,9 +38,6 @@ class Mapper:
         self.__admin_security = HTTPBearer()
         self.__flaat = FlaatWrapper()
         self.__lum = LUM()
-        self.__db = RedisMapperDB(**CONFIG['mapper.redis'])\
-            if CONFIG['mapper']['db'] == 'redis' \
-            else FileMapperDB(CONFIG['mapper.file']['location'])
 
     @property
     def user_security(self):
@@ -59,59 +52,46 @@ class Mapper:
         # supported IdPs, supported VOs, ...
         return {"info": "SSH"}
 
+    def login_required(self):
+        return self.__flaat.login_required()
+
     def authorized_login_required(self):
         return self.__flaat.authorized_login_required()
 
-    def get(self, request: Request):
-        local_username = self.__db.get(
-            self.__flaat.uid_from_request(request)
+    def authorised_admin_required(self):
+        return self.__flaat.authorised_admin_required()
+
+    def deploy(self, request: Request):
+        return self.__lum.reach_state(
+            self.__flaat.userinfo_from_request(request),
+            States.deployed
         )
-        # FIXME: get actual state
-        if local_username is None:
-            return {
-                "state": "not_deployed"
-            }
-        else:
-            return {
-                "username": local_username,
-                "state": "deployed"
-            }
 
     def reach_state(self, request: Request, state_target: States):
-        result = self.__lum.reach_state(
-            self.__flaat.userinfo_from_request(request),
+        return self.__lum.reach_state(
+            self.__flaat.uid_from_request(request),
             state_target
         )
-        logger.info(result)
-        unique_id = self.__flaat.uid_from_request(request)
-        if state_target == States.deployed and result['state'] == 'deployed':
-            local_username = result['credentials']['ssh_user']
-            logger.info(
-                f"Adding mapping for remote id {unique_id} to local id {local_username}")
-            self.__db.add(unique_id, local_username)
-        elif state_target == States.not_deployed and result['state'] == 'not_deployed':
-            logger.info(f"Removing local user {self.__db.get(unique_id)}")
-            self.__db.remove(unique_id)
-        else:
-            pass
-        return result
+
+    def reach_state_with_uid(self, sub: str, iss: str, state_target: States):
+        return self.__lum.reach_state(
+            {
+                "sub": sub,
+                "iss": iss
+            },
+            state_target
+        )
 
     def verify_user(self, request: Request, username: str):
-        local_username = self.__db.get(
-            self.__flaat.uid_from_request(request)
-        )
-        # FIXME: get actual state
-        if local_username is None:
-            return {
-                "verified": False,
-                "state": "not_deployed"
-            }
-        else:
-            verified = (local_username == username)
-            return {
-                "verified": verified,
-                "state": "deployed"
-            }
+        result = self.reach_state(request, States.get_status)
+        try:
+            local_username = result['message'].split()[1]
+        except Exception:
+            local_username = None
+        return {
+            "state": result['state'],
+            "verified": (local_username == username)
+        }
 
 
 class FlaatWrapper(Flaat):
@@ -179,6 +159,10 @@ class FlaatWrapper(Flaat):
             return self._return_formatter_wf("No authorisation info in config file", 401)
         return self.is_authorised()
 
+    def authorised_admin_required(self):
+        # FIXME
+        return self.login_required()
+
     def is_authorised(self):
         if self.__authorisation_info['aarc_g002_group']:
             return self.aarc_g002_group_required(
@@ -194,16 +178,28 @@ class FlaatWrapper(Flaat):
             )
 
     def userinfo_from_request(self, request: Request):
-        userinfo = self._get_all_info_from_request(request)
-        # FIX: iss not present in info from user endpoint
-        userinfo["iss"] = userinfo["body"]["iss"]
+        token = tokentools.get_access_token_from_request(request)
+        userinfo = self.get_info_from_userinfo_endpoints(token)
+        # add issuer to userinfo  -> needed by feudalAdapter
+        userinfo["iss"] = tokentools.get_issuer_from_accesstoken_info(token)
         return userinfo
 
     def uid_from_request(self, request: Request):
-        userinfo = self._get_all_info_from_request(request)
-        iss = userinfo["body"]["iss"]
-        sub = userinfo["body"]["sub"]
-        return iss+sub
+        token = tokentools.get_access_token_from_request(request)
+        # try to get it from access token (token already validated and user authorised)
+        try:
+            token_info = tokentools.get_accesstoken_info(token)
+            return {
+                "sub": token_info['body']['sub'],
+                "iss": token_info['body']['iss']
+            }
+        except Exception:
+            # go to user endpoint
+            userinfo = self.get_info_from_userinfo_endpoints(token)
+            return {
+                "sub": userinfo['sub'],
+                "iss": tokentools.get_issuer_from_accesstoken_info(token)
+            }
 
 
 class LUM:
@@ -234,87 +230,6 @@ class LUM:
             result = result.attributes
             logger.debug("Reached state '{state}': {message}".format(**result))
             return result
-
-
-# Simple Redis DB to store all mappings from remote to local identity
-class MapperDB:
-    def __init__(self):
-        pass
-
-    def get(self, unique_id):
-        return None
-
-    def add(self, unique_id, local_username):
-        pass
-
-    def remove(self, unique_id):
-        pass
-
-
-class FileMapperDB(MapperDB):
-    def __init__(self, filename):
-        super().__init__()
-        self.__filename = filename
-
-    def read_mappings(self):
-        if pathlib.Path(self.__filename).exists():
-            with open(self.__filename) as file:
-                mappings = json.load(file)
-        else:
-            mappings = {}
-        return mappings
-
-    def write_mappings(self, mappings):
-        with open(self.__filename, "w+") as file:
-            json.dump(mappings, file)
-
-    def get(self, unique_id):
-        try:
-            mappings = self.read_mappings()
-            return mappings[unique_id]
-        except Exception:
-            logger.warning(f"No mapping found for {unique_id}.")
-            return None
-
-    def add(self, unique_id, local_username):
-        try:
-            # these operations have to be atomic
-            mappings = self.read_mappings()
-            mappings[unique_id] = local_username
-            self.write_mappings(mappings)
-        except Exception:
-            logger.warning(
-                f"Something wentwrong when adding mapping {unique_id} to {local_username}.")
-
-    def remove(self, unique_id):
-        try:
-            # these operations have to be atomic
-            mappings = self.read_mappings()
-            del mappings[unique_id]
-            self.write_mappings(mappings)
-        except Exception:
-            logger.warning(
-                f"No mapping found for {unique_id}, cannot be removed.")
-
-
-class RedisMapperDB(MapperDB):
-    def __init__(self, endpoint='localhost', db=0, port=6379, password=''):
-        super().__init__()
-        self.__mappings = redis.StrictRedis(
-            host=endpoint,
-            db=db,
-            port=port,
-            password=password,
-            decode_responses=True)
-
-    def get(self, unique_id):
-        return self.__mappings.get(unique_id)
-
-    def add(self, unique_id, local_username):
-        self.__mappings.set(unique_id, local_username)
-
-    def remove(self, unique_id):
-        self.__mappings.delete(unique_id)
 
 
 mapper = Mapper()
