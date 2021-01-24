@@ -24,8 +24,15 @@ class States(Enum):
     pending = 2,
     suspended = 3,
     expired = 4,
-    failed = 5,
+    unknown = 5,
     get_status = 6
+
+
+class AdminActions(Enum):
+    suspend = 0,
+    expire = 1,
+    resume = 2,
+    undeploy = 3
 
 
 class Mapper:
@@ -37,7 +44,6 @@ class Mapper:
         self.__user_security = HTTPBearer()
         self.__admin_security = HTTPBearer()
         self.__flaat = FlaatWrapper()
-        self.__lum = LUM()
 
     @property
     def user_security(self):
@@ -61,26 +67,59 @@ class Mapper:
     def authorised_admin_required(self):
         return self.__flaat.authorised_admin_required()
 
-    def deploy(self, request: Request):
-        return self.__lum.reach_state(
-            self.__flaat.userinfo_from_request(request),
-            States.deployed
-        )
-
     def reach_state(self, request: Request, state_target: States):
-        return self.__lum.reach_state(
-            self.__flaat.uid_from_request(request),
-            state_target
-        )
-
-    def reach_state_with_uid(self, sub: str, iss: str, state_target: States):
-        return self.__lum.reach_state(
-            {
-                "sub": sub,
-                "iss": iss
+        if state_target == States.deployed:
+            userinfo = self.__flaat.userinfo_from_request(request)
+        else:
+            userinfo = self.__flaat.uid_from_request(request)
+        if userinfo is None:
+            logger.error("Cannot process null input")
+            return None
+        # build input for feudalAdapter
+        data = {
+            "state_target": state_target.name,
+            "user": {
+                "userinfo": userinfo,
             },
-            state_target
-        )
+        }
+        try:
+            logger.debug(f"Attempting to reach state '{state_target.name}'")
+            result = User(data).reach_state(data['state_target'])
+        except ExceptionalResult as result:
+            result = result.attributes
+            logger.debug("Reached state '{state}': {message}".format(**result))
+            return result
+        else:
+            result = result.attributes
+            logger.debug("Reached state '{state}': {message}".format(**result))
+            return result
+
+    def admin_action(self, sub: str, iss: str, action: AdminActions):
+        data = {
+            "user": {
+                "userinfo": {
+                    "sub": sub,
+                    "iss": iss
+                }
+            }
+        }
+        try:
+            if action == AdminActions.suspend:
+                result = User(data).reach_state(States.suspended.name)
+            elif action == AdminActions.expire:
+                result = User(data).reach_state(States.expired.name)
+            elif action == AdminActions.resume:
+                result = User(data).resume()
+            elif action == AdminActions.undeploy:
+                result = User(data).reach_state(States.not_deployed.name)
+        except ExceptionalResult as result:
+            result = result.attributes
+            logger.debug("Reached state '{state}': {message}".format(**result))
+            return result
+        else:
+            result = result.attributes
+            logger.debug("Reached state '{state}': {message}".format(**result))
+            return result
 
     def verify_user(self, request: Request, username: str):
         result = self.reach_state(request, States.get_status)
@@ -200,36 +239,6 @@ class FlaatWrapper(Flaat):
                 "sub": userinfo['sub'],
                 "iss": tokentools.get_issuer_from_accesstoken_info(token)
             }
-
-
-class LUM:
-    def __init__(self):
-        pass
-
-    def reach_state(self, userinfo, state_target: States):
-        data = {
-            "state_target": state_target.name,
-            "user": {
-                "userinfo": userinfo,
-            },
-        }
-
-        logger.debug(f"Attempting to reach state '{data['state_target']}'")
-
-        if data['user']['userinfo'] is None:
-            logger.error("Cannot process null input")
-            return None
-
-        try:
-            result = User(data).reach_state(data['state_target'])
-        except ExceptionalResult as result:
-            result = result.attributes
-            logger.debug("Reached state '{state}': {message}".format(**result))
-            return result
-        else:
-            result = result.attributes
-            logger.debug("Reached state '{state}': {message}".format(**result))
-            return result
 
 
 mapper = Mapper()

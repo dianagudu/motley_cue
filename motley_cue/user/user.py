@@ -15,10 +15,9 @@ async def read_root(request: Request):
         "endpoints": {
             "/get_status": "Get information about your local account.",
             "/deploy": "Provision local account.",
-            "/suspend": "Suspend local account.",
-            "/undeploy": "Deprovision local account."
+            "/suspend": "Suspend local account."
         }
-}
+    }
 
 
 @api.get("/get_status")
@@ -30,18 +29,10 @@ async def get_status(request: Request):
 @api.get("/deploy")
 @mapper.authorized_login_required()
 async def deploy(request: Request):
-    return mapper.deploy(request)
+    return mapper.reach_state(request, States.deployed)
 
 
 @api.get("/suspend")
 @mapper.authorized_login_required()
 async def suspend(request: Request):
-    return {
-        "message": "suspend not implemented"
-    }
-
-
-@api.get("/undeploy")
-@mapper.authorized_login_required()
-async def undeploy(request: Request):
-    return mapper.reach_state(request, States.not_deployed)
+    return mapper.reach_state(request, States.suspended)

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 
-from ..mapper import mapper, States
+from ..mapper import mapper, AdminActions
 
 
 api = APIRouter()
@@ -16,7 +16,7 @@ async def read_root(request: Request):
             "/undeploy": "Deprovision a local account.",
             "/suspend": "Suspends a local account.",
             "/resume": "Restores a suspended local account.",
-            "/expire": "Takes a local account into an “expired” state with limited capabilities."
+            "/expire": "Takes a local account into an 'expired' state with limited capabilities."
         }
     }
 
@@ -24,28 +24,22 @@ async def read_root(request: Request):
 @api.get("/undeploy")
 @mapper.authorised_admin_required()
 async def undeploy(request: Request, sub: str, iss: str):
-    return mapper.reach_state_with_uid(sub, iss, States.not_deployed)
+    return mapper.admin_action(sub, iss, AdminActions.undeploy)
 
 
 @api.get("/suspend")
 @mapper.authorised_admin_required()
 async def suspend(request: Request, sub: str, iss: str):
-    return {
-        "message": "suspend not implemented"
-    }
+    return mapper.admin_action(sub, iss, AdminActions.suspend)
 
 
 @api.get("/resume")
 @mapper.authorised_admin_required()
 async def resume(request: Request, sub: str, iss: str):
-    return {
-        "message": "resume not implemented"
-    }
+    return mapper.admin_action(sub, iss, AdminActions.resume)
 
 
 @api.get("/expire")
 @mapper.authorised_admin_required()
 async def expire(request: Request, sub: str, iss: str):
-    return {
-        "message": "expire not implemented"
-    }
+    return mapper.admin_action(sub, iss, AdminActions.expire)
