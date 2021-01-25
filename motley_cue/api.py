@@ -37,6 +37,6 @@ async def info(request: Request):
 
 
 @api.get('/verify_user', dependencies=[Depends(mapper.user_security)])
-@mapper.authorized_login_required()
+@mapper.authorised_login_required()
 async def verify_user(request: Request, username: str):
     return mapper.verify_user(request, username)

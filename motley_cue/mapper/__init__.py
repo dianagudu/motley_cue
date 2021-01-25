@@ -61,8 +61,8 @@ class Mapper:
     def login_required(self):
         return self.__flaat.login_required()
 
-    def authorized_login_required(self):
-        return self.__flaat.authorized_login_required()
+    def authorised_login_required(self):
+        return self.__flaat.authorised_login_required()
 
     def authorised_admin_required(self):
         return self.__flaat.authorised_admin_required()
@@ -191,7 +191,7 @@ class FlaatWrapper(Flaat):
             logger.warning(
                 "Missing or invalid authorisation information in config file, defaults to blocking all users.")
 
-    def authorized_login_required(self):
+    def authorised_login_required(self):
         if self.__authorise_all:
             return self.login_required()
         if self.__authorisation_info is None:
