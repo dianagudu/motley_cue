@@ -63,8 +63,8 @@ class Mapper:
     def login_required(self):
         return self.__flaat.login_required()
 
-    def authorised_login_required(self):
-        return self.__flaat.authorised_login_required()
+    def authorised_user_required(self):
+        return self.__flaat.authorised_user_required()
 
     def authorised_admin_required(self):
         return self.__flaat.authorised_admin_required()
@@ -161,14 +161,19 @@ class FlaatWrapper(Flaat):
             logger.warning(
                 "No OIDC client credentials, introspection endpoint cannot be used.")
 
+        self.__user_authorisation = self.__read_authorisation_info('mapper.flaat.authorisation')
+        self.__admin_authorisation = self.__read_authorisation_info('mapper.flaat.admin')
+
+    @staticmethod
+    def __read_authorisation_info(config_section):
         try:
-            self.__authorise_all = to_bool(
-                CONFIG['mapper.flaat.authorisation']['authorise_all'])
+            authorise_all = to_bool(
+                CONFIG[config_section]['authorise_all'])
         except Exception:
-            self.__authorise_all = False
+            authorise_all = False
 
         try:
-            authorisation_info = CONFIG['mapper.flaat.authorisation']
+            authorisation_info = CONFIG[config_section]
             # parse match option, defaults to all when missing
             try:
                 match = authorisation_info['match']
@@ -182,40 +187,44 @@ class FlaatWrapper(Flaat):
                     authorisation_info['aarc_g002_group'])
             except Exception:
                 aarc_g002_group = False
-            self.__authorisation_info = {
+            info = {
                 'group': to_list(authorisation_info['group']),
                 'claim': authorisation_info['claim'],
                 'match': match,
                 'aarc_g002_group': aarc_g002_group
             }
         except Exception:
-            self.__authorisation_info = None
+            info = None
             logger.warning(
                 "Missing or invalid authorisation information in config file, defaults to blocking all users.")
 
-    def authorised_login_required(self):
-        if self.__authorise_all:
-            return self.login_required()
-        if self.__authorisation_info is None:
-            return self._return_formatter_wf("No authorisation info in config file", 401)
-        return self.is_authorised()
+        return {
+            'authorise_all': authorise_all,
+            'info': info
+        }
+
+    def authorised_user_required(self):
+        return self.is_authorised(self.__user_authorisation)
 
     def authorised_admin_required(self):
-        # FIXME
-        return self.login_required()
+        return self.is_authorised(self.__admin_authorisation)
 
-    def is_authorised(self):
-        if self.__authorisation_info['aarc_g002_group']:
+    def is_authorised(self, authorisation):
+        if authorisation['authorise_all']:
+            return self.login_required()
+        if authorisation['info'] is None:
+            return self._return_formatter_wf("No authorisation info in config file", 401)
+        if authorisation['info']['aarc_g002_group']:
             return self.aarc_g002_group_required(
-                group=self.__authorisation_info['group'],
-                claim=self.__authorisation_info['claim'],
-                match=self.__authorisation_info['match']
+                group=authorisation['info']['group'],
+                claim=authorisation['info']['claim'],
+                match=authorisation['info']['match']
             )
         else:
             return self.group_required(
-                group=self.__authorisation_info['group'],
-                claim=self.__authorisation_info['claim'],
-                match=self.__authorisation_info['match']
+                group=authorisation['info']['group'],
+                claim=authorisation['info']['claim'],
+                match=authorisation['info']['match']
             )
 
     def userinfo_from_request(self, request: Request):
