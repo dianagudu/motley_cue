@@ -8,12 +8,14 @@
 import logging
 from enum import Enum
 from flaat import Flaat, tokentools
-from ldf_adapter import User
-from ldf_adapter.results import ExceptionalResult
 from fastapi import Request
 from fastapi.security import HTTPBearer
 from .config import CONFIG, to_list, to_bool
 
+from feudal_globalconfig import globalconfig
+globalconfig.config['parse_commandline_args'] = False
+from ldf_adapter import User
+from ldf_adapter.results import ExceptionalResult
 
 logger = logging.getLogger(__name__)
 
