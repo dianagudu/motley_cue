@@ -15,8 +15,7 @@ async def read_root(request: Request):
         "endpoints": {
             "/undeploy": "Deprovision a local account.",
             "/suspend": "Suspends a local account.",
-            "/resume": "Restores a suspended local account.",
-            "/expire": "Takes a local account into an 'expired' state with limited capabilities."
+            "/resume": "Restores a suspended local account."
         }
     }
 
@@ -37,9 +36,3 @@ async def suspend(request: Request, sub: str, iss: str):
 @mapper.authorised_admin_required()
 async def resume(request: Request, sub: str, iss: str):
     return mapper.admin_action(sub, iss, AdminActions.resume)
-
-
-@api.get("/expire")
-@mapper.authorised_admin_required()
-async def expire(request: Request, sub: str, iss: str):
-    return mapper.admin_action(sub, iss, AdminActions.expire)

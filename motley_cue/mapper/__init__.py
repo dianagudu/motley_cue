@@ -25,16 +25,15 @@ class States(Enum):
     not_deployed = 1,
     pending = 2,
     suspended = 3,
-    expired = 4,
+    limited = 4,
     unknown = 5,
     get_status = 6
 
 
 class AdminActions(Enum):
     suspend = 0,
-    expire = 1,
-    resume = 2,
-    undeploy = 3
+    resume = 1,
+    undeploy = 2
 
 
 class Mapper:
@@ -108,8 +107,6 @@ class Mapper:
         try:
             if action == AdminActions.suspend:
                 result = User(data).reach_state(States.suspended.name)
-            elif action == AdminActions.expire:
-                result = User(data).reach_state(States.expired.name)
             elif action == AdminActions.resume:
                 result = User(data).resume()
             elif action == AdminActions.undeploy:
