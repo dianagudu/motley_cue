@@ -5,15 +5,14 @@ import logging
 
 CONFIG = ConfigParser()
 
-
 def reload():
     """Reload configuration from disk.
 
     Config locations, by priority:
-    /etc/motley_cue/motley_cue.conf
     $MOTLEY_CUE_CONFIG
     ./motley_cue.conf
     ~/.config/motley_cue/motley_cue.conf
+    /etc/motley_cue/motley_cue.conf
 
     processing is stopped, once a give file is found
     """
@@ -24,8 +23,6 @@ def reload():
     logger = logging.getLogger(__name__)
     files = []
 
-    # FIXME: hardcoded path for config file
-    files += [Path("/etc/motley_cue/motley_cue.conf")]
     filename = os.environ.get("MOTLEY_CUE_CONFIG")
     if filename:
         files += [Path(filename)]
@@ -35,11 +32,10 @@ def reload():
         Path.home()/'.config'/'motley_cue'/'motley_cue.conf'
     ]
 
-    print(files)
+    files += [Path("/etc/motley_cue/motley_cue.conf")]
 
     for f in files:
         if f.exists():
-            print(f)
             files_read = CONFIG.read(f)
             logger.debug(F"Read config from {files_read}")
             break
