@@ -57,7 +57,16 @@ class Mapper:
     def info(self):
         # here we can return service name, description,
         # supported IdPs, supported VOs, ...
-        return {"info": "SSH"}
+        try:
+            login_info = CONFIG['backend.{}.login_info'
+                                .format(CONFIG['ldf_adapter']['backend'])]
+        except Exception:
+            login_info = {}
+        return {
+            "login info": login_info,
+            "supported IdPs": self.__flaat.trusted_op_list,
+            "authorisation": self.__flaat.str_repr_user_authorisation
+        }
 
     def login_required(self):
         return self.__flaat.login_required()
@@ -158,8 +167,18 @@ class FlaatWrapper(Flaat):
             logger.warning(
                 "No OIDC client credentials, introspection endpoint cannot be used.")
 
-        self.__user_authorisation = self.__read_authorisation_info('mapper.flaat.authorisation')
-        self.__admin_authorisation = self.__read_authorisation_info('mapper.flaat.admin')
+        self.__user_authorisation = self.__read_authorisation_info(
+            'mapper.flaat.authorisation')
+        self.__admin_authorisation = self.__read_authorisation_info(
+            'mapper.flaat.admin')
+
+    @property
+    def str_repr_user_authorisation(self):
+        return self.__authorisation_str_repr(self.__user_authorisation)
+
+    @property
+    def str_repr_admin_authorisation(self):
+        return self.__authorisation_str_repr(self.__admin_authorisation)
 
     @staticmethod
     def __read_authorisation_info(config_section):
@@ -172,21 +191,13 @@ class FlaatWrapper(Flaat):
         try:
             authorisation_info = CONFIG[config_section]
             # parse match option, defaults to all when missing
-            try:
-                match = authorisation_info['match']
-                match = match if match == 'all' or match == 'one' else int(
-                    match)
-            except Exception:
-                match = 'all'
+            match = authorisation_info.get('match', 'all')
+            match = match if match == 'all' or match == 'one' else int(match)
             # parse aarc_g002_option, defaults to False when missing
-            try:
-                aarc_g002_group = to_bool(
-                    authorisation_info['aarc_g002_group'])
-            except Exception:
-                aarc_g002_group = False
+            aarc_g002_group = to_bool(authorisation_info.get('aarc_g002_group', False))
             info = {
-                'group': to_list(authorisation_info['group']),
-                'claim': authorisation_info['claim'],
+                'group': to_list(authorisation_info['group']),  # required
+                'claim': authorisation_info['claim'],  # required
                 'match': match,
                 'aarc_g002_group': aarc_g002_group
             }
@@ -199,6 +210,23 @@ class FlaatWrapper(Flaat):
             'authorise_all': authorise_all,
             'info': info
         }
+
+    @staticmethod
+    def __authorisation_str_repr(authorisation):
+        try:
+            if authorisation['authorise_all']:
+                return {"info": "all users from supported IdPs are authorised"}
+            elif authorisation['info'] is None:
+                return {"info": "no one is authorised"}
+            else:
+                return {
+                    "info": "user must be in " +
+                            str(authorisation['info']['match']) +
+                            " of the supported VOs",
+                    "supported VOs": authorisation['info']['group']
+                }
+        except Exception:
+            return {"info": "invalid authorisation => no one is authorised"}
 
     def authorised_user_required(self):
         return self.is_authorised(self.__user_authorisation)
