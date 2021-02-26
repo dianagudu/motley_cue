@@ -14,13 +14,10 @@ dh_venv_safe_symlinks_remove() {
     cd $dh_venv_install_dir/lib
     for i in `seq 3 12`; do
         PYTHONDIR="python3.${i}"
-        echo $PYTHONDIR
         test -e $PYTHONDIR && {
             test -L $PYTHONDIR && {
                 # If it exists and it is a symlink, then we remove it
-                echo "removing $PYTHONDIR"
                 rm -f $PYTHONDIR
-                echo "done"
             } || true
         } || true
     done
