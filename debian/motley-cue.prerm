@@ -18,9 +18,11 @@ dh_venv_safe_symlinks_remove() {
         test -e $PYTHONDIR && {
             test -L $PYTHONDIR && {
                 # If it exists and it is a symlink, then we remove it
-                rm $PYTHONDIR
-            }
-        }
+                echo "removing $PYTHONDIR"
+                rm -f $PYTHONDIR
+                echo "done"
+            } || true
+        } || true
     done
 }
 
