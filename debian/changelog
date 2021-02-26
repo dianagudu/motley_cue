@@ -1,0 +1,6 @@
+motley-cue (0.0.4-1) UNRELEASED; urgency=medium
+
+  [ Marcus Hardt ]
+  * Initial go for packageing
+  
+ -- Marcus Hardt <marcus@hardt-it.de>  Fri, 26 Feb 2021 15:26:37 +0100
