@@ -65,8 +65,7 @@ dh_venv_safe_lib_symlinks_update() {
         echo "Can not find python package dir"
         exit 44
     }
-    echo "Package was packed for $PKG_PYTHONDIR adjusting symlinks for
-    installed python${PYTHON3_MAJOR}.${PYTHON3_MINOR}"
+    echo "Package was packed for $PKG_PYTHONDIR adjusting symlinks for installed python${PYTHON3_MAJOR}.${PYTHON3_MINOR}"
 
     ln -s $PKG_PYTHONDIR python${PYTHON3_MAJOR}.${PYTHON3_MINOR} 
 }
