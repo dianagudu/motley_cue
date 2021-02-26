@@ -10,3 +10,9 @@ __pycache__/*
 dist/*
 AUTHORS
 ChangeLog
+debian/.debhelper
+debian/files
+debian/debhelper-build-stamp
+debian/motley-cue
+debian/*debhelper
+debian/*substvars
