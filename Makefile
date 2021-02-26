@@ -1,7 +1,8 @@
 PKG_NAME  = motley-cue
 PKG_NAME_UNDERSCORES  = motley_cue
-VERSION := $(shell ./setup.py --version)
-VERSION := 0.0.4
+#VERSION := $(shell ./setup.py --version)
+VERSION := $(shell git tag -l  | tail -n 1 | sed s/v//)
+#VERSION := 0.0.4
 
 default: sdist bdist_wheel
 
