@@ -1,16 +1,22 @@
+###############################################
+#DEBHELPER#
+###############################################
 
 dh_venv_safe_symlinks_remove() {
     # Remove all symlinked python dirs
-    cd $dh_venv_install_dir/lib
-    for i in `seq 3 12`; do
-        PYTHONDIR="python3.${i}"
-        test -e $PYTHONDIR && {
-            test -L $PYTHONDIR && {
-                # If it exists and it is a symlink, then we remove it
-                rm -f $PYTHONDIR
+    SAVED_DIR=`pwd`
+        cd $dh_venv_install_dir/lib
+        for i in `seq 3 12`; do
+            PYTHONDIR="python3.${i}"
+            test -e $PYTHONDIR && {
+                test -L $PYTHONDIR && {
+                    # If it exists and it is a symlink, then we remove it
+                    rm -f $PYTHONDIR
+                } || true
             } || true
-        } || true
-    done
+        done
+    cd $SAVED_DIR
+
 }
 case "$1" in
     remove|deconfigure)
@@ -29,7 +35,3 @@ case "$1" in
         #exit 1
         ;;
 esac
-
-###############################################
-#DEBHELPER#
-###############################################
