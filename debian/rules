@@ -58,6 +58,7 @@ DH_VENV_ARGS=--setuptools --builtin-venv --python=$(SNAKE) $(EXTRA_REQUIREMENTS)
 			# --extra-pip-arg "--no-binary=psycopg2" \
 			# -v
 export DH_VIRTUALENV_INSTALL_ROOT=usr/lib/
+export DESTDIR=debian/$(PACKAGE)
 #PACKAGE=$(shell dh_listpackages)
 #VERSION=$(shell $(SNAKE) setup.py --version)
 #SDIST_DIR=debian/$(PACKAGE)-$(VERSION)
