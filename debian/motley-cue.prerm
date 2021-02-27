@@ -1,14 +1,4 @@
 
-# Automatically added by dh_python2:
-# dh-virtualenv prerm autoscript
-set -e
-dh_venv_install_dir='/opt/venvs/motley-cue'
-dh_venv_package='motley-cue'
-
-# set to empty to enable verbose output
-test "${DH_VERBOSE:-0}" = "1" && DH_VENV_DEBUG="" || DH_VENV_DEBUG=:
-$DH_VENV_DEBUG set -x
-
 dh_venv_safe_symlinks_remove() {
     # Remove all symlinked python dirs
     cd $dh_venv_install_dir/lib
@@ -22,10 +12,6 @@ dh_venv_safe_symlinks_remove() {
         } || true
     done
 }
-
-
-
-
 case "$1" in
     remove|deconfigure)
         $DH_VENV_DEBUG echo "$0 $1 called with $# args:" "$@"
@@ -44,7 +30,6 @@ case "$1" in
         ;;
 esac
 
-$DH_VENV_DEBUG set +x
-# END dh-virtualenv prerm autoscript
-
-# End automatically added section
+###############################################
+#DEBHELPER#
+###############################################
