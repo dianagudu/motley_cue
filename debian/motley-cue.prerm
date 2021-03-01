@@ -1,0 +1,37 @@
+###############################################
+#DEBHELPER#
+###############################################
+
+dh_venv_safe_symlinks_remove() {
+    # Remove all symlinked python dirs
+    SAVED_DIR=`pwd`
+        cd $dh_venv_install_dir/lib
+        for i in `seq 3 12`; do
+            PYTHONDIR="python3.${i}"
+            test -e $PYTHONDIR && {
+                test -L $PYTHONDIR && {
+                    # If it exists and it is a symlink, then we remove it
+                    rm -f $PYTHONDIR
+                } || true
+            } || true
+        done
+    cd $SAVED_DIR
+
+}
+case "$1" in
+    remove|deconfigure)
+        $DH_VENV_DEBUG echo "$0 $1 called with $# args:" "$@"
+        rm -rf "${dh_venv_install_dir:-/should_be_an_arg}/bin" >/dev/null 2>&1 || true
+        rm -rf "${dh_venv_install_dir:-/should_be_an_arg}/lib" >/dev/null 2>&1 || true
+        ;;
+
+    upgrade|failed-upgrade)
+        $DH_VENV_DEBUG echo "$0 $1 called with $# args:" "$@"
+        dh_venv_safe_symlinks_remove
+        ;;
+
+    *)
+        #echo >&2 "ERROR:" $(basename "$0") "called with unknown argument '$1'"
+        #exit 1
+        ;;
+esac

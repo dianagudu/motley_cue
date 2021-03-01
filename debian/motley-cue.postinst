@@ -1,0 +1,34 @@
+###############################################
+#DEBHELPER#
+###############################################
+
+dh_venv_safe_lib_symlinks_update() {
+    SAVED_DIR=`pwd`
+        cd $dh_venv_install_dir/lib
+        PKG_PYTHONDIR=""
+        PYTHON3_MAJOR=`python3 --version| cut -d\  -f 2 | cut -d\. -f 1`
+        PYTHON3_MINOR=`python3 --version| cut -d\  -f 2 | cut -d\. -f 2`
+        for PYTHONDIR in python*; do
+            test -e $PYTHONDIR && {
+                test -L $PYTHONDIR || {
+                    # If it exists but is not a symlink, then we found the
+                    # Python dir for the version this package was created for
+                    PKG_PYTHONDIR=$PYTHONDIR
+                    #echo "PKG_PYTHONDIR: $PKG_PYTHONDIR"
+                } || true
+            } || true
+        done
+        test -z $PKG_PYTHONDIR && {
+            echo "Can not find python package dir"
+            exit 44
+        }
+        echo "Package was packed for $PKG_PYTHONDIR adjusting symlinks for installed python${PYTHON3_MAJOR}.${PYTHON3_MINOR}"
+
+        ln -s $PKG_PYTHONDIR python${PYTHON3_MAJOR}.${PYTHON3_MINOR} 
+    cd $SAVED_DIR
+}
+case "$1" in
+    configure|triggered|reconfigure)
+        dh_venv_safe_lib_symlinks_update
+        ;;
+esac
