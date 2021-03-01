@@ -1,4 +1,4 @@
-./ldf_adapter-dist/feudalAdapter.tar.gz
+feudalAdapter
 flaat
 fastapi
 uvicorn
