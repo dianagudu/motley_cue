@@ -1,0 +1,9 @@
+FROM debian:testing
+
+RUN apt-get update && apt-get upgrade -y && apt-get install -y build-essential\
+    dh-make quilt python3-virtualenv dh-virtualenv python3-venv devscripts git
+
+RUN git clone https://github.com/dianagudu/motley_cue.git
+RUN cd motley_cue && make debsource && dpkg-buildpackage -uc -us && \
+    mkdir /dist && cp /motley-cue[-_]* /dist && \
+    dpkg-deb -I /dist/motley-cue_*.deb
