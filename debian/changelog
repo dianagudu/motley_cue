@@ -1,6 +1,10 @@
-motley-cue (0.0.7-3) UNRELEASED; urgency=medium
+motley-cue (0.0.8) UNRELEASED; urgency=medium
 
   [ Marcus Hardt ]
   * Initial go for packageing
   
- -- Marcus Hardt <marcus@hardt-it.de>  Fri, 26 Feb 2021 15:26:37 +0100
+  [ Diana Gudu ]
+  * New version number
+  * Install config files in /etc
+
+ -- Diana Gudu <diana.gudu@kit.edu>  Wed, 03 Mar 2021 11:05:32 +0000
