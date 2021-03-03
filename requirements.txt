@@ -1,7 +1,5 @@
 feudalAdapter
 flaat
 fastapi
-uvicorn
-uvloop
-httptools
+uvicorn[standard]
 gunicorn
