@@ -92,10 +92,12 @@ necessary. The examples assume a python virtualenv at `/usr/lib/motley-cue`.
 
 #### nginx
 
-A site configuration is provided at [etc/nginx.motley_cue](etc/nginx.motley_cue):
-```
+A site configuration is provided at [etc/nginx.motley_cue](etc/nginx.motley_cue). 
+Copy it to the appropriate location and disable the default site if necessary.
+```sh
 cp etc/nginx.motley_cue /etc/nginx/sites-available/
 ln -s /etc/nginx/sites-available/nginx.motley_cue /etc/nginx/sites-enabled/nginx.motley_cue
+rm /etc/nginx/sites-enabled/default
 ```
 
 It is highly recommented to use HTTPS. The site file also provides an example
