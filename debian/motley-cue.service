@@ -1,5 +1,6 @@
 [Unit]
 Description=motley_cue with gunicorn service
+Requires=motley-cue.socket nginx.service
 
 [Service]
 User=root
@@ -8,3 +9,5 @@ WorkingDirectory=/usr/lib/motley-cue
 EnvironmentFile=/etc/motley_cue/motley_cue.env
 ExecStart=/usr/lib/motley-cue/bin/gunicorn motley_cue.api:api -k "uvicorn.workers.UvicornWorker" --config /etc/motley_cue/gunicorn.conf.py
 
+[Install]
+WantedBy=multi-user.target
