@@ -6,5 +6,6 @@ motley-cue (0.0.9-1) UNRELEASED; urgency=medium
   [ Diana Gudu ]
   * New version number
   * Install config files in /etc
+  * Add nginx proxy for gunicorn
 
- -- Diana Gudu <diana.gudu@kit.edu>  Wed, 03 Mar 2021 11:05:32 +0000
+ -- Diana Gudu <diana.gudu@kit.edu>  Fri, 05 Mar 2021 17:49:36 +0000
