@@ -7,7 +7,7 @@ Standards-Version: 4.5.0
 Vcs-Git: https://github.com/dianagudu/motley_cue.git
 Vcs-Browser: https://github.com/dianagudu/motley_cue
 Rules-Requires-Root: no
-Build-Depends: debhelper-compat (= 13),
+Build-Depends: debhelper-compat (= 12),
                fakeroot,
                devscripts,
                dh-virtualenv,
