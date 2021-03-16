@@ -16,6 +16,8 @@ from feudal_globalconfig import globalconfig
 globalconfig.config['parse_commandline_args'] = False
 from ldf_adapter import User
 from ldf_adapter.results import ExceptionalResult
+from ldf_adapter.config import CONFIG as LDF_ADAPTER_CONFIG
+
 
 logger = logging.getLogger(__name__)
 
@@ -58,8 +60,8 @@ class Mapper:
         # here we can return service name, description,
         # supported IdPs, supported VOs, ...
         try:
-            login_info = CONFIG['backend.{}.login_info'
-                                .format(CONFIG['ldf_adapter']['backend'])]
+            login_info = LDF_ADAPTER_CONFIG['backend.{}.login_info'
+                                            .format(LDF_ADAPTER_CONFIG['ldf_adapter']['backend'])]
         except Exception:
             login_info = {}
         return {
