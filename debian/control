@@ -10,11 +10,16 @@ Rules-Requires-Root: no
 Build-Depends: debhelper-compat (= 12),
                fakeroot,
                devscripts,
-               dh-virtualenv,
+               dh-virtualenv (>= 1.0),
                python3,
-               python3-venv,
                python3-dev,
-               tar
+               python3-pip,
+               python3-setuptools,
+               python3-venv,
+               tar,
+               debhelper (>= 9),
+               python3,
+               libffi-dev
 
 Package: motley-cue
 Architecture: any
@@ -22,6 +27,6 @@ Pre-Depends: dpkg (>= 1.16.1), python3, python3-venv, ${misc:Pre-Depends}
 Depends: ${misc:Depends}, nginx
 Recommends: pam-ssh
 Description: Mapper Oidc To Local idEntitY with loCal User managEment
- This tool provides an OIDC-protecte REST interface that allows requesting 
+ This tool provides an OIDC-protecte REST interface that allows requesting
  the creation, deletion, and information of a user-account.
 
