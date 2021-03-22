@@ -55,3 +55,13 @@ debsource: distclean preparedeb
 deb: cleanapi create_obj_dir_structure preparedeb
 	dpkg-buildpackage -i -b -uc -us
 	@echo "Success: DEBs are in parent directory"
+
+docker_images:
+	docker build --tag debian_bullseye -f Dockerfile.build.debian.bullseye .
+	docker build --tag debian_buster -f Dockerfile.build.debian.buster .
+	docker build --tag debian_stretch -f Dockerfile.build.debian.stretch .
+	docker build --tag ubuntu_xenial -f Dockerfile.build.ubuntu.xenial .
+	docker build --tag ubuntu_bionic -f Dockerfile.build.ubuntu.bionic .
+	docker build --tag ubuntu_focal -f Dockerfile.build.ubuntu.focal .
+	docker build --tag centos7 -f Dockerfile.build.centos.7 .
+	docker build --tag centos8 -f Dockerfile.build.centos.8 .
