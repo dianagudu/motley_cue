@@ -68,6 +68,11 @@ systemctl start motley-cue
 
 This will start the `nginx` server too and serve requests on port 80.
 
+You might need to disable the default site in nginx:
+```sh
+rm /etc/nginx/sites-enabled/default
+```
+
 For more details (or other Linux distributions), keep on reading.
 
 #### gunicorn
