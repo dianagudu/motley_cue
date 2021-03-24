@@ -100,7 +100,7 @@ ln -s /etc/nginx/sites-available/nginx.motley_cue /etc/nginx/sites-enabled/nginx
 rm /etc/nginx/sites-enabled/default
 ```
 
-It is highly recommented to use HTTPS. The site file also provides an example
+It is highly recommended to use HTTPS. The site file also provides an example
 configuration for that in the comments. You just need to generate certificates
 for your server. Probably the simplest way to do that is by  using 
 https://letsencrypt.org/.
