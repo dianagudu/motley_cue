@@ -48,9 +48,9 @@ tox:
 	tox -e py39
 
 # Dockers
-dockerised_all_packages: dockerised_deb_debian_buster dockerised_deb_debian_bullseye dockerised_deb_ubuntu_bionic dockerised_deb_ubuntu_focal dockerised_rpm_centos7 dockerised_rpm_centos8
+dockerised_all_packages: dockerised_deb_debian_buster dockerised_deb_debian_bullseye dockerised_deb_ubuntu_bionic dockerised_deb_ubuntu_focal dockerised_rpm_centos8
 
-docker_images: docker_centos8 docker_centos7 docker_debian_bullseye docker_debian_buster docker_ubuntu_bionic docker_ubuntu_focal
+docker_images: docker_centos8 docker_debian_bullseye docker_debian_buster docker_ubuntu_bionic docker_ubuntu_focal
 docker_debian_buster:
 	echo "\ndebian_buster"
 	@echo "FROM debian:buster\n"\
@@ -89,13 +89,6 @@ docker_ubuntu_focal:
 		"python3-virtualenv python3-venv devscripts git "\
 		"python3 python3-dev python3-pip python3-setuptools "| \
 	docker build --tag ubuntu_focal -f - .
-docker_centos7:
-	echo "\ncentos7"
-	@echo "FROM centos:7\n"\
-	"RUN yum -y install make rpm-build\n"\
-	"RUN yum -y groups mark convert\n"\
-	"RUN yum -y groupinstall \"Development tools\"\n" | \
-	docker build --tag centos7 -f - .
 docker_centos8:
 	echo "\ncentos8"
 	@echo "FROM centos:8\n"\
@@ -121,11 +114,6 @@ dockerised_deb_ubuntu_bionic: docker_ubuntu_bionic
 dockerised_deb_ubuntu_focal: docker_ubuntu_focal
 	@docker run -it --rm -v ${DOCKER_BASE}:/home/build ubuntu_focal \
 		/home/build/${PACKAGE}/build.sh ${PACKAGE} ubuntu_focal
-
-.PHONY: dockerised_rpm_centos7
-dockerised_rpm_centos7: docker_centos7
-	@docker run -it --rm -v ${DOCKER_BASE}:/home/build centos7 \
-		/home/build/${PACKAGE}/build.sh ${PACKAGE} centos7
 
 .PHONY: dockerised_rpm_centos8
 dockerised_rpm_centos8: docker_centos8
