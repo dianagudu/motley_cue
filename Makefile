@@ -11,6 +11,7 @@ PACKAGE=`basename ${PWD}`
 SRC_TAR:=$(PKG_NAME).tar
 
 
+### Actual targets
 default: sdist bdist_wheel
 
 sdist:
@@ -120,6 +121,14 @@ dockerised_rpm_centos8: docker_centos8
 	@docker run -it --rm -v ${DOCKER_BASE}:/home/build centos8 \
 		/home/build/${PACKAGE}/build.sh ${PACKAGE} centos8
 
+.PHONE: publish-to-repo
+publish-to-repo:
+	@scp ../results/centos8/* build@repo.data.kit.edu:/var/www/centos/centos8
+	@scp ../results/debian_buster/* build@repo.data.kit.edu:/var/www/debian/buster
+	@scp ../results/debian_bullseye/* build@repo.data.kit.edu:/var/www/debian/bullseye
+	@scp ../results/ubuntu_bionic/* build@repo.data.kit.edu:/var/www/ubuntu/bionic 
+	@scp ../results/ubuntu_focal/* build@repo.data.kit.edu:/var/www/ubuntu/focal
+
 # Debian Packaging
 
 .PHONY: preparedeb
@@ -142,8 +151,6 @@ deb: cleanapi create_obj_dir_structure preparedeb
 .PHONY: srctar
 srctar:
 	(cd ..; tar cf $(BASENAME)/$(SRC_TAR) $(PKG_NAME_UNDERSCORES) --transform='s^${PKG_NAME_UNDERSCORES}^${PKG_NAME}-$(VERSION)^')
-	#(cd ..; tar cf $(BASENAME)/$(SRC_TAR) $(PKG_NAME) --transform='s/${PKG_NAME_UNDERSCORES}/${PKG_NAME}-$(VERSION)/')
-	# motley_cue => motley-cue-0.0.9
 	mkdir -p rpm/rpmbuild/SOURCES
 	mv $(SRC_TAR) rpm/rpmbuild/SOURCES/
 
