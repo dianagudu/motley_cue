@@ -16,3 +16,4 @@ debian/debhelper-build-stamp
 debian/motley-cue
 debian/*debhelper
 debian/*substvars
+*.swp
