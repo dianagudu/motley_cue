@@ -1,6 +1,7 @@
 FROM centos:8
 
 RUN yum install -y make rpm-build
+RUN dnf -y group install "Development Tools"
 
 #RUN apt-get update && apt-get upgrade -y && apt-get install -y build-essential\
 #    dh-make quilt python3-virtualenv dh-virtualenv python3-venv devscripts git
