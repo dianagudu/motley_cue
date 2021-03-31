@@ -1,13 +1,16 @@
 #!/bin/bash
 
 ### Build using:
-# DIST=debian_bullseye 
-# docker run -it --rm -v `dirname $PWD`:/home/build $DIST /home/build/motley_cue/build.sh `basename $PWD` $DIST
-# DIST=ubuntu_bionic; # docker run -it --rm -v `dirname $PWD`:/home/build $DIST /home/build/`basename $PWD`/build.sh `basename $PWD` $DIST
 
+#DIST=ubuntu_bionic ; docker run -it --rm -v `dirname $PWD`:/home/build $DIST /home/build/`basename $PWD`/build.sh `basename $PWD` $DIST
+
+## ASSUMPTION: /home/build/$PACKAGE holds the sources for the package to be built
+## ASSUMPTION: /home/build is on the host system.
+
+BASE="/home/build"
 PACKAGE=$1
 DIST=$2
-OUTPUT="../results"
+OUTPUT="$BASE/results"
 
 echo "PACKAGE: $PACKAGE"
 echo "DIST: $DIST"
@@ -17,18 +20,31 @@ test -z $DIST && {
     exit
 }
 
+common_prepare_dirs() {
+    mkdir -p /tmp/build
+    mkdir -p $OUTPUT/$DIST
+    cp -af $BASE/$PACKAGE /tmp/build
+    cd /tmp/build/$PACKAGE 
+}
+common_fix_output_permissions() {
+    UP_UID=`stat -c '%u' $BASE`
+    UP_GID=`stat -c '%g' $BASE`
+    chown $UP_UID:$UP_GID $OUTPUT
+    chown -R $UP_UID:$UP_GID $OUTPUT/$DIST
+}
 debian_install_dependencies() {
     apt-get -y install libffi-dev  \
         python3 python3-dev python3-pip python3-setuptools
-    }
+}
 debian_build_package() {
     make debsource && \
     dpkg-buildpackage -uc -us
 }
 
 debian_copy_output() {
-    mv ../motley-cue_* $OUTPUT/$DIST
-    mv ../motley-cue-dbgsym_* $OUTPUT/$DIST
+    ls -l ..
+    mv ../$PACKAGE_* $OUTPUT/$DIST
+    mv ../${PACKAGE}-dbgsym_* $OUTPUT/$DIST 2>/dev/null
 }
 ubuntu_focal_install_dependencies() {
     apt-get update
@@ -39,11 +55,27 @@ ubuntu_focal_install_dependencies() {
     apt-get -y install dh-virtualenv
 }
 
-cd /home/build/$PACKAGE 
-mkdir -p $OUTPUT/$DIST
+centos8_install_dependencies() {
+    yum -y install python3 python3-devel python3-pip python3-setuptools \
+        python3-virtualenv python3-pip
+    pip3 install -U pip
+}
+rpm_build_package() {
+    cd /tmp/build/$PACKAGE 
+    #make srctar
+    make rpm
+}
+rpm_copy_output() {
+    ls -l rpm/rpmbuild/RPMS/*/*
+    echo "-----"
+    mv rpm/rpmbuild/RPMS/*/*rpm $OUTPUT/$DIST
+}
+
+###########################################################################
+common_prepare_dirs
 
 case "$DIST" in
-    debian_buster|debian_bullseye|debian_stretch|ubuntu_bionic)
+    debian_buster|debian_bullseye|ubuntu_bionic)
         debian_install_dependencies
         debian_build_package
         debian_copy_output
@@ -54,7 +86,11 @@ case "$DIST" in
         debian_build_package
         debian_copy_output
     ;;
+    centos8)
+        centos8_install_dependencies
+        rpm_build_package
+        rpm_copy_output
+    ;;
 esac
 
-
-
+common_fix_output_permissions
