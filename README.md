@@ -139,12 +139,17 @@ compromised):
 
 ## Building the package in a docker container
 
-To build the deb package for Debian testing, a Dockerfile is provided:
+To build the supported packages, a Makefile is provided, which uses docker
+for building:
 ```
-docker build --tag motley_cue_debianisation -f Dockerfile.build.debian .
+make dockerised_<name>
 ```
+Where `<name>` can be one of:
+- `debian_buster`
+- `debian_bullseye`
+- `ubuntu_bionic`
+- `ubuntu_focal`
+- `centos8`
+- all_packages (to build all of the above)
 
-The resulting files must be copied out of the build container to the `dist/debian` folder, using these commands:
-```
-mkdir -p dist/debian && docker run --rm motley_cue_debianisation tar -C /dist -c . | tar -C dist/debian -xv
-```
+The resulting files are copied out of the build container to the `../results` folder.
