@@ -43,8 +43,8 @@ debian_build_package() {
 
 debian_copy_output() {
     ls -l ..
-    mv ../$PACKAGE_[0-9]* $OUTPUT/$DIST
-    mv ../${PACKAGE}-dbgsym_* $OUTPUT/$DIST 2>/dev/null
+    mv ../*_[0-9]* $OUTPUT/$DIST
+    mv ../*-dbgsym_* $OUTPUT/$DIST 2>/dev/null
 }
 ubuntu_focal_install_dependencies() {
     apt-get update
