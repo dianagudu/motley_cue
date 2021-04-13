@@ -57,6 +57,7 @@ DH_VENV_ARGS=--setuptools --builtin-venv --python=$(SNAKE) $(EXTRA_REQUIREMENTS)
 			--extra-pip-arg=--progress-bar=pretty
 			# --extra-pip-arg "--no-binary=psycopg2" \
 			# -v
+			#
 export DH_VIRTUALENV_INSTALL_ROOT=/usr/lib/
 export DESTDIR=debian/$(PACKAGE)
 #PACKAGE=$(shell dh_listpackages)
@@ -69,3 +70,6 @@ export DESTDIR=debian/$(PACKAGE)
 %: 
 	dh $@ --with python-virtualenv
 	#dh $@ --with python-virtualenv --sourcedir $(SDIST_DIR)
+
+override_dh_virtualenv:
+	dh_virtualenv --python python3
