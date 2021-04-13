@@ -1,5 +1,5 @@
 Name: motley-cue
-Version: 0.0.9
+Version: 0.0.10
 Release: 1
 Summary: Mapper Oidc To Local idEntitY with loCal User managEment
 Group: Misc
@@ -10,11 +10,12 @@ Source0: motley-cue.tar
 BuildRequires: python3-setuptools >= 39, python36 >= 3.6, python3-pip >= 9.0, python3-virtualenv >= 15.1, python36-devel >= 3.6
 
 BuildRoot:	%{_tmppath}/%{name}
+Requires: nginx
 
 %define debug_package %{nil}
 
 %description
-This tool provides an OIDC-protecte REST interface that allows requesting
+This tool provides an OIDC-protected REST interface that allows requesting
 the creation, deletion, and information of a user-account.
 
 %prep
@@ -22,6 +23,9 @@ the creation, deletion, and information of a user-account.
 
 %build
 #make virtualenv DESTDIR=${RPM_BUILD_ROOT}
+
+#%clean
+#rm -rf %{buildroot}
 
 %install
 echo "Buildroot: ${RPM_BUILD_ROOT}"
@@ -40,6 +44,7 @@ make install DESTDIR=${RPM_BUILD_ROOT}
 /usr/*
 /lib/*
 /bin/*
+/etc/*
 
 %changelog
 
