@@ -99,27 +99,27 @@ docker_centos8:
 
 .PHONY: dockerised_deb_debian_buster
 dockerised_deb_debian_buster: docker_debian_buster
-	@docker run -it --rm -v ${DOCKER_BASE}:/home/build debian_buster /home/build/${PACKAGE}/build.sh ${PACKAGE} debian_buster
+	@docker run -it --rm -v ${DOCKER_BASE}:/home/build debian_buster /home/build/${PACKAGE}/build.sh ${PACKAGE} debian_buster ${PKG_NAME}
 
 .PHONY: dockerised_deb_debian_bullseye
 dockerised_deb_debian_bullseye: docker_debian_bullseye
 	@docker run -it --rm -v ${DOCKER_BASE}:/home/build debian_bullseye \
-		/home/build/${PACKAGE}/build.sh ${PACKAGE} debian_bullseye
+		/home/build/${PACKAGE}/build.sh ${PACKAGE} debian_bullseye ${PKG_NAME}
 
 .PHONY: dockerised_deb_ubuntu_bionic
 dockerised_deb_ubuntu_bionic: docker_ubuntu_bionic
 	@docker run -it --rm -v ${DOCKER_BASE}:/home/build ubuntu_bionic \
-		/home/build/${PACKAGE}/build.sh ${PACKAGE} ubuntu_bionic
+		/home/build/${PACKAGE}/build.sh ${PACKAGE} ubuntu_bionic ${PKG_NAME}
 
 .PHONY: dockerised_deb_ubuntu_focal
 dockerised_deb_ubuntu_focal: docker_ubuntu_focal
 	@docker run -it --rm -v ${DOCKER_BASE}:/home/build ubuntu_focal \
-		/home/build/${PACKAGE}/build.sh ${PACKAGE} ubuntu_focal
+		/home/build/${PACKAGE}/build.sh ${PACKAGE} ubuntu_focal ${PKG_NAME}
 
 .PHONY: dockerised_rpm_centos8
 dockerised_rpm_centos8: docker_centos8
 	@docker run -it --rm -v ${DOCKER_BASE}:/home/build centos8 \
-		/home/build/${PACKAGE}/build.sh ${PACKAGE} centos8
+		/home/build/${PACKAGE}/build.sh ${PACKAGE} centos8 ${PKG_NAME}
 
 .PHONE: publish-to-repo
 publish-to-repo:

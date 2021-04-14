@@ -2,18 +2,26 @@
 
 ### Build using:
 
-#DIST=ubuntu_bionic ; docker run -it --rm -v `dirname $PWD`:/home/build $DIST /home/build/`basename $PWD`/build.sh `basename $PWD` $DIST
+#DIST=ubuntu_bionic ; docker run -it --rm -v `dirname $PWD`:/home/build $DIST /home/build/`basename $PWD`/build.sh `basename $PWD` $DIST $PKG_NAME
 
 ## ASSUMPTION: /home/build/$PACKAGE holds the sources for the package to be built
 ## ASSUMPTION: /home/build is on the host system.
+## PKG_NAME is optional, defaults to $PACKAGE when not given
 
 BASE="/home/build"
 PACKAGE=$1
 DIST=$2
 OUTPUT="$BASE/results"
+PKG_NAME=$3
+
+test -z $PKG_NAME && {
+    echo "Package name not specified, using $PACKAGE"
+    PKG_NAME=$PACKAGE
+}
 
 echo "PACKAGE: $PACKAGE"
 echo "DIST: $DIST"
+echo "PKG_NAME: $PKG_NAME"
 
 test -z $DIST && {
     echo "Must specify DIST as 2nd parameter"
@@ -43,8 +51,8 @@ debian_build_package() {
 
 debian_copy_output() {
     ls -l ..
-    mv ../*_[0-9]* $OUTPUT/$DIST
-    mv ../*-dbgsym_* $OUTPUT/$DIST 2>/dev/null
+    mv ../${PKG_NAME}_[0-9]* $OUTPUT/$DIST
+    mv ../${PKG_NAME}-dbgsym_* $OUTPUT/$DIST 2>/dev/null
 }
 ubuntu_focal_install_dependencies() {
     apt-get update
