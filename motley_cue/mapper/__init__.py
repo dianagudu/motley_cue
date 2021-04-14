@@ -196,7 +196,7 @@ class FlaatWrapper(Flaat):
             match = authorisation_info.get('match', 'all')
             match = match if match == 'all' or match == 'one' else int(match)
             # parse aarc_g002_option, defaults to True when missing
-            aarc_g002_group = to_bool(authorisation_info.get('aarc_g002_group', True))
+            aarc_g002_group = to_bool(authorisation_info.get('aarc_g002_group', 'True'))
             info = {
                 'group': to_list(authorisation_info['group']),  # required
                 'claim': authorisation_info['claim'],  # required
