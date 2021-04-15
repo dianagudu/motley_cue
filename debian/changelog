@@ -1,11 +1,14 @@
-motley-cue (0.0.10-1) UNRELEASED; urgency=medium
+motley-cue (0.0.11-1) UNRELEASED; urgency=medium
 
   [ Marcus Hardt ]
   * Initial go for packageing
+  * Packaging for Debian Buster and Bullseye, Ubuntu Bionic and Focal, and CentOS 8
   
   [ Diana Gudu ]
   * New version number
   * Install config files in /etc
   * Add nginx proxy for gunicorn
+  * Changed default port in nginx to 8080
+  * Bug fixes
 
- -- Diana Gudu <diana.gudu@kit.edu>  Fri, 05 Mar 2021 17:49:36 +0000
+ -- Diana Gudu <diana.gudu@kit.edu>  Thu, 15 Apr 2021 17:49:36 +0000
