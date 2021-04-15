@@ -23,8 +23,8 @@ Build-Depends: debhelper-compat (= 11),
 
 Package: motley-cue
 Architecture: any
-Pre-Depends: dpkg (>= 1.16.1), python3, python3-venv, ${misc:Pre-Depends}
-Depends: ${misc:Depends}, nginx
+Pre-Depends: dpkg (>= 1.16.1), python3, python3-venv, nginx, ${misc:Pre-Depends}
+Depends: ${misc:Depends}
 Recommends: pam-ssh
 Description: Mapper Oidc To Local idEntitY with loCal User managEment
  This tool provides an OIDC-protecte REST interface that allows requesting
