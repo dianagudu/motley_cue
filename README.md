@@ -66,12 +66,9 @@ If you installed `motley_cue` using the debian package, you can simply start the
 systemctl start motley-cue
 ```
 
-This will start the `nginx` server too and serve requests on port 80.
+This will start the `nginx` server too and serve requests on port 8080.
 
-You might need to disable the default site in nginx:
-```sh
-rm /etc/nginx/sites-enabled/default
-```
+You can change the port and other nginx settings by editing `/etc/nginx/sites-enabled/nginx.motley_cue`.
 
 For more details about setting up the production instance, keep on reading.
 
@@ -96,11 +93,10 @@ necessary. The examples assume a python virtualenv at `/usr/lib/motley-cue`.
 #### nginx
 
 A site configuration is provided at [etc/nginx.motley_cue](etc/nginx.motley_cue). 
-Copy it to the appropriate location and disable the default site if necessary.
+Copy it to the appropriate location:
 ```sh
 cp etc/nginx.motley_cue /etc/nginx/sites-available/
 ln -s /etc/nginx/sites-available/nginx.motley_cue /etc/nginx/sites-enabled/nginx.motley_cue
-rm /etc/nginx/sites-enabled/default
 ```
 
 It is highly recommended to use HTTPS. The site file also provides an example
@@ -179,6 +175,7 @@ and configure the verification endpoint to your motley_cue instance in `/etc/pam
 local = false
 verify_endpoint = $MOTLEY_CUE_ENDPOINT/verify_user
 ```
+where MOTLEY_CUE_ENDPOINT=<http://localhost:8080> with a default installation.
 
 Finally, make sure you have in your `/etc/ssh/sshd_config`:
 ```

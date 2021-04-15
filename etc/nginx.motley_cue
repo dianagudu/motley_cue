@@ -1,3 +1,6 @@
+# # if you uncomment this block, make sure that the default site
+# # that might come with a clean nginx install is disabled
+# # i.e. rm /etc/nginx/sites-enabled/default
 # server {
 #     listen 80;
 #     server_name localhost;
@@ -5,9 +8,11 @@
 # }
 
 server {
-    listen 80;
-    listen [::]:80;
+    listen 8080;
+    listen [::]:8080;
 
+    # # if you uncomment this block, make sure you remove the two directives above
+    # # also consider uncommenting the server block above for port 80 redirects to 443 
     # listen 443 ssl;
     # listen [::]:443 ssl;
     # ssl_certificate /etc/ssl/private/nginx.pem;
