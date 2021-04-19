@@ -1,4 +1,4 @@
-motley-cue (0.0.11-1) UNRELEASED; urgency=medium
+motley-cue (0.0.12-1) UNRELEASED; urgency=medium
 
   [ Marcus Hardt ]
   * Initial go for packageing
@@ -10,5 +10,6 @@ motley-cue (0.0.11-1) UNRELEASED; urgency=medium
   * Add nginx proxy for gunicorn
   * Changed default port in nginx to 8080
   * Bug fixes
+  * reload nginx config on install
 
- -- Diana Gudu <diana.gudu@kit.edu>  Thu, 15 Apr 2021 17:49:36 +0000
+ -- Diana Gudu <diana.gudu@kit.edu>  Mon, 19 Apr 2021 11:34:28 +0000
