@@ -1,6 +1,6 @@
 [Unit]
 Description=motley_cue with gunicorn service
-Requires=motley-cue.socket nginx.service
+Before=nginx.service
 
 [Service]
 User=root

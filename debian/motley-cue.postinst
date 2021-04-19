@@ -30,5 +30,6 @@ dh_venv_safe_lib_symlinks_update() {
 case "$1" in
     configure|triggered|reconfigure)
         dh_venv_safe_lib_symlinks_update
+        nginx -s reload || true
         ;;
 esac
