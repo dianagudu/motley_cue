@@ -54,7 +54,7 @@ dockerised_all_packages: dockerised_deb_debian_buster dockerised_deb_debian_bull
 docker_images: docker_centos8 docker_debian_bullseye docker_debian_buster docker_ubuntu_bionic docker_ubuntu_focal
 docker_debian_buster:
 	echo "\ndebian_buster"
-	@echo -e "FROM debian:buster\n"\
+	@echo "FROM debian:buster\n"\
 	"RUN apt-get update && "\
 		"apt-get -y upgrade && "\
 		"apt-get -y install build-essential dh-make quilt "\
@@ -63,7 +63,7 @@ docker_debian_buster:
 	docker build --tag debian_buster -f - .
 docker_debian_bullseye:
 	echo "\ndebian_bullseye"
-	@echo -e "FROM debian:bullseye\n"\
+	@echo "FROM debian:bullseye\n"\
 	"RUN apt-get update && "\
 		"apt-get -y upgrade && "\
 		"apt-get -y install build-essential dh-make quilt "\
@@ -72,7 +72,7 @@ docker_debian_bullseye:
 	docker build --tag debian_bullseye -f - .
 docker_ubuntu_bionic:
 	echo "\nubuntu_bionic"
-	@echo -e "FROM ubuntu:bionic\n"\
+	@echo "FROM ubuntu:bionic\n"\
 	"RUN apt-get update && "\
 		"apt-get -y upgrade && "\
 		"apt-get -y install build-essential dh-make quilt "\
@@ -81,7 +81,7 @@ docker_ubuntu_bionic:
 	docker build --tag ubuntu_bionic -f - .
 docker_ubuntu_focal:
 	echo "\nubuntu_focal"
-	@echo -e "FROM ubuntu:focal\n"\
+	@echo "FROM ubuntu:focal\n"\
 	"ENV DEBIAN_FRONTEND=noninteractive\n"\
 	"ENV  TZ=Europe/Berlin\n"\
 	"RUN apt-get update && "\
@@ -92,7 +92,7 @@ docker_ubuntu_focal:
 	docker build --tag ubuntu_focal -f - .
 docker_centos8:
 	echo "\ncentos8"
-	@echo -e "FROM centos:8\n"\
+	@echo "FROM centos:8\n"\
 	"RUN yum install -y make rpm-build\n" \
 	"RUN dnf -y group install \"Development Tools\"\n" | \
 	docker build --tag centos8 -f -  .
