@@ -165,12 +165,16 @@ virtualenv:
 		pip --version; \
 		pip install -r requirements.txt; \
 	)
+	# fix venv paths:
+.PHONY: fix-venv-path
+fix-venv-path:
+	./rpm/fix-venv-paths.sh ${DESTDIR} ${PKG_NAME}
 
 .PHONY: rpm
 rpm: srctar
 	echo ${PATH}
 	pip --version
-	QA_SKIP_BUILD_ROOT=1 rpmbuild --define "_topdir ${PWD}/rpm/rpmbuild" -bb  rpm/${PKG_NAME}.spec
+	rpmbuild --define "_topdir ${PWD}/rpm/rpmbuild" -bb  rpm/${PKG_NAME}.spec
 
 .PHONY: install # called from specfile
 install: virtualenv
@@ -179,3 +183,5 @@ install: virtualenv
 		python3 ./setup.py install --prefix ${DESTDIR}; \
 	)
 	rm -rf ${DESTDIR}/usr/lib/.build-id
+	mkdir -p ${DESTDIR}/lib/systemd/system/
+	install debian/motley-cue.service ${DESTDIR}/lib/systemd/system/
