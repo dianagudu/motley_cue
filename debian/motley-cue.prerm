@@ -20,7 +20,7 @@ dh_venv_safe_symlinks_remove() {
 }
 case "$1" in
     remove|deconfigure)
-        $DH_VENV_DEBUG echo "$0 $1 called with $# args:" "$@"
+        #$DH_VENV_DEBUG echo "$0 $1 called with $# args:" "$@"
         rm -rf "${dh_venv_install_dir:-/should_be_an_arg}/bin" >/dev/null 2>&1 || true
         rm -rf "${dh_venv_install_dir:-/should_be_an_arg}/lib" >/dev/null 2>&1 || true
         ;;
