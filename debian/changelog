@@ -1,4 +1,4 @@
-motley-cue (0.0.12-1) UNRELEASED; urgency=medium
+motley-cue (0.0.13-1) UNRELEASED; urgency=medium
 
   [ Marcus Hardt ]
   * Initial go for packageing
@@ -12,4 +12,4 @@ motley-cue (0.0.12-1) UNRELEASED; urgency=medium
   * Bug fixes
   * reload nginx config on install
 
- -- Diana Gudu <diana.gudu@kit.edu>  Mon, 19 Apr 2021 11:34:28 +0000
+ -- Diana Gudu <diana.gudu@kit.edu>  Fri, 23 Apr 2021 18:34:28 +0000

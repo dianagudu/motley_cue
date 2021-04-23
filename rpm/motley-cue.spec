@@ -1,6 +1,6 @@
 Name: motley-cue
-Version: 0.0.12
-Release: 2
+Version: 0.0.13
+Release: 1
 Summary: Mapper Oidc To Local idEntitY with loCal User managEment
 Group: Misc
 License: MIT-License
