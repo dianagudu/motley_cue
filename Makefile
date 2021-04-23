@@ -170,12 +170,11 @@ virtualenv:
 rpm: srctar
 	echo ${PATH}
 	pip --version
-	QA_SKIP_BUILD_ROOT=1 rpmbuild --define "_topdir ${PWD}/rpm/rpmbuild" -bb  rpm/${PKG_NAME}.spec
+	rpmbuild --define "_topdir ${PWD}/rpm/rpmbuild" --define "_build_id_links none" -bb  rpm/${PKG_NAME}.spec
 
 .PHONY: install # called from specfile
 install: virtualenv
 	( \
 		source ${DESTDIR}/usr/lib/${PKG_NAME}/bin/activate; \
-		python3 ./setup.py install --prefix ${DESTDIR}; \
+		python3 ./setup.py install --prefix ${DESTDIR}/usr/lib/${PKG_NAME}; \
 	)
-	rm -rf ${DESTDIR}/usr/lib/.build-id
