@@ -10,7 +10,7 @@ Source0: motley-cue.tar
 BuildRequires: python3-setuptools >= 39, python36 >= 3.6, python3-pip >= 9.0, python3-virtualenv >= 15.1, python36-devel >= 3.6
 
 BuildRoot:	%{_tmppath}/%{name}
-Requires: nginx
+Requires: python36 >= 3.6, nginx
 
 %define debug_package %{nil}
 
