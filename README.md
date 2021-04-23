@@ -18,13 +18,13 @@ Mapper Oidc To Local idEntitY with loCal User managEment
 
 Two configuration files are required:
 - `motley_cue.conf`: contains configuration options specific to the REST API
-- `ldf_adapter.conf`: contains configuration options for the [feudalAdapter](https://git.scc.kit.edu/feudal/feudalAdapterLdf)
+- `feudal_adapter.conf`: contains configuration options for the [feudalAdapter](https://git.scc.kit.edu/feudal/feudalAdapterLdf)
 
 ### Configuration templates
 
 An example config file explaining the options can be found in [etc/motley_cue.conf](etc/motley_cue.conf).
 
-An example config for feudalAdapter is also included: [etc/ldf_adapter.conf](etc/ldf_adapter.conf).
+An example config for feudalAdapter is also included: [etc/feudal_adapter.conf](etc/feudal_adapter.conf).
 
 ### Config files search locations
 
@@ -36,12 +36,12 @@ The config file `motley_cue.conf` will be searched in several places. Once it is
     - `$HOME/.config/motley_cue/motley_cue.conf`
     - `/etc/motley_cue/motley_cue.conf`
 
-Similar search locations are used for `ldf_adapter.conf`, according to the feudalAdapter documentation:
-- the environment variable `LDF_ADAPTER_CONFIG`
-- `ldf_adapter.conf`
-- `$HOME/.config/ldf_adapter.conf`
-- `$HOME/.config/feudal/ldf_adapter.conf`
-- `/etc/feudal/ldf_adapter.conf`
+Similar search locations are used for `feudal_adapter.conf`, according to the feudalAdapter documentation:
+- the environment variable `FEUDAL_ADAPTER_CONFIG`
+- `feudal_adapter.conf`
+- `$HOME/.config/feudal_adapter.conf`
+- `$HOME/.config/feudal/feudal_adapter.conf`
+- `/etc/feudal/feudal_adapter.conf`
 
 ## Running
 
@@ -76,7 +76,7 @@ For more details about setting up the production instance, keep on reading.
 
 To configure `motley_cue` to run with `gunicorn`, copy the following configuration files from `etc/` to `/etc/motley_cue`:
 - `motley_cue.conf`
-- `ldf_adapter.conf`
+- `feudal_adapter.conf`
 - `gunicorn.conf.py`: config file for gunicorn with sane default values.
 - `motley_cue.env`: here you can set the environment variables used in the gunicorn config, such as the socket address gunicorn listens on (`BIND`), log file location or log level.
 
