@@ -13,6 +13,9 @@ BuildRoot:	%{_tmppath}/%{name}
 Requires: python36 >= 3.6, nginx
 
 %define debug_package %{nil}
+%define modname motley_cue
+%define venv_install /usr/lib/%{name}
+%define installroot %{buildroot}%{venv_install}
 
 %description
 This tool provides an OIDC-protected REST interface that allows requesting
@@ -22,36 +25,33 @@ the creation, deletion, and information of a user-account.
 %setup -q
 
 %build
-#make virtualenv DESTDIR=${RPM_BUILD_ROOT}
-
-#%clean
-#rm -rf %{buildroot}
 
 %install
-echo "Buildroot: ${RPM_BUILD_ROOT}"
-echo "ENV: "
-env | grep -i rpm
-echo "PWD"
-pwd
-#make install INSTALL_PATH=${RPM_BUILD_ROOT}/usr MAN_PATH=${RPM_BUILD_ROOT}/usr/share/man CONFIG_PATH=${RPM_BUILD_ROOT}/etc
-#make virtualenv DESTDIR=/tmp/build/motley_cue/rpm/rpmbuild/BUILD/motley-cue-0.0.9-1.x86_64
-#make install DESTDIR=/tmp/build/motley_cue/rpm/rpmbuild/BUILD/motley-cue-0.0.9-1.x86_64
-make virtualenv DESTDIR=${RPM_BUILD_ROOT}
-make install DESTDIR=${RPM_BUILD_ROOT}
-make fix-venv-path DESTDIR=${RPM_BUILD_ROOT}
+make install DESTDIR=%{buildroot}
+./rpm/fix-venv-paths.sh %{buildroot} %{name}
+
+mkdir -p %{buildroot}{/var/log/%{modname},/run/%{modname},/etc/nginx/conf.d,/lib/systemd/system}
+mv %{installroot}/etc/%{modname} %{buildroot}/etc/%{modname}
+mv %{installroot}/etc/nginx/nginx.motley_cue %{buildroot}/etc/nginx/conf.d/nginx.motley_cue.conf
+mv %{installroot}/etc/systemd/system/motley-cue.service %{buildroot}/lib/systemd/system/
 
 %files
 %defattr(-,root,root,-)
-/usr/lib/motley*
-/lib/*
-/bin/*
-/etc/*
+%license LICENSE
+%dir %{venv_install}
+%dir /etc/%{modname}
+%dir /var/log/%{modname}
+%dir /run/%{modname}
+%{venv_install}/*
+/etc/%{modname}/*
+/etc/nginx/conf.d/nginx.motley_cue.conf
+/lib/systemd/system/motley-cue.service
 
 %changelog
 
 %post
 SAVED_DIR=`pwd`
-    cd /usr/lib/motley-cue/lib
+    cd %{venv_install}/lib
     PKG_PYTHONDIR=""
     PYTHON3_MAJOR=`python3 --version| cut -d\  -f 2 | cut -d\. -f 1`
     PYTHON3_MINOR=`python3 --version| cut -d\  -f 2 | cut -d\. -f 2`
