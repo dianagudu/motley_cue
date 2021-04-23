@@ -79,6 +79,6 @@ SAVED_DIR=`pwd`
     fi
 cd $SAVED_DIR
 systemctl enable nginx
-systemctl enable motley_cue 
+systemctl enable %{name} 
 systemctl restart nginx
-systemctl restart motley_cue 
+systemctl restart %{name} 
