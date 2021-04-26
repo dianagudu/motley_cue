@@ -68,9 +68,18 @@ centos8_install_dependencies() {
         python3-virtualenv python3-pip
     pip3 install -U pip
 }
+centos7_install_dependencies() {
+    yum -y install python3 python3-devel python3-pip python3-setuptools \
+        python3-virtualenv python3-pip
+    pip3 install -U pip
+    pip3 install virtualenv
+}
+centos7_patch_rpm() {
+    # Force RPM's python-bytecompile script to use python3
+    sed "s@^default_python@default_python=/usr/bin/python3\n#default_python@" -i /usr/lib/rpm/brp-python-bytecompile
+}
 rpm_build_package() {
     cd /tmp/build/$PACKAGE 
-    #make srctar
     make rpm
 }
 rpm_copy_output() {
@@ -93,6 +102,12 @@ case "$DIST" in
         debian_install_dependencies
         debian_build_package
         debian_copy_output
+    ;;
+    centos7)
+        centos7_install_dependencies
+        centos7_patch_rpm
+        rpm_build_package
+        rpm_copy_output
     ;;
     centos8)
         centos8_install_dependencies
