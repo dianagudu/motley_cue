@@ -1,6 +1,6 @@
 Name: motley-cue
 Version: 0.0.13
-Release: 1
+Release: 2
 Summary: Mapper Oidc To Local idEntitY with loCal User managEment
 Group: Misc
 License: MIT-License
@@ -27,6 +27,7 @@ the creation, deletion, and information of a user-account.
 %build
 
 %install
+export PYTHONPATH=/usr/local/lib/python3.6/site-packages
 make install DESTDIR=%{buildroot}
 ./rpm/fix-venv-paths.sh %{buildroot} %{name}
 
