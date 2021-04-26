@@ -209,5 +209,4 @@ install: virtualenv
 		source ${DESTDIR}/usr/lib/${PKG_NAME}/bin/activate; \
 		python3 ./setup.py install --prefix ${DESTDIR}/usr/lib/${PKG_NAME}; \
 	)
-	@ls -l ${DESTDIR}/usr/lib/motley-cue/.gitignore
-	@rm ${DESTDIR}/usr/lib/motley-cue/.gitignore
+	@test -e ${DESTDIR}/usr/lib/motley-cue/.gitignore && rm ${DESTDIR}/usr/lib/motley-cue/.gitignore
