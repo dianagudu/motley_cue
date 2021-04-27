@@ -146,11 +146,19 @@ dockerised_deb_ubuntu_focal: docker_ubuntu_focal
 dockerised_rpm_centos7: docker_centos7
 	@docker run -it --rm -v ${DOCKER_BASE}:/home/build centos7 \
 		/home/build/${PACKAGE}/build.sh ${PACKAGE} centos7
+	@echo "RPM was built. Don't forget to  sign it:"
+	@echo "    rpmsign --addsign ../results/centos7/*rpm"
+	@echo "You may need a file $HOME/.rpmmacros containing:"
+	@echo "%_gpg_name ACDFB08FDC962044D87FF00B512839863D487A87"
 
 .PHONY: dockerised_rpm_centos8
 dockerised_rpm_centos8: docker_centos8
 	@docker run -it --rm -v ${DOCKER_BASE}:/home/build centos8 \
 		/home/build/${PACKAGE}/build.sh ${PACKAGE} centos8 ${PKG_NAME}
+	@echo "RPM was built. Don't forget to  sign it:"
+	@echo "    rpmsign --addsign ../results/centos8/*rpm"
+	@echo "You may need a file $HOME/.rpmmacros containing:"
+	@echo "%_gpg_name ACDFB08FDC962044D87FF00B512839863D487A87"
 
 .PHONE: publish-to-repo
 publish-to-repo:
@@ -194,7 +202,7 @@ virtualenv:
 		echo "PATH"; \
 		echo ${PATH}; \
 		pip --version; \
-		pip install -r requirements.txt; \
+		pip install -I -r requirements.txt; \
 	)
 
 .PHONY: rpm
