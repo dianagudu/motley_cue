@@ -1,0 +1,19 @@
+
+module motley-cue-gunicorn 1.0;
+
+require {
+	type var_log_t;
+	type init_t;
+	type lib_t;
+	class dir write;
+	class file { create setattr };
+}
+
+#============= init_t ==============
+
+#!!!! This avc is allowed in the current policy
+allow init_t lib_t:dir write;
+
+#!!!! This avc can be allowed using the boolean 'use_virtualbox'
+allow init_t var_log_t:file create;
+allow init_t var_log_t:file setattr;
