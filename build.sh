@@ -81,6 +81,7 @@ centos7_install_dependencies() {
 centos7_patch_rpm() {
     # Force RPM's python-bytecompile script to use python3
     sed "s@^default_python@default_python=/usr/bin/python3\n#default_python@" -i /usr/lib/rpm/brp-python-bytecompile
+    echo "typing-extensions" >> requirements.txt
 }
 centos7_create_spec() {
     cat ${SPEC_IN} \
