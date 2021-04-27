@@ -72,7 +72,6 @@ centos8_install_dependencies() {
     pip3 install -U pip
 }
 centos7_install_dependencies() {
-    #yum -y install centos-release-scl
     yum -y install python3 python3-devel python3-pip python3-setuptools \
         python3-virtualenv python3-pip
     pip3 install -U pip
@@ -86,17 +85,17 @@ centos7_patch_rpm() {
 centos7_create_spec() {
     cat ${SPEC_IN} \
         | sed s/@PYTHON_VENV@// \
+        | sed "s%@PYTHONPATH@%export PYTHONPATH=/usr/local/lib/python3.6/site-packages%" \
         > ${SPEC_OUT}
 }
 centos8_create_spec() {
     cat ${SPEC_IN} \
         | sed s/@PYTHON_VENV@/", python3-virtualenv >= 15.1"/ \
+        | sed s%@PYTHONPATH@%% \
         > ${SPEC_OUT}
 }
 rpm_build_package() {
     cd /tmp/build/$PACKAGE 
-    # in case we need to use software collections:
-    #echo make rpm | scl enable devtoolset-7 -
     make rpm
 }
 rpm_copy_output() {
