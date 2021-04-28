@@ -14,9 +14,6 @@ DIST=$2
 OUTPUT="$BASE/results"
 PKG_NAME=$3
 
-SPEC_IN=rpm/motley-cue.spec.in
-SPEC_OUT=rpm/motley-cue.spec
-
 test -z $PKG_NAME && {
     echo "Package name not specified, using $PACKAGE"
     PKG_NAME=$PACKAGE
@@ -68,12 +65,12 @@ ubuntu_focal_install_dependencies() {
 
 centos8_install_dependencies() {
     yum -y install python3 python3-devel python3-pip python3-setuptools \
-        python3-virtualenv python3-pip
+        python3-virtualenv python3-pip python3-policycoreutils
     pip3 install -U pip
 }
 centos7_install_dependencies() {
     yum -y install python3 python3-devel python3-pip python3-setuptools \
-        python3-virtualenv python3-pip
+        python3-pip policycoreutils-python
     pip3 install -U pip
     pip3 install virtualenv
 }
@@ -81,18 +78,6 @@ centos7_patch_rpm() {
     # Force RPM's python-bytecompile script to use python3
     sed "s@^default_python@default_python=/usr/bin/python3\n#default_python@" -i /usr/lib/rpm/brp-python-bytecompile
     echo "typing-extensions" >> requirements.txt
-}
-centos7_create_spec() {
-    cat ${SPEC_IN} \
-        | sed s/@PYTHON_VENV@// \
-        | sed "s%@PYTHONPATH@%export PYTHONPATH=/usr/local/lib/python3.6/site-packages%" \
-        > ${SPEC_OUT}
-}
-centos8_create_spec() {
-    cat ${SPEC_IN} \
-        | sed s/@PYTHON_VENV@/", python3-virtualenv >= 15.1"/ \
-        | sed s%@PYTHONPATH@%% \
-        > ${SPEC_OUT}
 }
 rpm_build_package() {
     cd /tmp/build/$PACKAGE 
@@ -121,14 +106,12 @@ case "$DIST" in
     ;;
     centos7)
         centos7_install_dependencies
-        centos7_create_spec
         centos7_patch_rpm
         rpm_build_package
         rpm_copy_output
     ;;
     centos8)
         centos8_install_dependencies
-        centos8_create_spec
         rpm_build_package
         rpm_copy_output
     ;;
