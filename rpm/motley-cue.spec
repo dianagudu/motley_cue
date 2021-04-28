@@ -96,15 +96,20 @@ SAVED_DIR=`pwd`
         }
     fi
 cd $SAVED_DIR
-semodule -i %{se_dir}/motley-cue-gunicorn.pp
-semodule -i %{se_dir}/motley-cue-sshd.pp
-semodule -i %{se_dir}/motley-cue-nginx.pp
-setsebool -P nis_enabled 1
+(
+    semodule -i %{se_dir}/motley-cue-gunicorn.pp
+    semodule -i %{se_dir}/motley-cue-sshd.pp
+    semodule -i %{se_dir}/motley-cue-nginx.pp
+    setsebool -P nis_enabled 1
+) || true
 systemctl enable %{name} nginx
 systemctl restart %{name} nginx
 
-%postun
-semodule -r motley-cue-gunicorn
-semodule -r motley-cue-sshd
-semodule -r motley-cue-nginx
-setsebool -P nis_enabled 0
+%posttrans
+(
+    semodule -r motley-cue-gunicorn
+    semodule -r motley-cue-sshd
+    semodule -r motley-cue-nginx
+    setsebool -P nis_enabled 0
+) || true
+systemctl restart nginx
