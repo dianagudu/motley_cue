@@ -145,7 +145,7 @@ dockerised_deb_ubuntu_focal: docker_ubuntu_focal
 .PHONY: dockerised_rpm_centos7
 dockerised_rpm_centos7: docker_centos7
 	@docker run -it --rm -v ${DOCKER_BASE}:/home/build centos7 \
-		/home/build/${PACKAGE}/build.sh ${PACKAGE} centos7
+		/home/build/${PACKAGE}/build.sh ${PACKAGE} centos7 ${PKG_NAME}
 	@echo "RPM was built. Don't forget to  sign it:"
 	@echo "    rpmsign --addsign ../results/centos7/*rpm"
 	@echo "You may need a file $HOME/.rpmmacros containing:"
