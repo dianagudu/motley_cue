@@ -105,7 +105,7 @@ cd $SAVED_DIR
 systemctl enable %{name} nginx
 systemctl restart %{name} nginx
 
-%posttrans
+%postun
 (
     semodule -r motley-cue-gunicorn
     semodule -r motley-cue-sshd
