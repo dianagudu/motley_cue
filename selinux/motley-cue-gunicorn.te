@@ -1,0 +1,27 @@
+
+module motley-cue-gunicorn 1.0;
+
+require {
+	type var_log_t;
+	type init_t;
+	type lib_t;
+	type user_home_t;
+	type init_t;
+	class dir write;
+	# class dir { write add_name remove_name };
+	class file { create setattr write };
+}
+
+#============= init_t ==============
+
+allow init_t lib_t:dir write;
+# allow init_t lib_t:dir add_name;
+# allow init_t lib_t:dir remove_name;
+
+# allow init_t lib_t:file write;
+# allow init_t lib_t:file create;
+
+allow init_t var_log_t:file create;
+allow init_t var_log_t:file setattr;
+
+allow init_t user_home_t:file create;

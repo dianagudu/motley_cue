@@ -1,7 +1,8 @@
 PKG_NAME  = motley-cue
 PKG_NAME_UNDERSCORES  = motley_cue
 #VERSION := $(shell ./setup.py --version)
-VERSION := $(shell git tag -l --sort=committerdate | tail -n 1 | sed s/v//)
+#VERSION := $(shell git tag -l --sort=committerdate | tail -n 1 | sed s/v//)
+VERSION := $(shell git tag -l | sort -V | tail -n 1 | sed s/v//)
 #VERSION := 0.0.4
 
 BASEDIR = $(PWD)
@@ -11,6 +12,23 @@ PACKAGE=`basename ${PWD}`
 SRC_TAR:=$(PKG_NAME).tar
 
 SHELL:=bash
+#VIRTUALENV:=$(shell virtualenv --version ; shell if [ $? == 0 ]; then echo "virtualenv"; else echo "virtualenv-3"; fi)
+HAS_VENV:=$(shell virtualenv    --version >/dev/null 2>&1 && echo "yes" || echo "")
+HAS_VENV3:=$(shell virtualenv-3 --version >/dev/null 2>&1 && echo "yes" || echo "")
+ifeq ($(HAS_VENV),yes)
+	VIRTUALENV:=virtualenv
+endif
+ifeq ($(HAS_VENV3),yes)
+	VIRTUALENV:=virtualenv-3
+endif
+
+info:
+	@echo "############################################################"
+	@echo "DESTDIR: ${DESTDIR}"
+	@echo "BASEDIR: ${BASEDIR}"
+	@echo "VIRTUALENV: ${VIRTUALENV}"
+	#env
+	@echo "############################################################"
 
 ### Actual targets
 default: sdist bdist_wheel
@@ -91,6 +109,13 @@ docker_ubuntu_focal:
 		"python3-virtualenv python3-venv devscripts git "\
 		"python3 python3-dev python3-pip python3-setuptools "| \
 	docker build --tag ubuntu_focal -f - .
+docker_centos7:
+	echo -e "\ncentos7"
+	@echo -e "FROM centos:7\n"\
+	"RUN yum -y install make rpm-build\n"\
+	"RUN yum -y groups mark convert\n"\
+	"RUN yum -y groupinstall \"Development tools\"\n" | \
+	docker build --tag centos7 -f - .
 docker_centos8:
 	echo -e "\ncentos8"
 	@echo -e "FROM centos:8\n"\
@@ -117,13 +142,27 @@ dockerised_deb_ubuntu_focal: docker_ubuntu_focal
 	@docker run -it --rm -v ${DOCKER_BASE}:/home/build ubuntu_focal \
 		/home/build/${PACKAGE}/build.sh ${PACKAGE} ubuntu_focal ${PKG_NAME}
 
+.PHONY: dockerised_rpm_centos7
+dockerised_rpm_centos7: docker_centos7
+	@docker run -it --rm -v ${DOCKER_BASE}:/home/build centos7 \
+		/home/build/${PACKAGE}/build.sh ${PACKAGE} centos7 ${PKG_NAME}
+	@echo "RPM was built. Don't forget to  sign it:"
+	@echo "    rpmsign --addsign ../results/centos7/*rpm"
+	@echo "You may need a file $HOME/.rpmmacros containing:"
+	@echo "%_gpg_name ACDFB08FDC962044D87FF00B512839863D487A87"
+
 .PHONY: dockerised_rpm_centos8
 dockerised_rpm_centos8: docker_centos8
 	@docker run -it --rm -v ${DOCKER_BASE}:/home/build centos8 \
 		/home/build/${PACKAGE}/build.sh ${PACKAGE} centos8 ${PKG_NAME}
+	@echo "RPM was built. Don't forget to  sign it:"
+	@echo "    rpmsign --addsign ../results/centos8/*rpm"
+	@echo "You may need a file $HOME/.rpmmacros containing:"
+	@echo "%_gpg_name ACDFB08FDC962044D87FF00B512839863D487A87"
 
 .PHONE: publish-to-repo
 publish-to-repo:
+	@scp ../results/centos7/* build@repo.data.kit.edu:/var/www/centos/centos7
 	@scp ../results/centos8/* build@repo.data.kit.edu:/var/www/centos/centos8
 	@scp ../results/debian_buster/* build@repo.data.kit.edu:/var/www/debian/buster
 	@scp ../results/debian_bullseye/* build@repo.data.kit.edu:/var/www/debian/bullseye
@@ -157,13 +196,13 @@ srctar:
 
 .PHONY: virtualenv # called from specfile
 virtualenv:
-	virtualenv-3 ${DESTDIR}/usr/lib/${PKG_NAME}
+	${VIRTUALENV} ${DESTDIR}/usr/lib/${PKG_NAME}
 	( \
 		source ${DESTDIR}/usr/lib/${PKG_NAME}/bin/activate; \
 		echo "PATH"; \
 		echo ${PATH}; \
 		pip --version; \
-		pip install -r requirements.txt; \
+		pip install -I -r requirements.txt; \
 	)
 
 .PHONY: rpm
@@ -178,3 +217,4 @@ install: virtualenv
 		source ${DESTDIR}/usr/lib/${PKG_NAME}/bin/activate; \
 		python3 ./setup.py install --prefix ${DESTDIR}/usr/lib/${PKG_NAME}; \
 	)
+	@test -e ${DESTDIR}/usr/lib/motley-cue/.gitignore && rm ${DESTDIR}/usr/lib/motley-cue/.gitignore || true

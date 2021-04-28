@@ -8,7 +8,9 @@ Mapper Oidc To Local idEntitY with loCal User managEment
     - Install prerequisites: `pip install -r requirements.txt`
     - Build package: `./setup.py sdist`
     - Install package: `pip install dist/motley_cue-$version.tar.gz`
-- Debian package from http://repo.data.kit.edu/:
+- Packages for various Linux distributions are available at http://repo.data.kit.edu/
+  - Supported distros: Debian stable and testing, Ubuntu 18.04 and 20.04, CentOS 7 and 8
+  - Example install on Debian-based systems:
     ```
     curl repo.data.kit.edu/key.pgp | apt-key add -
     apt-get install motley-cue
@@ -187,4 +189,4 @@ UsePam yes
 
 To ssh into a server that supports OIDC authentication, you'll need to trigger the deployment of a local account by calling the /deploy endpoint and then getting the local username.
 
-Of you can have a look at this SSH client wrapper that does all this for you: https://github.com/dianagudu/mc_ssh.
+Or you can have a look at this SSH client wrapper that does all this for you: https://github.com/dianagudu/mc_ssh.

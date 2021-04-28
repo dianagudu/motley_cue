@@ -1,0 +1,11 @@
+
+module motley-cue-sshd 1.0;
+
+require {
+	type http_cache_port_t;
+	type sshd_t;
+	class tcp_socket name_connect;
+}
+
+#============= sshd_t ==============
+allow sshd_t http_cache_port_t:tcp_socket name_connect;

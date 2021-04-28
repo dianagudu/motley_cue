@@ -17,3 +17,4 @@ debian/motley-cue
 debian/*debhelper
 debian/*substvars
 *.swp
+.pc
