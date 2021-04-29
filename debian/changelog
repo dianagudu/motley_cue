@@ -1,10 +1,11 @@
-motley-cue (0.0.14-1) UNRELEASED; urgency=medium
+motley-cue (0.0.14-2) UNRELEASED; urgency=medium
 
   [ Marcus Hardt ]
   * Initial go for packageing
   * Packaging for Debian Buster and Bullseye, Ubuntu Bionic and Focal, and CentOS 8
   * reload nginx config on install
   * Add support for CentOS 7
+  * Add example for pooled accounts in config
 
  -- Marcus Hardt <hardt@kit.edu>  Tue, 27 Apr 2021 06:37:32 PM CEST
   
