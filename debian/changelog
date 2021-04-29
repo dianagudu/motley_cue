@@ -1,4 +1,4 @@
-motley-cue (0.0.14-2) UNRELEASED; urgency=medium
+motley-cue (0.0.15-1) UNRELEASED; urgency=medium
 
   [ Marcus Hardt ]
   * Initial go for packageing
@@ -6,8 +6,6 @@ motley-cue (0.0.14-2) UNRELEASED; urgency=medium
   * reload nginx config on install
   * Add support for CentOS 7
   * Add example for pooled accounts in config
-
- -- Marcus Hardt <hardt@kit.edu>  Tue, 27 Apr 2021 06:37:32 PM CEST
   
   [ Diana Gudu ]
   * New version number
@@ -15,5 +13,6 @@ motley-cue (0.0.14-2) UNRELEASED; urgency=medium
   * Add nginx proxy for gunicorn
   * Changed default port in nginx to 8080
   * Bug fixes
+  * Add latest feudalAdapter version (chage fix)
 
- -- Diana Gudu <diana.gudu@kit.edu>  Fri, 23 Apr 2021 18:34:28 +0000
+ -- Diana Gudu <diana.gudu@kit.edu>  Thu, 29 Apr 2021 14:46:44 +0200
