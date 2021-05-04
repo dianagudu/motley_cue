@@ -74,6 +74,16 @@ centos7_install_dependencies() {
     pip3 install -U pip
     pip3 install virtualenv
 }
+opensuse15_install_dependencies() {
+    # FIXME: These should go to build requires of the spec file, no?
+    zypper -n install libcurl-devel pam-devel zypper audit-devel git \
+        python3 python3-devel python3-pip python3-setuptools \
+        python3-pip policycoreutils-python
+    pip3 install -U pip
+    pip3 install virtualenv || {
+        /usr/local/bin/pip3 install virtualenv
+    }
+}
 centos7_patch_rpm() {
     # Force RPM's python-bytecompile script to use python3
     sed "s@^default_python@default_python=/usr/bin/python3\n#default_python@" -i /usr/lib/rpm/brp-python-bytecompile
@@ -81,6 +91,7 @@ centos7_patch_rpm() {
 }
 rpm_build_package() {
     cd /tmp/build/$PACKAGE 
+    bash
     make rpm
 }
 rpm_copy_output() {
@@ -112,6 +123,11 @@ case "$DIST" in
     ;;
     centos8)
         centos8_install_dependencies
+        rpm_build_package
+        rpm_copy_output
+    ;;
+    opensuse15|opensuse_tumbleweed)
+        opensuse15_install_dependencies
         rpm_build_package
         rpm_copy_output
     ;;

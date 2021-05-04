@@ -1,5 +1,5 @@
 Name: motley-cue
-Version: 0.0.14
+Version: 0.0.15
 Release: 1
 Summary: Mapper Oidc To Local idEntitY with loCal User managEment
 Group: Misc
@@ -7,13 +7,19 @@ License: MIT-License
 URL: https://github.com/dianagudu/motley_cue.git
 Source0: motley-cue.tar
 
-BuildRequires: python3-setuptools >= 39, python36 >= 3.6, python3-pip >= 9.0, python36-devel >= 3.6
 %if 0%{?centos} == 7
+BuildRequires: python3-setuptools >= 39, python36 >= 3.6, python3-pip >= 9.0, python36-devel >= 3.6
 BuildRequires: policycoreutils-python
 %endif
 %if 0%{?centos} == 8
+BuildRequires: python3-setuptools >= 39, python36 >= 3.6, python3-pip >= 9.0, python36-devel >= 3.6
 BuildRequires: python3-policycoreutils >= 2.9, python3-virtualenv >= 15.1
 %endif
+%if 0%{?suse_version}
+BuildRequires: python3 >= 3.6 python3-policycoreutils >= 2.9
+#, python3-virtualenv >= 15.1
+%endif
+
 
 BuildRoot:	%{_tmppath}/%{name}
 Requires: python36 >= 3.6, nginx >= 1.16.1

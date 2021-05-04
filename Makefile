@@ -68,7 +68,7 @@ tox:
 	tox -e py39
 
 # Dockers
-dockerised_all_packages: dockerised_deb_debian_buster dockerised_deb_debian_bullseye dockerised_deb_ubuntu_bionic dockerised_deb_ubuntu_focal dockerised_rpm_centos8
+dockerised_all_packages: dockerised_deb_debian_buster dockerised_deb_debian_bullseye dockerised_deb_ubuntu_bionic dockerised_deb_ubuntu_focal dockerised_rpm_centos8 dockerised_rpm_opensuse15 dockerised_rpm_opensuse_tumbleweed
 
 docker_images: docker_centos8 docker_debian_bullseye docker_debian_buster docker_ubuntu_bionic docker_ubuntu_focal
 docker_debian_buster:
@@ -122,6 +122,18 @@ docker_centos8:
 	"RUN yum install -y make rpm-build\n" \
 	"RUN dnf -y group install \"Development Tools\"\n" | \
 	docker build --tag centos8 -f -  .
+docker_opensuse15.2:
+	echo -e "\nopensuse-15.2"
+	@echo -e "FROM opensuse/leap:15.2\n"\
+	"RUN zypper -n install make rpm-build\n" \
+	"RUN zypper -n install -t pattern devel_C_C++" | \
+	docker build --tag opensuse15.2 -f -  .
+docker_opensuse_tumbleweed:
+	echo -e "\nopensuse_tumbleweed"
+	@echo -e "FROM opensuse/tumbleweed\n"\
+	"RUN zypper -n install make rpm-build\n" \
+	"RUN zypper -n install -t pattern devel_C_C++" | \
+	docker build --tag opensuse_tumbleweed -f -  .
 
 .PHONY: dockerised_deb_debian_buster
 dockerised_deb_debian_buster: docker_debian_buster
@@ -160,14 +172,39 @@ dockerised_rpm_centos8: docker_centos8
 	@echo "You may need a file $HOME/.rpmmacros containing:"
 	@echo "%_gpg_name ACDFB08FDC962044D87FF00B512839863D487A87"
 
+.PHONY: dockerised_rpm_opensuse15.2
+dockerised_rpm_opensuse15.2: docker_opensuse15.2
+	@docker run -it --rm -v ${DOCKER_BASE}:/home/build opensuse15.2 \
+		/home/build/${PACKAGE}/build.sh ${PACKAGE} opensuse15 
+	@echo "RPM was built. Don't forget to  sign it:"
+	@echo "    rpmsign --addsign ../results/centos8/*rpm"
+	@echo "You may need a file $HOME/.rpmmacros containing:"
+	@echo "%_gpg_name ACDFB08FDC962044D87FF00B512839863D487A87"
+
+.PHONY: dockerised_rpm_opensuse_tumbleweed
+dockerised_rpm_opensuse_tumbleweed: docker_opensuse_tumbleweed
+	@docker run -it --rm -v ${DOCKER_BASE}:/home/build opensuse_tumbleweed \
+		/home/build/${PACKAGE}/build.sh ${PACKAGE} opensuse_tumbleweed 
+	@echo "RPM was built. Don't forget to  sign it:"
+	@echo "    rpmsign --addsign ../results/centos8/*rpm"
+	@echo "You may need a file $HOME/.rpmmacros containing:"
+	@echo "%_gpg_name ACDFB08FDC962044D87FF00B512839863D487A87"
+
 .PHONE: publish-to-repo
 publish-to-repo:
+	@rpmsign --addsign ../results/centos8/*rpm ../results/centos7/*rpm ../results/opensuse15/*rpm || {\
+		@echo "Error signing packages:";\
+		@echo "You may need a file $HOME/.rpmmacros containing:";\
+		@echo "%_gpg_name ACDFB08FDC962044D87FF00B512839863D487A87";\
+		};
 	@scp ../results/centos7/* build@repo.data.kit.edu:/var/www/centos/centos7
 	@scp ../results/centos8/* build@repo.data.kit.edu:/var/www/centos/centos8
 	@scp ../results/debian_buster/* build@repo.data.kit.edu:/var/www/debian/buster
 	@scp ../results/debian_bullseye/* build@repo.data.kit.edu:/var/www/debian/bullseye
 	@scp ../results/ubuntu_bionic/* build@repo.data.kit.edu:/var/www/ubuntu/bionic 
 	@scp ../results/ubuntu_focal/* build@repo.data.kit.edu:/var/www/ubuntu/focal
+	@scp ../results/opensuse15/* build@repo.data.kit.edu:/var/www/opensuse/leap-15.2
+	@scp ../results/opensuse_tumbleweed/* build@repo.data.kit.edu:/var/www/opensuse/tumbleweed
 
 # Debian Packaging
 
