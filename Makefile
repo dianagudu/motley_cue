@@ -91,8 +91,8 @@ docker_images: docker_centos8\
 
 .PHONY: docker_debian_buster
 docker_debian_buster:
-	echo -e "\ndebian_buster"
-	echo -e "FROM debian:buster\n"\
+	@echo -e "\ndebian_buster"
+	@echo -e "FROM debian:buster\n"\
 	"RUN apt-get update && "\
 		"apt-get -y upgrade && "\
 		"apt-get -y install build-essential dh-make quilt "\
@@ -101,7 +101,7 @@ docker_debian_buster:
 	docker build --tag debian_buster -f - .
 .PHONY: docker_debian_bullseye
 docker_debian_bullseye:
-	echo -e "\ndebian_bullseye"
+	@echo -e "\ndebian_bullseye"
 	@echo -e "FROM debian:bullseye\n"\
 	"RUN apt-get update && "\
 		"apt-get -y upgrade && "\
@@ -111,7 +111,7 @@ docker_debian_bullseye:
 	docker build --tag debian_bullseye -f - .
 .PHONY: docker_ubuntu_bionic
 docker_ubuntu_bionic:
-	echo -e "\nubuntu_bionic"
+	@echo -e "\nubuntu_bionic"
 	@echo -e "FROM ubuntu:bionic\n"\
 	"RUN apt-get update && "\
 		"apt-get -y upgrade && "\
@@ -121,7 +121,7 @@ docker_ubuntu_bionic:
 	docker build --tag ubuntu_bionic -f - .
 .PHONY: docker_ubuntu_focal
 docker_ubuntu_focal:
-	echo -e "\nubuntu_focal"
+	@echo -e "\nubuntu_focal"
 	@echo -e "FROM ubuntu:focal\n"\
 	"ENV DEBIAN_FRONTEND=noninteractive\n"\
 	"ENV  TZ=Europe/Berlin\n"\
@@ -133,7 +133,7 @@ docker_ubuntu_focal:
 	docker build --tag ubuntu_focal -f - .
 .PHONY: docker_centos7
 docker_centos7:
-	echo -e "\ncentos7"
+	@echo -e "\ncentos7"
 	@echo -e "FROM centos:7\n"\
 	"RUN yum -y install make rpm-build\n"\
 	"RUN yum -y groups mark convert\n"\
@@ -141,35 +141,35 @@ docker_centos7:
 	docker build --tag centos7 -f - .
 .PHONY: docker_centos8
 docker_centos8:
-	echo -e "\ncentos8"
+	@echo -e "\ncentos8"
 	@echo -e "FROM centos:8\n"\
 	"RUN yum install -y make rpm-build\n" \
 	"RUN dnf -y group install \"Development Tools\"\n" | \
 	docker build --tag centos8 -f -  .
 .PHONY: docker_opensuse15.2
 docker_opensuse15.2:
-	echo -e "\nopensuse-15.2"
+	@echo -e "\nopensuse-15.2"
 	@echo -e "FROM registry.opensuse.org/opensuse/leap:15.2\n"\
 	"RUN zypper -n install make rpm-build\n" \
 	"RUN zypper -n install -t pattern devel_C_C++" | \
 	docker build --tag opensuse15.2 -f -  .
 .PHONY: docker_opensuse15.3
 docker_opensuse15.3:
-	echo -e "\nopensuse-15.3"
+	@echo -e "\nopensuse-15.3"
 	@echo -e "FROM registry.opensuse.org/opensuse/leap:15.3\n"\
 	"RUN zypper -n install make rpm-build\n" \
 	"RUN zypper -n install -t pattern devel_C_C++" | \
 	docker build --tag opensuse15.3 -f -  .
 .PHONY: docker_opensuse_tumbleweed
 docker_opensuse_tumbleweed:
-	echo -e "\nopensuse_tumbleweed"
+	@echo -e "\nopensuse_tumbleweed"
 	@echo -e "FROM registry.opensuse.org/opensuse/tumbleweed:latest\n"\
 	"RUN zypper -n install make rpm-build\n" \
 	"RUN zypper -n install -t pattern devel_C_C++" | \
 	docker build --tag opensuse_tumbleweed -f -  .
 .PHONY: docker_sle15
 docker_sle15:
-	echo -e "\nsle15"
+	@echo -e "\nsle15"
 	@echo -e "FROM registry.suse.com/suse/sle15\n"\
 	"RUN zypper -n install make rpm-build\n" \
 	"RUN zypper -n install -t pattern devel_C_C++" | \
