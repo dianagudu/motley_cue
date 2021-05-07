@@ -83,7 +83,7 @@ class Authorisation(Flaat):
             # if all users from this OP are authorised,
             # it is sufficient to require login, which validates the token
             # at the userinfo endpoint
-            if to_bool(op_authz.get('authorise_all', False)):
+            if to_bool(op_authz.get('authorise_all', 'False')):
                 logging.getLogger(__name__).warning(f"Authorising all users from {op_url}."
                                                     "We recommend setting the authorised_vos field in motley_cue.conf.")
 
@@ -95,7 +95,7 @@ class Authorisation(Flaat):
             # if this user is specifically authorised,
             # it is sufficient to require login, which validates the token
             # at the userinfo endpoint
-            authorised_users = to_list(op_authz.get('authorised_users', []))
+            authorised_users = to_list(op_authz.get('authorised_users', '[]'))
             if len(authorised_users) > 0:
                 sub = self.get_sub_from_request(request)
                 if sub is None:
@@ -113,7 +113,7 @@ class Authorisation(Flaat):
             # treat them all as normal groups
             # possible FIX: flaat should deal with it and provide a uniform interface to check
             # VO membership for mixed lists of VOs
-            authorised_vos = to_list(op_authz.get('authorised_vos', []))
+            authorised_vos = to_list(op_authz.get('authorised_vos', '[]'))
             if len(authorised_vos) > 0:
                 try:
                     _ = [Aarc_g002_entitlement(vo, strict=False)
