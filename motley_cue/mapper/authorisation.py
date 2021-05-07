@@ -96,8 +96,8 @@ class Authorisation(Flaat):
             # it is sufficient to require login, which validates the token
             # at the userinfo endpoint
             authorised_users = to_list(op_authz.get('authorised_users', '[]'))
+            sub = self.get_sub_from_request(request)
             if len(authorised_users) > 0:
-                sub = self.get_sub_from_request(request)
                 if sub is None:
                     logging.getLogger(__name__).error(self.get_last_error())
                     return self._return_formatter_wf(f"No sub found in AT: {self.get_last_error()}", 401)
@@ -149,9 +149,59 @@ class Authorisation(Flaat):
     def authorised_admin_required(self, func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            # request = kwargs["request"]
-            # op_url = self.get_iss_from_request(request)
-            return self._return_formatter_wf("Admin authorisation disabled", 401)
+            # get request from wrapped function params
+            request = kwargs.get("request", None)
+            if request is None:
+                self.set_last_error("No request object found.")
+                logging.getLogger(__name__).error(f"{self.get_last_error()}")
+                return self._return_formatter_wf(f"{self.get_last_error()}", 400)
+            # get OP from request
+            op_url = self.get_iss_from_request(request)
+            if op_url is None:
+                logging.getLogger(__name__).error(self.get_last_error())
+                return self._return_formatter_wf(f"No issuer found in AT: {self.get_last_error()}", 401)
+            # get authorisation info for this OP
+            op_authz = self.__authorisation.get(canonical_url(op_url), None)
+            # if OP not supported:
+            if op_authz is None:
+                return self._return_formatter_wf(f"The token issuer is not supported on this service: {op_url}", 403)
+
+            # check if sub in request is authorised to be admin
+            authorised_admins = to_list(op_authz.get('authorised_admins', '[]'))
+            if len(authorised_admins) > 0:
+                sub = self.get_sub_from_request(request)
+                if sub is None:
+                    logging.getLogger(__name__).error(self.get_last_error())
+                    return self._return_formatter_wf(f"No sub found in AT: {self.get_last_error()}", 401)
+                if sub in authorised_admins:
+                    # check if admin is authorised for all OPs or if admin's issuer matches user's issuer
+                    is_authorised = to_bool(op_authz.get('authorise_admins_for_all_ops', 'False'))
+                    if not is_authorised:
+                        # get iss of user to suspend/resume from wrapped function params
+                        user_iss = kwargs.get("iss", None)
+                        if user_iss is None:
+                            self.set_last_error("No user issuer found.")
+                            logging.getLogger(__name__).error(f"{self.get_last_error()}")
+                            return self._return_formatter_wf(f"{self.get_last_error()}", 400)
+                        if canonical_url(user_iss) == canonical_url(op_url):
+                            is_authorised = True
+                            # HACKY: if the URLs are the same (in canonical form) use the admin URL instead
+                            # this URL is in the form found in ATs released by this OP
+                            # this means you can leave out the "https://" of ending "/" in admin API calls and it still works
+                            # otherwise, feudal_adapter cannot find the user since it queries by gecos field: sub@iss
+                            # BUT it doesn't work when admins can suspend users from other OPs
+                            # FIXME: can to be done in feudal, or by storing the exact URL in the mapper
+                            print(op_url, user_iss)
+                            kwargs["iss"] = op_url
+                    if is_authorised:
+                        @self.login_required()
+                        async def tmp(*args, **kwargs):
+                            return await func(*args, **kwargs)
+                        return tmp(*args, **kwargs)
+                    else:
+                        self._return_formatter_wf("Forbidden: you are not authorised to perform actions on users from other OPs", 403)
+
+            return self._return_formatter_wf("Forbidden: you are not authorised as admin on this service", 403)
         return wrapper
 
     def get_sub_from_request(self, request: Request):

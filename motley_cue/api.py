@@ -13,7 +13,6 @@ api.include_router(admin.api,
                    tags=["admin"])
 
 
-@api.get("")
 @api.get("/")
 async def read_root():
     return {
