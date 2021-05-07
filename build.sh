@@ -22,6 +22,7 @@ test -z $PKG_NAME && {
 echo "PACKAGE: $PACKAGE"
 echo "DIST: $DIST"
 echo "PKG_NAME: $PKG_NAME"
+echo "PACKAGE: $PACKAGE"
 
 test -z $DIST && {
     echo "Must specify DIST as 2nd parameter"
@@ -41,6 +42,7 @@ common_fix_output_permissions() {
     chown -R $UP_UID:$UP_GID $OUTPUT/$DIST
 }
 debian_install_dependencies() {
+    apt-get update
     apt-get -y install libffi-dev  \
         python3 python3-dev python3-pip python3-setuptools
 }
@@ -50,6 +52,7 @@ debian_build_package() {
 }
 
 debian_copy_output() {
+    echo "Moving output:"
     ls -l ..
     mv ../${PKG_NAME}_[0-9]* $OUTPUT/$DIST
     mv ../${PKG_NAME}-dbgsym_* $OUTPUT/$DIST 2>/dev/null
@@ -74,6 +77,17 @@ centos7_install_dependencies() {
     pip3 install -U pip
     pip3 install virtualenv
 }
+opensuse15_install_dependencies() {
+    zypper -n install libcurl-devel pam-devel zypper audit-devel git \
+        python3 python3-devel python3-pip python3-setuptools
+    zypper -n install python3-pip
+    zypper -n install policycoreutils
+    zypper -n install policycoreutils-python
+    pip3 install -U pip
+    pip3 install virtualenv || {
+        /usr/local/bin/pip3 install virtualenv
+    }
+}
 centos7_patch_rpm() {
     # Force RPM's python-bytecompile script to use python3
     sed "s@^default_python@default_python=/usr/bin/python3\n#default_python@" -i /usr/lib/rpm/brp-python-bytecompile
@@ -81,12 +95,14 @@ centos7_patch_rpm() {
 }
 rpm_build_package() {
     cd /tmp/build/$PACKAGE 
-    make rpm
+    make rpms
 }
 rpm_copy_output() {
     ls -l rpm/rpmbuild/RPMS/*/*
+    ls -l rpm/rpmbuild/SRPMS/
     echo "-----"
-    mv rpm/rpmbuild/RPMS/*/*rpm $OUTPUT/$DIST
+    mv rpm/rpmbuild/RPMS/x86_64/${PKG_NAME}*rpm $OUTPUT/$DIST/
+    echo mv rpm/rpmbuild/SRPMS/*rpm $OUTPUT/$DIST/
 }
 
 ###########################################################################
@@ -112,6 +128,11 @@ case "$DIST" in
     ;;
     centos8)
         centos8_install_dependencies
+        rpm_build_package
+        rpm_copy_output
+    ;;
+    opensuse15*|opensuse_tumbleweed|sle*)
+        opensuse15_install_dependencies
         rpm_build_package
         rpm_copy_output
     ;;
