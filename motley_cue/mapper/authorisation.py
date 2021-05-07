@@ -37,13 +37,13 @@ class Authorisation(Flaat):
                 "info": "OP is not supported or provided URL is invalid"
             }
         # if all users from this OP are authorised
-        if to_bool(op_authz.get('authorise_all', False)):
+        if to_bool(op_authz.get('authorise_all', 'False')):
             return{
                 "OP": op_url,
                 "info": "All users from this OP are authorised"
             }
         # if authorised VOs are specified
-        authorised_vos = to_list(op_authz.get('authorised_vos', []))
+        authorised_vos = to_list(op_authz.get('authorised_vos', '[]'))
         if len(authorised_vos) > 0:
             return {
                 "OP": op_url,

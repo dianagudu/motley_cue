@@ -21,7 +21,7 @@ async def read_root():
         "usage": "All endpoints are available via a bearer token.",
         "endpoints": {
             "/info": "Service-specific information.",
-            "/info/authorisation": "Authorisation information for specific OP; requires valid access token from a supported OP",
+            "/info/authorisation": "Authorisation information for specific OP; requires valid access token from a supported OP.",
             "/user": "User API; requires valid access token of an authorised user.",
             "/admin": "Admin API; requires valid access token of an authorised user with admin role.",
             "/verify_user": "Verifies if a given token belongs to a given local account via 'username'."

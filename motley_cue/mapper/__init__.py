@@ -40,8 +40,7 @@ class Mapper:
         return self.__admin_security
 
     def info(self):
-        # here we can return service name, description,
-        # supported IdPs, supported VOs, ...
+        # here we return service name, description, supported OPs
         return {
             "login info": self.__lum.login_info(),
             "supported OPs": self.__authorisation.trusted_op_list,
