@@ -1,5 +1,5 @@
 Name: motley-cue
-Version: 0.0.15
+Version: 0.1.1
 Release: 1
 Summary: Mapper Oidc To Local idEntitY with loCal User managEment
 Group: Misc
