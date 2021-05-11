@@ -84,13 +84,12 @@ To configure `motley_cue` to run with `gunicorn`, copy the following configurati
 
 #### systemd
 
-Create the service files to run gunicorn under `systemd`.
-Examples are provided with the debian package:
-- [debian/motley-cue.service](debian/motley-cue.service)
-- [debian/motley-cue.socket](debian/motley-cue.socket)
+Create the service file to run gunicorn under `systemd`.
+An example is provided in `etc`:
+- [etc/motley-cue.service](etc/motley-cue.service)
 
-Copy the files to `/lib/systemd/system/motley-cue.service` and adapt them if 
-necessary. The examples assume a python virtualenv at `/usr/lib/motley-cue`.
+Copy the file to `/lib/systemd/system/motley-cue.service` and adapt it if
+necessary. The example assumes a python virtualenv at `/usr/lib/motley-cue`.
 
 #### nginx
 
