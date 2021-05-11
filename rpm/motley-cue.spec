@@ -21,7 +21,13 @@ BuildRequires: python3 >= 3.6 python3-policycoreutils >= 2.9
 
 
 BuildRoot:	%{_tmppath}/%{name}
-Requires: python36 >= 3.6, nginx >= 1.16.1
+%if 0%{?centos}
+Requires: python36 >= 3.6
+%endif
+%if 0%{?suse_version}
+Requires: python3 >= 3.6
+%endif
+Requires: nginx >= 1.16.1
 
 %define debug_package %{nil}
 %define modname motley_cue
