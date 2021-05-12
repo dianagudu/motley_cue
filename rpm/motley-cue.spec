@@ -1,3 +1,4 @@
+Name: motley-cue
 Version: 0.1.1
 Release: 1
 Summary: Mapper Oidc To Local idEntitY with loCal User managEment
@@ -80,17 +81,19 @@ install %{installroot}/etc/systemd/system/motley-cue.service %{buildroot}/lib/sy
 
 %post
 SAVED_DIR=`pwd`
+    # LIB 
     cd %{venv_dir}/lib
     PKG_PYTHONDIR=""
     PYTHON3_MAJOR=`python3 --version| cut -d\  -f 2 | cut -d\. -f 1`
     PYTHON3_MINOR=`python3 --version| cut -d\  -f 2 | cut -d\. -f 2`
     for PYTHONDIR in python*; do
+        echo "For loop: PYTHONDIR: ${PYTHONDIR}"
         test -e $PYTHONDIR && {
             test -L $PYTHONDIR || {
                 # If it exists but is not a symlink, then we found the
                 # Python dir for the version this package was created for
                 PKG_PYTHONDIR=$PYTHONDIR
-                #echo "PKG_PYTHONDIR: $PKG_PYTHONDIR"
+                echo "PKG_PYTHONDIR: $PKG_PYTHONDIR"
             } || true
         } || true
     done
@@ -106,6 +109,9 @@ SAVED_DIR=`pwd`
             ln -s $PKG_PYTHONDIR python${PYTHON3_MAJOR}.${PYTHON3_MINOR}
         }
     fi
+    # BIN 
+    #cd %{venv_dir}/bin
+    
 cd $SAVED_DIR
 (
     semodule -i %{se_dir}/motley-cue-gunicorn.pp
