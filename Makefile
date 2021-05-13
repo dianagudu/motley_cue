@@ -282,7 +282,7 @@ deb: cleanapi create_obj_dir_structure preparedeb
 
 .PHONY: srctar
 srctar:
-	(cd ..; tar cf $(BASENAME)/$(SRC_TAR) $(PKG_NAME_UNDERSCORES) --transform='s^${PKG_NAME_UNDERSCORES}^${PKG_NAME}-$(VERSION)^')
+	(cd ..; tar cf $(BASENAME)/$(SRC_TAR) --exclude-vcs --exclude=.pc $(PKG_NAME_UNDERSCORES) --transform='s^${PKG_NAME_UNDERSCORES}^${PKG_NAME}-$(VERSION)^')
 	mkdir -p rpm/rpmbuild/SOURCES
 	mv $(SRC_TAR) rpm/rpmbuild/SOURCES/
 
