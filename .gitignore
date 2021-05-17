@@ -18,3 +18,4 @@ debian/*debhelper
 debian/*substvars
 *.swp
 .pc
+docker*log
