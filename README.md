@@ -135,6 +135,15 @@ compromised):
   http http://localhost:8080/user/suspend "Authorization: Bearer `oidc-token egi`"
   ```
 
+## Testing
+
+A Dockerfile and compose file are provided for testing.
+
+Run all the test with:
+```sh
+docker-compose up --build -d
+docker-compose exec web pytest . -v
+```
 
 ## Building the package in a docker container
 
