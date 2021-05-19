@@ -71,6 +71,7 @@ install %{installroot}%{se_dir}/* %{buildroot}%{se_dir}/
 install %{installroot}/etc/nginx/nginx.motley_cue %{buildroot}/etc/nginx/conf.d/nginx.motley_cue.conf
 install %{installroot}/etc/systemd/system/motley-cue.service %{buildroot}/lib/systemd/system/
 
+#FIXME: dont package selinux files for suse
 %files
 %defattr(-,root,root,-)
 %license LICENSE
@@ -80,7 +81,7 @@ install %{installroot}/etc/systemd/system/motley-cue.service %{buildroot}/lib/sy
 %dir %{run_dir}
 %dir %{se_dir}
 %{venv_dir}/*
-%{etc_dir}/*
+%config(noreplace) %{etc_dir}/*
 %{se_dir}/*
 /etc/nginx/conf.d/nginx.motley_cue.conf
 /lib/systemd/system/motley-cue.service
