@@ -78,7 +78,9 @@ class Authorisation(Flaat):
 
             # if OP not supported:
             if op_authz is None:
-                return self._return_formatter_wf(f"The token issuer is not supported on this service: {op_url}", 403)
+                msg = f"The token issuer is not supported on this service: {op_url}"
+                logging.getLogger(__name__).info(msg)
+                return self._return_formatter_wf(msg, 403)
 
             # if all users from this OP are authorised,
             # it is sufficient to require login, which validates the token
@@ -102,10 +104,15 @@ class Authorisation(Flaat):
                     logging.getLogger(__name__).error(self.get_last_error())
                     return self._return_formatter_wf(f"No sub found in AT: {self.get_last_error()}", 401)
                 if sub in authorised_users:
+                    logging.getLogger(__name__).debug(f"User {sub} is individually authorised by sub.")
+
                     @self.login_required()
                     async def tmp(*args, **kwargs):
                         return await func(*args, **kwargs)
                     return tmp(*args, **kwargs)
+                logging.getLogger(__name__).debug(f"User {sub} is not individually authorised by sub.")
+            else:
+                logging.getLogger(__name__).debug("No individual users authorised by sub.")
 
             # if authorised VOs are specified, try to authorise based on VOs
             # this depends on the type of VO: AARC-G002 compatible or not
@@ -116,6 +123,8 @@ class Authorisation(Flaat):
             authorised_vos = to_list(op_authz.get('authorised_vos', '[]'))
             if len(authorised_vos) > 0:
                 try:
+                    logging.getLogger(__name__).debug(
+                        f"Trying VO-based authorisation for user {sub}; list of authorised VOs: {authorised_vos}.")
                     _ = [Aarc_g002_entitlement(vo, strict=False)
                          for vo in authorised_vos]
 
@@ -139,6 +148,8 @@ class Authorisation(Flaat):
                     async def tmp(*args, **kwargs):
                         return await func(*args, **kwargs)
                     return tmp(*args, **kwargs)
+            else:
+                logging.getLogger(__name__).debug("No authorised VOs specified.")
 
             # user not authorised
             logging.getLogger(__name__).info(
@@ -164,7 +175,9 @@ class Authorisation(Flaat):
             op_authz = self.__authorisation.get(canonical_url(op_url), None)
             # if OP not supported:
             if op_authz is None:
-                return self._return_formatter_wf(f"The token issuer is not supported on this service: {op_url}", 403)
+                msg = f"The token issuer is not supported on this service: {op_url}"
+                logging.getLogger(__name__).info(msg)
+                return self._return_formatter_wf(msg, 403)
 
             # check if sub in request is authorised to be admin
             authorised_admins = to_list(op_authz.get('authorised_admins', '[]'))
@@ -174,8 +187,10 @@ class Authorisation(Flaat):
                     logging.getLogger(__name__).error(self.get_last_error())
                     return self._return_formatter_wf(f"No sub found in AT: {self.get_last_error()}", 401)
                 if sub in authorised_admins:
+                    logging.getLogger(__name__).debug(f"Sub {sub} is an authorised admin.")
                     # check if admin is authorised for all OPs or if admin's issuer matches user's issuer
                     is_authorised = to_bool(op_authz.get('authorise_admins_for_all_ops', 'False'))
+                    logging.getLogger(__name__).debug(f"Checking if {sub} is authorised as admin for all OPs: {is_authorised}")
                     if not is_authorised:
                         # get iss of user to suspend/resume from wrapped function params
                         user_iss = kwargs.get("iss", None)
@@ -183,6 +198,9 @@ class Authorisation(Flaat):
                             self.set_last_error("No user issuer found.")
                             logging.getLogger(__name__).error(f"{self.get_last_error()}")
                             return self._return_formatter_wf(f"{self.get_last_error()}", 400)
+                        logging.getLogger(__name__).debug(f"Checking if admin {sub} is authorised for given user, i.e. "
+                                                          f"{user_iss} == {op_url}: "
+                                                          f"{canonical_url(user_iss) == canonical_url(op_url)}")
                         if canonical_url(user_iss) == canonical_url(op_url):
                             is_authorised = True
                             # HACKY: if the URLs are the same (in canonical form) use the admin URL instead
@@ -191,7 +209,7 @@ class Authorisation(Flaat):
                             # otherwise, feudal_adapter cannot find the user since it queries by gecos field: sub@iss
                             # BUT it doesn't work when admins can suspend users from other OPs
                             # FIXME: can to be done in feudal, or by storing the exact URL in the mapper
-                            print(op_url, user_iss)
+                            # print(op_url, user_iss)
                             kwargs["iss"] = op_url
                     if is_authorised:
                         @self.login_required()
@@ -199,9 +217,15 @@ class Authorisation(Flaat):
                             return await func(*args, **kwargs)
                         return tmp(*args, **kwargs)
                     else:
-                        self._return_formatter_wf("Forbidden: you are not authorised to perform actions on users from other OPs", 403)
+                        msg = "Forbidden: you are not authorised to perform actions on users from other OPs"
+                        logging.getLogger(__name__).info(msg)
+                        self._return_formatter_wf(msg, 403)
+            else:
+                logging.getLogger(__name__).debug("No admins authorised by sub.")
 
-            return self._return_formatter_wf("Forbidden: you are not authorised as admin on this service", 403)
+            msg = "Forbidden: you are not authorised as admin on this service"
+            logging.getLogger(__name__).info(msg)
+            return self._return_formatter_wf(msg, 403)
         return wrapper
 
     def get_sub_from_request(self, request: Request):
@@ -210,6 +234,7 @@ class Authorisation(Flaat):
             return tokentools.get_accesstoken_info(token)["body"]["sub"]
         except Exception as e:
             self.set_last_error(e)
+            logging.getLogger(__name__).debug(f"Getting sub from request: {e}")
             return None
 
     def get_iss_from_request(self, request: Request):
