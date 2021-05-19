@@ -19,10 +19,9 @@ test -z $PKG_NAME && {
     PKG_NAME=$PACKAGE
 }
 
-echo "PACKAGE: $PACKAGE"
-echo "DIST: $DIST"
-echo "PKG_NAME: $PKG_NAME"
-echo "PACKAGE: $PACKAGE"
+echo "PACKAGE=$PACKAGE"
+echo "DIST=$DIST"
+echo "PKG_NAME=$PKG_NAME"
 
 test -z $DIST && {
     echo "Must specify DIST as 2nd parameter"
@@ -102,7 +101,7 @@ rpm_copy_output() {
     ls -l rpm/rpmbuild/SRPMS/
     echo "-----"
     mv rpm/rpmbuild/RPMS/x86_64/${PKG_NAME}*rpm $OUTPUT/$DIST/
-    echo mv rpm/rpmbuild/SRPMS/*rpm $OUTPUT/$DIST/
+    mv rpm/rpmbuild/SRPMS/*rpm $OUTPUT/$DIST
 }
 
 ###########################################################################
