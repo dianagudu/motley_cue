@@ -1,6 +1,9 @@
 Name: motley-cue
-Version: 0.1.1
-Release: 1
+%define ver %(head debian/changelog -n 1|cut -d \\\( -f 2|cut -d \\\) -f 1|cut -d \- -f 1)
+%define rel %(head debian/changelog -n 1|cut -d \\\( -f 2|cut -d \\\) -f 1|cut -d \- -f 2)
+Version: %{ver}
+Release: %{rel}
+
 Summary: Mapper Oidc To Local idEntitY with loCal User managEment
 Group: Misc
 License: MIT-License
@@ -20,7 +23,6 @@ BuildRequires: python3-policycoreutils >= 2.9, python3-virtualenv >= 15.1
 BuildRequires: python3 >= 3.6 python3-policycoreutils >= 2.9
 #, python3-virtualenv >= 15.1
 %endif
-
 
 BuildRoot:	%{_tmppath}/%{name}
 %if 0%{?centos}
@@ -89,13 +91,13 @@ SAVED_DIR=`pwd`
     PYTHON3_MAJOR=`python3 --version| cut -d\  -f 2 | cut -d\. -f 1`
     PYTHON3_MINOR=`python3 --version| cut -d\  -f 2 | cut -d\. -f 2`
     for PYTHONDIR in python*; do
-        echo "For loop: PYTHONDIR: ${PYTHONDIR}"
+        #echo "For loop: PYTHONDIR: ${PYTHONDIR}"
         test -e $PYTHONDIR && {
             test -L $PYTHONDIR || {
                 # If it exists but is not a symlink, then we found the
                 # Python dir for the version this package was created for
                 PKG_PYTHONDIR=$PYTHONDIR
-                echo "PKG_PYTHONDIR: $PKG_PYTHONDIR"
+                #echo "PKG_PYTHONDIR: $PKG_PYTHONDIR"
             } || true
         } || true
     done
