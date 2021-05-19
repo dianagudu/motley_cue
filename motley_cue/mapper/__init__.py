@@ -1,10 +1,10 @@
 '''Map OIDC remote identity to local account'''
 # This code is distributed under the MIT License
 
+import logging
 from fastapi import Request
 from fastapi.security import HTTPBearer
 
-from .. import logger as parent_logger
 from .config import Config
 from .authorisation import Authorisation
 from .local_user_management import LocalUserManager
@@ -20,8 +20,7 @@ class Mapper:
             self.__config = Config.from_default_files()
         else:
             self.__config = Config.from_files([config_file])
-        # log setup for parent module to be inherited by child modules
-        parent_logger.setLevel(self.__config.log_level)
+        logging.basicConfig(level=self.__config.log_level)
         self.__user_security = HTTPBearer()
         self.__admin_security = HTTPBearer()
         self.__authorisation = Authorisation(self.__config)
