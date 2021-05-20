@@ -1,0 +1,13 @@
+diff --git a/etc/motley_cue.conf b/etc/motley_cue.conf
+index d059a00..7db53a7 100644
+--- a/etc/motley_cue.conf
++++ b/etc/motley_cue.conf
+@@ -8,7 +8,7 @@
+ ## log_level -- default: WARNING
+ log_level = WARNING
+ ## log_file -- default: /dev/stderr
+-# log_file = /var/log/motley_cue/mapper.log
++log_file = /var/log/motley_cue/mapper.log
+ ##
+ ## audience claim specific to this service
+ ## NOT SUPPORTED
