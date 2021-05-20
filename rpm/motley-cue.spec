@@ -6,6 +6,7 @@ Group: Misc
 License: MIT-License
 URL: https://github.com/dianagudu/motley_cue.git
 Source0: motley-cue.tar
+Patch0: logfiles.patch
 
 %if 0%{?centos} == 7
 BuildRequires: python3-setuptools >= 39, python36 >= 3.6, python3-pip >= 9.0, python36-devel >= 3.6
@@ -46,6 +47,7 @@ the creation, deletion, and information of a user-account.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 
