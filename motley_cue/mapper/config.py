@@ -7,9 +7,12 @@ from configparser import ConfigParser
 class Config():
     def __init__(self, config_parser):
         # log level
-        loglevel_env = os.environ.get("LOG", "WARNING")
         self.__log_level = config_parser['mapper'].get(
-            'log_level', loglevel_env)
+            'log_level', logging.WARNING)
+        # log file
+        self.__log_file = config_parser['mapper'].get(
+            'log_file', None
+        )
         # trusted OPs
         authz_sections = [section for section in config_parser.sections()
                           if section.startswith("authorisation")]
@@ -21,8 +24,6 @@ class Config():
                 self.__trusted_ops.append(op_url)
                 self.__authorisation[canonical_url(op_url)] = dict(
                     config_parser[section].items())
-        # admin authorisation
-        # TODO
 
     def get_authorisation(self, op_url):
         return self.__authorisation[op_url]
@@ -34,6 +35,10 @@ class Config():
     @property
     def authorisation(self):
         return self.__authorisation
+
+    @property
+    def log_file(self):
+        return self.__log_file
 
     @property
     def log_level(self):
