@@ -1,7 +1,9 @@
 '''Map OIDC remote identity to local account'''
 # This code is distributed under the MIT License
 
+import sys
 import logging
+import logging.handlers
 from fastapi import Request
 from fastapi.security import HTTPBearer
 
@@ -20,7 +22,26 @@ class Mapper:
             self.__config = Config.from_default_files()
         else:
             self.__config = Config.from_files([config_file])
-        logging.basicConfig(level=self.__config.log_level)
+
+        # configure logging
+        if self.__config.log_file is None or \
+                self.__config.log_file == "/dev/stderr":
+            log_handler = logging.StreamHandler()
+        elif self.__config.log_file == "/dev/stdout":
+            log_handler = logging.StreamHandler(sys.stdout)
+        else:
+            try:
+                log_handler = logging.handlers.RotatingFileHandler(
+                    self.__config.log_file, maxBytes=100**6, backupCount=2)
+            except Exception:
+                # anything goes wrong, fallback to stderr
+                log_handler = logging.StreamHandler()
+        log_format = "[%(asctime)s] [%(name)s] %(levelname)s - %(message)s"
+        logging.basicConfig(level=self.__config.log_level,
+                            handlers=[log_handler],
+                            format=log_format,
+                            datefmt='%Y-%m-%d %H:%M:%S')
+
         self.__user_security = HTTPBearer()
         self.__admin_security = HTTPBearer()
         self.__authorisation = Authorisation(self.__config)
