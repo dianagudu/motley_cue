@@ -1,12 +1,21 @@
 Name: motley-cue
-Version: 0.1.1
-Release: 1
+%define ver %(head debian/changelog -n 1|cut -d \\\( -f 2|cut -d \\\) -f 1|cut -d \- -f 1)
+%define rel %(head debian/changelog -n 1|cut -d \\\( -f 2|cut -d \\\) -f 1|cut -d \- -f 2)
+Version: %{ver}
+Release: %{rel}
+
 Summary: Mapper Oidc To Local idEntitY with loCal User managEment
 Group: Misc
-License: MIT-License
-URL: https://github.com/dianagudu/motley_cue.git
-Source0: motley-cue.tar
+License: MIT
+URL: https://github.com/dianagudu/motley_cue
+Source0: motley-cue.tar.gz
 Patch0: logfiles.patch
+AutoReq: no
+
+# OpenSUSE likes to have a Group
+%if 0%{?suse_version} > 0
+Group: System/Libraries
+%endif
 
 %if 0%{?centos} == 7
 BuildRequires: python3-setuptools >= 39, python36 >= 3.6, python3-pip >= 9.0, python36-devel >= 3.6
@@ -20,7 +29,6 @@ BuildRequires: python3-policycoreutils >= 2.9, python3-virtualenv >= 15.1
 BuildRequires: python3 >= 3.6 python3-policycoreutils >= 2.9
 #, python3-virtualenv >= 15.1
 %endif
-
 
 BuildRoot:	%{_tmppath}/%{name}
 %if 0%{?centos}
@@ -65,6 +73,7 @@ install %{installroot}%{se_dir}/* %{buildroot}%{se_dir}/
 install %{installroot}/etc/nginx/nginx.motley_cue %{buildroot}/etc/nginx/conf.d/nginx.motley_cue.conf
 install %{installroot}/etc/systemd/system/motley-cue.service %{buildroot}/lib/systemd/system/
 
+#FIXME: dont package selinux files for suse
 %files
 %defattr(-,root,root,-)
 %license LICENSE
@@ -74,7 +83,7 @@ install %{installroot}/etc/systemd/system/motley-cue.service %{buildroot}/lib/sy
 %dir %{run_dir}
 %dir %{se_dir}
 %{venv_dir}/*
-%{etc_dir}/*
+%config(noreplace) %{etc_dir}/*
 %{se_dir}/*
 /etc/nginx/conf.d/nginx.motley_cue.conf
 /lib/systemd/system/motley-cue.service
@@ -89,13 +98,13 @@ SAVED_DIR=`pwd`
     PYTHON3_MAJOR=`python3 --version| cut -d\  -f 2 | cut -d\. -f 1`
     PYTHON3_MINOR=`python3 --version| cut -d\  -f 2 | cut -d\. -f 2`
     for PYTHONDIR in python*; do
-        echo "For loop: PYTHONDIR: ${PYTHONDIR}"
+        #echo "For loop: PYTHONDIR: ${PYTHONDIR}"
         test -e $PYTHONDIR && {
             test -L $PYTHONDIR || {
                 # If it exists but is not a symlink, then we found the
                 # Python dir for the version this package was created for
                 PKG_PYTHONDIR=$PYTHONDIR
-                echo "PKG_PYTHONDIR: $PKG_PYTHONDIR"
+                #echo "PKG_PYTHONDIR: $PKG_PYTHONDIR"
             } || true
         } || true
     done
