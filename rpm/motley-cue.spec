@@ -73,7 +73,6 @@ install %{installroot}%{se_dir}/* %{buildroot}%{se_dir}/
 install %{installroot}/etc/nginx/nginx.motley_cue %{buildroot}/etc/nginx/conf.d/nginx.motley_cue.conf
 install %{installroot}/etc/systemd/system/motley-cue.service %{buildroot}/lib/systemd/system/
 
-#FIXME: dont package selinux files for suse
 %files
 %defattr(-,root,root,-)
 %license LICENSE
@@ -81,10 +80,16 @@ install %{installroot}/etc/systemd/system/motley-cue.service %{buildroot}/lib/sy
 %dir %{etc_dir}
 %dir %{log_dir}
 %dir %{run_dir}
+%if 0%{?centos}
 %dir %{se_dir}
+%endif
 %{venv_dir}/*
 %config(noreplace) %{etc_dir}/*
+%if 0%{?centos}
 %{se_dir}/*
+%else
+%exclude %{se_dir}/*
+%endif
 /etc/nginx/conf.d/nginx.motley_cue.conf
 /lib/systemd/system/motley-cue.service
 
@@ -123,6 +128,7 @@ SAVED_DIR=`pwd`
     # BIN 
     #cd %{venv_dir}/bin
     
+%if 0%{?centos}
 cd $SAVED_DIR
 (
     semodule -i %{se_dir}/motley-cue-gunicorn.pp
@@ -130,14 +136,22 @@ cd $SAVED_DIR
     semodule -i %{se_dir}/motley-cue-nginx.pp
     setsebool -P nis_enabled 1
 ) || true
+%endif
 systemctl enable %{name} nginx
 systemctl restart %{name} nginx
 
 %postun
-(
-    semodule -r motley-cue-gunicorn
-    semodule -r motley-cue-sshd
-    semodule -r motley-cue-nginx
-    setsebool -P nis_enabled 0
-) || true
+echo "Postun: $0 $1"
+# Only run on uninstall
+if [ $1 = 0 ]; then
+    echo "postun uninstall"
+    %if 0%{?centos}
+    (
+        semodule -r motley-cue-gunicorn
+        semodule -r motley-cue-sshd
+        semodule -r motley-cue-nginx
+        setsebool -P nis_enabled 0
+    ) || true
+    %endif
+fi
 systemctl restart nginx
