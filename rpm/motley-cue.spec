@@ -141,8 +141,10 @@ systemctl enable %{name} nginx
 systemctl restart %{name} nginx
 
 %postun
+echo "Postun: $0 $1"
 # Only run on uninstall
 if [ $1 = 0 ]; then
+    echo "postun uninstall"
     %if 0%{?centos}
     (
         semodule -r motley-cue-gunicorn
@@ -150,6 +152,6 @@ if [ $1 = 0 ]; then
         semodule -r motley-cue-nginx
         setsebool -P nis_enabled 0
     ) || true
+    %endif
 fi
-%endif
 systemctl restart nginx
