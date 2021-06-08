@@ -142,7 +142,7 @@ A Dockerfile and compose file are provided for testing.
 Run all the test with:
 ```sh
 docker-compose up --build -d
-docker-compose exec web pytest . -v
+docker-compose exec -e ACCESS_TOKEN=`oidc-token https://aai.egi.eu/oidc/` web pytest . -v
 ```
 
 ## Building the package in a docker container

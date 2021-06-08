@@ -4,7 +4,9 @@ services:
   web:
     build: .
     command: gunicorn motley_cue.api:api -k "uvicorn.workers.UvicornWorker" --reload -b 0.0.0.0:8000 --log-level DEBUG -c /etc/motley_cue/gunicorn.conf.py --access-logfile "-" --error-logfile "-"
-    volumes:
-      - .:/motley_cue
+    # volumes:
+    #   - .:/motley_cue
     ports:
       - 8002:8000
+    environment:
+      - ACCESS_TOKEN
