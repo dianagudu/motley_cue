@@ -23,8 +23,16 @@ def test_admin_root(test_api):
     assert set(response.json().keys()) == set(ROOT_KEYS)
     assert set(response.json()["endpoints"].keys()) == set(ADMIN_ENDPOINTS)
 
+    response = test_api.get("/user")
+    assert response.status_code == 200
+    assert set(response.json().keys()) == set(ROOT_KEYS)
+    assert set(response.json()["endpoints"].keys()) == set(USER_ENDPOINTS)
 
-def test_info(test_api):
+    response = test_api.get("/admin")
+    assert response.status_code == 200
+    assert set(response.json().keys()) == set(ROOT_KEYS)
+    assert set(response.json()["endpoints"].keys()) == set(ADMIN_ENDPOINTS)
+
     response = test_api.get("/info")
     assert response.status_code == 200
     assert set(response.json().keys()) == set(INFO_KEYS)
