@@ -13,6 +13,6 @@ def test_api():
 
 @pytest.fixture(scope="module")
 def test_api_with_token():
-    token = os.getenv("ACCESS_TOKEN")
+    token = os.getenv("EGI_TOKEN")
     client = TestClient(api)
     yield client, token  # testing happens here

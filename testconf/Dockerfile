@@ -20,5 +20,5 @@ ENV PYTHONUNBUFFERED 1
 ENV FEUDAL_ADAPTER_CONFIG /etc/motley_cue/feudal_adapter.conf
 
 COPY ./etc /etc/motley_cue
-COPY ./tests/configs /tests/configs
+COPY ./testconf/etc/motley_cue.conf /etc/motley_cue/motley_cue.conf
 COPY . /motley_cue
