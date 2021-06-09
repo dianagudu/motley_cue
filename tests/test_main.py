@@ -1,4 +1,6 @@
-from .utils import *
+from .utils import ROOT_KEYS, ROOT_ENDPOINTS
+from .utils import USER_ENDPOINTS, ADMIN_ENDPOINTS
+from .utils import INFO_KEYS, INFO_AUTHZ_KEYS
 
 
 def test_public_endpoints(test_api):
