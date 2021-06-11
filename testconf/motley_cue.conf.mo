@@ -80,6 +80,7 @@ authorised_admins = []
 ###################
 [authorisation.wlcg]
 ###################
+## AUTHORISE ALL
 op_url = https://wlcg.cloud.cnaf.infn.it/
 
 ## USER AUTHORISATION
@@ -89,15 +90,10 @@ authorise_all = True
 ###################
 [authorisation.egi]
 ###################
+## INDIVIDUAL AUTHORISATION
 op_url = https://aai.egi.eu/oidc
 
 ## USER AUTHORISATION
-## In this example, there is one VO whose members can use the service.
-## In addition, individual users are authorised by 'sub' claim.
-## These users don't have to be members of the authorised VOs.
-# authorised_vos = [
-#         "urn:mace:egi.eu:group:eosc-synergy.eu:role=member#aai.egi.eu"
-#     ]
 authorised_users = [
         "{{EGI_USER}}"
     ]
@@ -113,68 +109,24 @@ authorise_admins_for_all_ops = True
 #############################
 [authorisation.helmholtz-dev]
 #############################
+## VO-BASED AUTHORISATION
 op_url = https://login-dev.helmholtz.de/oauth2
 
 ## USER AUTHORISATION
 ## In this example, the user has to be a member of all the specified VOs.
-authorised_vos = [
-        "{{HELMHOLTZ_DEV_VOS}}"
-    ]
-# vo_match = all
-
-## ADMIN AUTHORISATION
-## no admin users allowed from this OP
-
-
-###################
-[authorisation.kit]
-###################
-op_url = https://oidc.scc.kit.edu/auth/realms/kit
-
-## USER AUTHORISATION
-## In this example, any KIT user can access the service.
-# authorise_all = True
-
-## ADMIN AUTHORISATION
-## In this example, two admins are authorised to suspend / resume accounts
-## of KIT users on this service.
-# authorised_admins = [
-#         "4cbcd471-1f51-4e54-97b8-2dd5177e25ec",
-#         "d0c5d6f7-ca8b-4430-954f-37289ab38913"
-#     ]
+authorised_vos = {{HELMHOLTZ_DEV_VOS}}
 
 
 ####################
 [authorisation.deep]
 ####################
+## SUPPORTED but NOT AUTHORISED
 op_url = https://iam.deep-hybrid-datacloud.eu
 
-## USER AUTHORISATION
-## example for supported VOs with a different claim
-# authorised_vos = [
-#         "KIT-Cloud"
-#     ]
-# vo_claim = groups
 
-## ADMIN AUTHORISATION
-## no admin users allowed from this OP
-
-
-#########################
-[authorisation.helmholtz]
-#########################
-op_url = https://login.helmholtz.de/oauth2/
-
-## USER AUTHORISATION
-## In this example, when no additional authorisation is specified besides the OP URL,
-## no users from this OP are in fact authorised on the service.
-
-## ADMIN AUTHORISATION
-## In this example, even though Helmholtz users are not authorised on this service,
-## the admin specified can suspend users from other OPs.
-## Note that the admin is NOT authorised to USE the service.
-# authorised_admins = [
-#         "6c611e2a-2c1c-487f-9948-c058a36c8f0e"
-#     ]
-# authorise_admins_for_all_ops = True
+###################
+# [authorisation.kit]
+###################
+## NOT SUPPORTED
+# op_url = https://oidc.scc.kit.edu/auth/realms/kit
 

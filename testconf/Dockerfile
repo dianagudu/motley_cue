@@ -9,7 +9,7 @@ RUN set -eux \
         libressl-dev libffi-dev gcc musl-dev python3-dev \
     && pip install --upgrade pip setuptools wheel \
     && pip install -r /requirements.txt \
-    && pip install -r dev-requirements.txt \
+    && pip install -r /dev-requirements.txt \
     && rm -rf /root/.cache/pip
 
 WORKDIR /motley_cue
@@ -20,5 +20,5 @@ ENV PYTHONUNBUFFERED 1
 ENV FEUDAL_ADAPTER_CONFIG /etc/motley_cue/feudal_adapter.conf
 
 COPY ./etc /etc/motley_cue
-COPY ./testconf/etc/motley_cue.conf /etc/motley_cue/motley_cue.conf
+COPY ./testconf/motley_cue.conf /etc/motley_cue/motley_cue.conf
 COPY . /motley_cue

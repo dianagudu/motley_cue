@@ -1,54 +1,27 @@
-from .utils import *
+import pytest
+
+from .utils import PUBLIC_ENDPOINTS, PROTECTED_ENDPOINTS
 
 
-def test_public_endpoints(test_api):
-    response = test_api.get("/")
+@pytest.mark.parametrize(
+    "endpoint,keys,children",
+    [(x.endpoint, x.keys, x.children) for x in PUBLIC_ENDPOINTS],
+    ids=[x.endpoint for x in PUBLIC_ENDPOINTS]
+)
+def test_public_endpoints(test_api, endpoint, keys, children):
+    response = test_api.get(endpoint)
     assert response.status_code == 200
-    assert set(response.json().keys()) == set(ROOT_KEYS)
-    assert set(response.json()["endpoints"].keys()) == set(ROOT_ENDPOINTS)
-
-    response = test_api.get("/user")
-    assert response.status_code == 200
-    assert set(response.json().keys()) == set(ROOT_KEYS)
-    assert set(response.json()["endpoints"].keys()) == set(USER_ENDPOINTS)
-
-    response = test_api.get("/admin")
-    assert response.status_code == 200
-    assert set(response.json().keys()) == set(ROOT_KEYS)
-    assert set(response.json()["endpoints"].keys()) == set(ADMIN_ENDPOINTS)
-
-    response = test_api.get("/info")
-    assert response.status_code == 200
-    assert set(response.json().keys()) == set(INFO_KEYS)
+    assert set(response.json().keys()) == set(keys)
+    if children:
+        assert set(response.json()["endpoints"].keys()) == set(
+            [child.endpoint for child in children]
+        )
 
 
-def test_protected_endpoints_forbidden(test_api):
-    response = test_api.get("/info/authorisation")
+@pytest.mark.parametrize(
+    "endpoint",
+    [x.endpoint for x in PROTECTED_ENDPOINTS]
+)
+def test_protected_endpoints(test_api, endpoint):
+    response = test_api.get(endpoint)
     assert response.status_code == 403
-
-    response = test_api.get("/verify_user")
-    assert response.status_code == 403
-
-    for endpoint in USER_ENDPOINTS:
-        response = test_api.get(f"/user{endpoint}")
-        assert response.status_code == 403
-
-    for endpoint in ADMIN_ENDPOINTS:
-        response = test_api.get(f"/admin{endpoint}")
-        assert response.status_code == 403
-
-
-def test_bad_token(test_api):
-    token = "BADTOKEN"
-    headers = {"Authorization": f"Bearer {token}"}
-    response = test_api.get("/info/authorisation", headers=headers)
-    assert response.status_code == 401
-
-
-def test_login_info_authorisation(test_api_with_token):
-    test_api, token = test_api_with_token
-    headers = {"Authorization": f"Bearer {token}"}
-    response = test_api.get("/info/authorisation", headers=headers)
-    assert response.status_code == 200
-    assert set(response.json().keys()).issuperset(
-        set(INFO_AUTHZ_KEYS))
