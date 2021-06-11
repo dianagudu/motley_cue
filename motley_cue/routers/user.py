@@ -4,7 +4,7 @@ from ..dependencies import mapper
 from ..models import FeudalResponse, responses
 
 
-api = APIRouter()
+api = APIRouter(prefix="/user")
 
 
 @api.get("")
@@ -20,9 +20,9 @@ async def read_root():
         "description": "This is the user API for mapping remote identities to local identities.",
         "usage": "All endpoints are available using an OIDC Access Token as a bearer token.",
         "endpoints": {
-            "/get_status": "Get information about your local account.",
-            "/deploy": "Provision local account.",
-            "/suspend": "Suspend local account."
+            f"{api.prefix}/get_status": "Get information about your local account.",
+            f"{api.prefix}/deploy": "Provision local account.",
+            f"{api.prefix}/suspend": "Suspend local account."
         }
     }
 

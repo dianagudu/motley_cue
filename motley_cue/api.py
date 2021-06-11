@@ -17,10 +17,8 @@ api = FastAPI(
 )
 
 api.include_router(user.api,
-                   prefix="/user",
                    tags=["user"])
 api.include_router(admin.api,
-                   prefix="/admin",
                    tags=["admin"])
 api.add_exception_handler(RequestValidationError, validation_exception_handler)
 
