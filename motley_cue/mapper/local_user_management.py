@@ -48,9 +48,11 @@ class LocalUserManager():
 
     def login_info(self):
         try:
-            login_info = LDF_ADAPTER_CONFIG[
-                'backend.{}.login_info'
-                .format(LDF_ADAPTER_CONFIG['ldf_adapter']['backend'])]
+            login_info = dict(
+                    LDF_ADAPTER_CONFIG[
+                        'backend.{}.login_info'
+                        .format(LDF_ADAPTER_CONFIG['ldf_adapter']['backend'])
+                ])
         except Exception:
             login_info = {}
         return login_info
