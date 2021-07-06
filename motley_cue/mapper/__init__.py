@@ -10,6 +10,7 @@ from fastapi.security import HTTPBearer
 from .config import Config
 from .authorisation import Authorisation
 from .local_user_management import LocalUserManager
+from .utils import MapperResponse
 
 
 class Mapper:
@@ -61,13 +62,13 @@ class Mapper:
 
     def info(self):
         # here we return service name, description, supported OPs
-        return {
+        return MapperResponse({
             "login info": self.__lum.login_info(),
             "supported OPs": self.__authorisation.trusted_op_list,
-        }
+        })
 
     def info_authorisation(self, request):
-        return self.__authorisation.info(request)
+        return MapperResponse(self.__authorisation.info(request))
 
     def login_required(self):
         return self.__authorisation.login_required()
@@ -80,31 +81,22 @@ class Mapper:
 
     def deploy(self, request: Request):
         userinfo = self.__authorisation.get_userinfo_from_request(request)
-        return self.__lum.deploy(userinfo)
+        return MapperResponse(**self.__lum.deploy(userinfo))
 
     def get_status(self, request: Request):
         userinfo = self.__authorisation.get_uid_from_request(request)
-        return self.__lum.get_status(userinfo)
+        return MapperResponse(**self.__lum.get_status(userinfo))
 
     def suspend(self, request: Request):
         userinfo = self.__authorisation.get_uid_from_request(request)
-        return self.__lum.suspend(userinfo)
+        return MapperResponse(**self.__lum.suspend(userinfo))
 
     def admin_suspend(self, sub: str, iss: str):
-        return self.__lum.admin_suspend(sub, iss)
+        return MapperResponse(**self.__lum.admin_suspend(sub, iss))
 
     def admin_resume(self, sub: str, iss: str):
-        return self.__lum.admin_resume(sub, iss)
+        return MapperResponse(**self.__lum.admin_resume(sub, iss))
 
     def verify_user(self, request: Request, username: str):
-        state = "unknown"
-        try:
-            result = self.get_status(request)
-            state = result['state']
-            local_username = result['message'].split()[1]
-        except Exception:
-            local_username = None
-        return {
-            "state": state,
-            "verified": (local_username == username)
-        }
+        userinfo = self.__authorisation.get_uid_from_request(request)
+        return MapperResponse(self.__lum.verify_user(userinfo, username))
