@@ -1,4 +1,3 @@
-etc/gunicorn.conf.py etc/motley_cue
 etc/motley_cue.env etc/motley_cue
 etc/motley_cue.conf etc/motley_cue
 etc/feudal_adapter.conf etc/motley_cue
