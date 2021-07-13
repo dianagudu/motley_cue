@@ -263,6 +263,18 @@ class Authorisation(Flaat):
             userinfo = self.get_info_from_userinfo_endpoints(token)
             # add issuer to userinfo  -> needed by feudalAdapter
             userinfo["iss"] = iss
+            # HACK for wlcg OP: copy groups from AT body in 'wlcg.groups' claim to 'groups' claim in userinfo
+            # also needed by feudalAdapter
+            at_info = self.get_info_thats_in_at(token)
+            try:
+                wlcg_groups = at_info["body"]["wlcg.groups"]
+                logging.getLogger(__name__).info(f"Found 'wlcg.groups' in token, will add them to 'groups' claim: {wlcg_groups}")
+                if not userinfo.get("groups", None):
+                    userinfo["groups"] = wlcg_groups
+                else:
+                    userinfo["groups"] += wlcg_groups
+            except:
+                pass
         else:
             # non JWT AT
             logging.getLogger(__name__).debug("Could not find issuer URL in AT, probably not a JTW")
