@@ -25,9 +25,18 @@ class Authorisation(Flaat):
         super().set_trusted_OP_list(config.trusted_ops)
         super().set_verbosity(config.verbosity)
         self.__authorisation = config.authorisation
+        # create list of OPs supported on service that do not support JWT tokens
+        self.__non_jwt_ops = []
+        ops_that_support_jwt_canonical = [canonical_url(op) for op in self.ops_that_support_jwt]
+        for iss in self.trusted_op_list:
+            if canonical_url(iss) not in ops_that_support_jwt_canonical:
+                self.__non_jwt_ops += [iss]
+        logging.getLogger(__name__).debug(f"List of OPs that do not support JWT ATs: {self.__non_jwt_ops}")
 
     def info(self, request):
-        op_url = self.get_iss_from_request(request)
+        # get OP from request
+        userinfo = self.get_uid_from_request(request)
+        op_url = userinfo.get("iss", None)
         if op_url is None:
             return {
                 "content": "Bad Token: no issuer found in Access Token",
@@ -38,8 +47,8 @@ class Authorisation(Flaat):
         if op_authz is None:
             return {
                 "content": {
-                "OP": op_url,
-                "info": "OP is not supported or provided URL is invalid"
+                    "OP": op_url,
+                    "info": "OP is not supported or provided URL is invalid"
                 },
                 "status_code": 200
             }
@@ -47,8 +56,8 @@ class Authorisation(Flaat):
         if to_bool(op_authz.get('authorise_all', 'False')):
             return {
                 "content": {
-                "OP": op_url,
-                "info": "All users from this OP are authorised"
+                    "OP": op_url,
+                    "info": "All users from this OP are authorised"
                 },
                 "status_code": 200
             }
@@ -57,10 +66,10 @@ class Authorisation(Flaat):
         if len(authorised_vos) > 0:
             return {
                 "content": {
-                "OP": op_url,
-                "info": "VO-based authorisation",
-                "description": f"Users who are in {str(op_authz['vo_match'])} of the supported VOs are authorised",
-                "supported VOs": authorised_vos
+                    "OP": op_url,
+                    "info": "VO-based authorisation",
+                    "description": f"Users who are in {str(op_authz['vo_match'])} of the supported VOs are authorised",
+                    "supported VOs": authorised_vos
                 },
                 "status_code": 200
             }
@@ -68,9 +77,9 @@ class Authorisation(Flaat):
         # (or individual users are authorised, but we don't print those)
         return {
             "content": {
-            "OP": op_url,
-            "info": "OP is supported but no VO-based or OP-wide authorisation configured.",
-            "description": "Users might still be authorised on an individual basis. Please contact the service administrator to request access."
+                "OP": op_url,
+                "info": "OP is supported but no VO-based or OP-wide authorisation configured.",
+                "description": "Users might still be authorised on an individual basis. Please contact the service administrator to request access."
             },
             "status_code": 200
         }
@@ -84,8 +93,10 @@ class Authorisation(Flaat):
                 self.set_last_error("No request object found.")
                 logging.getLogger(__name__).error(f"{self.get_last_error()}")
                 return MapperResponse(f"{self.get_last_error()}", 401)
-            # get OP from request
-            op_url = self.get_iss_from_request(request)
+            # get OP and sub from request
+            userinfo = self.get_uid_from_request(request)
+            op_url = userinfo.get("iss", None)
+            sub = userinfo.get("sub", None)
             if op_url is None:
                 logging.getLogger(__name__).error(self.get_last_error())
                 return MapperResponse(f"Bad Token: no issuer found in Access Token: {self.get_last_error()}", 401)
@@ -114,7 +125,6 @@ class Authorisation(Flaat):
             # it is sufficient to require login, which validates the token
             # at the userinfo endpoint
             authorised_users = to_list(op_authz.get('authorised_users', '[]'))
-            sub = self.get_sub_from_request(request)
             if len(authorised_users) > 0:
                 if sub is None:
                     logging.getLogger(__name__).error(self.get_last_error())
@@ -182,8 +192,10 @@ class Authorisation(Flaat):
                 self.set_last_error("No request object found.")
                 logging.getLogger(__name__).error(f"{self.get_last_error()}")
                 return MapperResponse(f"{self.get_last_error()}", 401)
-            # get OP from request
-            op_url = self.get_iss_from_request(request)
+            # get OP and sub from request
+            userinfo = self.get_uid_from_request(request)
+            op_url = userinfo.get("iss", None)
+            sub = userinfo.get("sub", None)
             if op_url is None:
                 logging.getLogger(__name__).error(self.get_last_error())
                 return MapperResponse(f"Bad Token: no issuer found in Access Token: {self.get_last_error()}", 401)
@@ -197,7 +209,6 @@ class Authorisation(Flaat):
 
             # check if sub in request is authorised to be admin
             authorised_admins = to_list(op_authz.get('authorised_admins', '[]'))
-            sub = self.get_sub_from_request(request)
             if len(authorised_admins) > 0:
                 if sub is None:
                     logging.getLogger(__name__).error(self.get_last_error())
@@ -243,39 +254,58 @@ class Authorisation(Flaat):
             return MapperResponse("Forbidden: you are not authorised as admin on this service", 403)
         return wrapper
 
-    def get_sub_from_request(self, request: Request):
-        token = tokentools.get_access_token_from_request(request)
-        try:
-            return tokentools.get_accesstoken_info(token)["body"]["sub"]
-        except Exception as e:
-            self.set_last_error(e)
-            logging.getLogger(__name__).debug(f"Getting sub from request: {e}")
-            return None
-
-    def get_iss_from_request(self, request: Request):
-        token = tokentools.get_access_token_from_request(request)
-        return tokentools.get_issuer_from_accesstoken_info(token)
-
     def get_userinfo_from_request(self, request: Request):
         token = tokentools.get_access_token_from_request(request)
-        userinfo = self.get_info_from_userinfo_endpoints(token)
-        # add issuer to userinfo  -> needed by feudalAdapter
-        userinfo["iss"] = tokentools.get_issuer_from_accesstoken_info(token)
+        iss = tokentools.get_issuer_from_accesstoken_info(token)
+        if iss:
+            # assume JWT
+            logging.getLogger(__name__).debug(f"Found issuer URL in AT: {iss}")
+            userinfo = self.get_info_from_userinfo_endpoints(token)
+            # add issuer to userinfo  -> needed by feudalAdapter
+            userinfo["iss"] = iss
+        else:
+            # non JWT AT
+            logging.getLogger(__name__).debug("Could not find issuer URL in AT, probably not a JTW")
+            userinfo = self.get_userinfo_non_jwt(token)
         return userinfo
 
     def get_uid_from_request(self, request: Request):
         token = tokentools.get_access_token_from_request(request)
-        # try to get it from access token (token already validated and user authorised)
-        try:
-            token_info = tokentools.get_accesstoken_info(token)
-            return {
-                "sub": token_info['body']['sub'],
-                "iss": token_info['body']['iss']
-            }
-        except Exception:
-            # go to user endpoint
+        iss = tokentools.get_issuer_from_accesstoken_info(token)
+        if iss:
+            # assume JWT
+            logging.getLogger(__name__).debug(f"Found issuer URL in AT: {iss}")
+            try:
+                token_info = tokentools.get_accesstoken_info(token)
+                sub = token_info["body"]["sub"]
+            except Exception:
+                # somehow, no sub found in JWT, even though iss was there
+                # go to user endpoint
+                logging.getLogger(__name__).debug("No sub found in AT, trying to query userinfo endpoint...")
+                userinfo = self.get_info_from_userinfo_endpoints(token)
+                if userinfo.get("iss", None):
+                    sub = userinfo["iss"]
+                else:
+                    return None
+        else:
+            # non JWT AT
+            logging.getLogger(__name__).debug("Could not find issuer URL in AT, probably not a JWT")
+            userinfo = self.get_userinfo_non_jwt(token)
+            iss = userinfo["iss"]
+            sub = userinfo["sub"]
+        return {
+            "sub": sub,
+            "iss": iss
+        }
+
+    def get_userinfo_non_jwt(self, token):
+        logging.getLogger(__name__).debug(f"Trying all OPs that do not support JWTs...")
+        for iss in self.__non_jwt_ops:
+            logging.getLogger(__name__).debug(f"Trying OP URL: {iss}")
+            self.set_trusted_OP(iss)
             userinfo = self.get_info_from_userinfo_endpoints(token)
-            return {
-                "sub": userinfo['sub'],
-                "iss": tokentools.get_issuer_from_accesstoken_info(token)
-            }
+            self.iss = None
+            if userinfo:
+                userinfo["iss"] = iss
+                return userinfo
+        return None
