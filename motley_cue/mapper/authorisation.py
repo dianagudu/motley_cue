@@ -29,35 +29,50 @@ class Authorisation(Flaat):
     def info(self, request):
         op_url = self.get_iss_from_request(request)
         if op_url is None:
-            return MapperResponse("Bad Token: no issuer found in Access Token", status_code=400)
+            return {
+                "content": "Bad Token: no issuer found in Access Token",
+                "status_code": 400
+            }
         op_authz = self.__authorisation.get(canonical_url(op_url), None)
         # if OP not supported
         if op_authz is None:
             return {
+                "content": {
                 "OP": op_url,
                 "info": "OP is not supported or provided URL is invalid"
+                },
+                "status_code": 200
             }
         # if all users from this OP are authorised
         if to_bool(op_authz.get('authorise_all', 'False')):
             return {
+                "content": {
                 "OP": op_url,
                 "info": "All users from this OP are authorised"
+                },
+                "status_code": 200
             }
         # if authorised VOs are specified
         authorised_vos = to_list(op_authz.get('authorised_vos', '[]'))
         if len(authorised_vos) > 0:
             return {
+                "content": {
                 "OP": op_url,
                 "info": "VO-based authorisation",
                 "description": f"Users who are in {str(op_authz['vo_match'])} of the supported VOs are authorised",
                 "supported VOs": authorised_vos
+                },
+                "status_code": 200
             }
         # OP is supported but no authorisation is configured
         # (or individual users are authorised, but we don't print those)
         return {
+            "content": {
             "OP": op_url,
             "info": "OP is supported but no VO-based or OP-wide authorisation configured.",
             "description": "Users might still be authorised on an individual basis. Please contact the service administrator to request access."
+            },
+            "status_code": 200
         }
 
     def authorised_user_required(self, func):

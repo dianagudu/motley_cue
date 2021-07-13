@@ -68,7 +68,7 @@ class Mapper:
         })
 
     def info_authorisation(self, request):
-        return MapperResponse(self.__authorisation.info(request))
+        return MapperResponse(**self.__authorisation.info(request))
 
     def login_required(self):
         return self.__authorisation.login_required()
