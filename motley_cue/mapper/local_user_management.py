@@ -77,9 +77,12 @@ class LocalUserManager():
 
     def _reach_state(self, userinfo, state_target: States):
         if userinfo is None:
-            logging.getLogger(__name__).error("Cannot process null input")
+            logging.getLogger(__name__).error("Something went wrong when trying to get userinfo for feudal.")
             return {
-                "content": None,
+                "content": {
+                    "state": States.unknown.name,
+                    "message": "Something went wrong when trying to retrieve user info."
+                },
                 "status_code": 500
             }
         # build input for feudalAdapter
