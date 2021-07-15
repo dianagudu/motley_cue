@@ -5,7 +5,7 @@ from flaat import Flaat, tokentools
 from aarc_g002_entitlement import Aarc_g002_entitlement, Aarc_g002_entitlement_Error
 
 from .config import canonical_url, to_bool, to_list
-from .utils import MapperResponse
+from .utils import MapperResponse, EXACT_OP_URLS
 
 
 class Authorisation(Flaat):
@@ -139,7 +139,7 @@ class Authorisation(Flaat):
 
             # if authorised VOs are specified, try to authorise based on VOs
             # this depends on the type of VO: AARC-G002 compatible or not
-            # HACKY: if at least on of the provided groups is not compatible with AARC-G002,
+            # HACK: if at least on of the provided groups is not compatible with AARC-G002,
             # treat them all as normal groups
             # possible FIX: flaat should deal with it and provide a uniform interface to check
             # VO membership for mixed lists of VOs
@@ -216,29 +216,38 @@ class Authorisation(Flaat):
                     return MapperResponse(f"Bad Token: no sub claim found in Access Token: {self.get_last_error()}", 401)
                 if sub in authorised_admins:
                     logging.getLogger(__name__).debug(f"Sub {sub} is an authorised admin.")
-                    # check if admin is authorised for all OPs or if admin's issuer matches user's issuer
-                    is_authorised = to_bool(op_authz.get('authorise_admins_for_all_ops', 'False'))
-                    logging.getLogger(__name__).debug(f"Checking if {sub} is authorised as admin for all OPs: {is_authorised}")
-                    if not is_authorised:
-                        # get iss of user to suspend/resume from wrapped function params
-                        user_iss = kwargs.get("iss", None)
-                        if user_iss is None:
-                            self.set_last_error("Bad Request: No user issuer provided.")
-                            logging.getLogger(__name__).error(f"{self.get_last_error()}")
-                            return MapperResponse(f"{self.get_last_error()}", 400)
-                        logging.getLogger(__name__).debug(f"Checking if admin {sub} is authorised for given user, i.e. "
-                                                          f"{user_iss} == {op_url}: "
-                                                          f"{canonical_url(user_iss) == canonical_url(op_url)}")
-                        if canonical_url(user_iss) == canonical_url(op_url):
-                            is_authorised = True
-                            # HACKY: if the URLs are the same (in canonical form) use the admin URL instead
-                            # this URL is in the form found in ATs released by this OP
-                            # this means you can leave out the "https://" of ending "/" in admin API calls and it still works
-                            # otherwise, feudal_adapter cannot find the user since it queries by gecos field: sub@iss
-                            # BUT it doesn't work when admins can suspend users from other OPs
-                            # FIXME: can to be done in feudal, or by storing the exact URL in the mapper
-                            # print(op_url, user_iss)
-                            kwargs["iss"] = op_url
+                    # get iss of user to suspend/resume from wrapped function params
+                    user_iss = kwargs.get("iss", None)
+                    if user_iss is None:
+                        self.set_last_error("Bad Request: No user issuer provided.")
+                        logging.getLogger(__name__).error(f"{self.get_last_error()}")
+                        return MapperResponse(f"{self.get_last_error()}", 400)
+                    # check if admin's issuer matches user's issuer
+                    logging.getLogger(__name__).debug(f"Checking if admin {sub} is authorised for given user's iss, i.e. "
+                                                      f"{user_iss} == {op_url}: "
+                                                      f"{canonical_url(user_iss) == canonical_url(op_url)}")
+                    if canonical_url(user_iss) == canonical_url(op_url):
+                        is_authorised = True
+                        # HACK: if the URLs are the same (in canonical form) use the admin URL instead.
+                        # This URL is in the form found in ATs released by this OP.
+                        # This means you can leave out the "https://" of ending "/" in admin API calls and it still works.
+                        # Otherwise, feudal_adapter cannot find the user since it queries by gecos field: sub@iss
+                        # FIXME: can also be done in feudal, or by storing the exact URL in the mapper
+                        # print(op_url, user_iss)
+                        logging.getLogger(__name__).warning(f"Changing iss of user to perform admin action on: {user_iss} => {op_url}")
+                        kwargs["iss"] = op_url
+                    else:
+                        # the admin iss does not match the user iss,
+                        # check if admin is authorised for all OPs
+                        is_authorised = to_bool(op_authz.get('authorise_admins_for_all_ops', 'False'))
+                        logging.getLogger(__name__).debug(f"Checking if {sub} is authorised as admin for all OPs: {is_authorised}")
+                        # HACK: still try to overwrite user iss with the url as stored in flaat, but first check EXACT_OP_URLS for exceptions
+                        if is_authorised:
+                            for iss in EXACT_OP_URLS + self.trusted_op_list:
+                                if canonical_url(user_iss) == canonical_url(iss):
+                                    logging.getLogger(__name__).warning(f"Changing iss of user to perform admin action on: {user_iss} => {iss}")
+                                    kwargs["iss"] = iss
+                                    break
                     if is_authorised:
                         @self.login_required()
                         async def tmp(*args, **kwargs):
@@ -247,7 +256,7 @@ class Authorisation(Flaat):
                     else:
                         msg = "Forbidden: you are not authorised to perform actions on users from other OPs"
                         logging.getLogger(__name__).error(f"Admin {sub} from {op_url} is not authorised to perform actions on users from other OPs (i.e. {user_iss})")
-                        MapperResponse(msg, 403)
+                        return MapperResponse(msg, 403)
             else:
                 logging.getLogger(__name__).debug("No admins authorised by sub.")
 
