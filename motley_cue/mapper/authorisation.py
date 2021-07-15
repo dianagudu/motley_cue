@@ -25,13 +25,6 @@ class Authorisation(Flaat):
         super().set_trusted_OP_list(config.trusted_ops)
         super().set_verbosity(config.verbosity)
         self.__authorisation = config.authorisation
-        # create list of OPs supported on service that do not support JWT tokens
-        self.__non_jwt_ops = []
-        ops_that_support_jwt_canonical = [canonical_url(op) for op in self.ops_that_support_jwt]
-        for iss in self.trusted_op_list:
-            if canonical_url(iss) not in ops_that_support_jwt_canonical:
-                self.__non_jwt_ops += [iss]
-        logging.getLogger(__name__).debug(f"List of OPs that do not support JWT ATs: {self.__non_jwt_ops}")
 
     def info(self, request):
         # get OP from request
@@ -93,8 +86,12 @@ class Authorisation(Flaat):
                 self.set_last_error("No request object found.")
                 logging.getLogger(__name__).error(f"{self.get_last_error()}")
                 return MapperResponse(f"{self.get_last_error()}", 401)
-            # get OP and sub from request
+            # get uid from request
             userinfo = self.get_uid_from_request(request)
+            if userinfo is None:
+                logging.getLogger(__name__).error(self.get_last_error())
+                return MapperResponse(f"Something went wrong: {self.get_last_error()}", 401)
+            # get OP and sub from userinfo
             op_url = userinfo.get("iss", None)
             sub = userinfo.get("sub", None)
             if op_url is None:
@@ -192,8 +189,12 @@ class Authorisation(Flaat):
                 self.set_last_error("No request object found.")
                 logging.getLogger(__name__).error(f"{self.get_last_error()}")
                 return MapperResponse(f"{self.get_last_error()}", 401)
-            # get OP and sub from request
+            # get uid from request
             userinfo = self.get_uid_from_request(request)
+            if userinfo is None:
+                logging.getLogger(__name__).error(self.get_last_error())
+                return MapperResponse(f"Something went wrong: {self.get_last_error()}", 401)
+            # get OP and sub from userinfo
             op_url = userinfo.get("iss", None)
             sub = userinfo.get("sub", None)
             if op_url is None:
@@ -256,14 +257,13 @@ class Authorisation(Flaat):
 
     def get_userinfo_from_request(self, request: Request):
         token = tokentools.get_access_token_from_request(request)
-        # iss = tokentools.get_issuer_from_accesstoken_info(token)
+        userinfo = self.get_info_from_userinfo_endpoints(token)
+        if not userinfo:
+            self.set_last_error("Could not get userinfo from userinfo endpoints.")
+            return None
         iss = self.get_issuer_from_accesstoken(token)
         if iss:
-            # assume JWT
-            logging.getLogger(__name__).debug(f"Found issuer URL in AT: {iss}")
-            userinfo = self.get_info_from_userinfo_endpoints(token)
-            if not userinfo:
-                return None
+            logging.getLogger(__name__).debug(f"Found issuer URL in AT or cache: {iss}")
             # add issuer to userinfo  -> needed by feudalAdapter
             userinfo["iss"] = iss
             # HACK for wlcg OP: copy groups from AT body in 'wlcg.groups' claim to 'groups' claim in userinfo
@@ -279,17 +279,14 @@ class Authorisation(Flaat):
             except:
                 pass
         else:
-            # non JWT AT
-            logging.getLogger(__name__).debug("Could not find issuer URL in AT, probably not a JTW")
-            userinfo = self.get_userinfo_non_jwt(token)
+            logging.getLogger(__name__).debug("Could not get issuer URL from Access Token or cache.")
         return userinfo
 
     def get_uid_from_request(self, request: Request):
         token = tokentools.get_access_token_from_request(request)
-        iss = tokentools.get_issuer_from_accesstoken_info(token)
+        iss = self.get_issuer_from_accesstoken(token)
         if iss:
-            # assume JWT
-            logging.getLogger(__name__).debug(f"Found issuer URL in AT: {iss}")
+            logging.getLogger(__name__).debug(f"Found issuer URL in AT or cache: {iss}")
             try:
                 token_info = tokentools.get_accesstoken_info(token)
                 sub = token_info["body"]["sub"]
@@ -298,31 +295,13 @@ class Authorisation(Flaat):
                 # go to user endpoint
                 logging.getLogger(__name__).debug("No sub found in AT, trying to query userinfo endpoint...")
                 userinfo = self.get_info_from_userinfo_endpoints(token)
-                if userinfo.get("iss", None):
-                    sub = userinfo["iss"]
-                else:
-                    return None
+                sub = userinfo.get("sub", None)
         else:
-            # non JWT AT
-            logging.getLogger(__name__).debug("Could not find issuer URL in AT, probably not a JWT")
-            userinfo = self.get_userinfo_non_jwt(token)
-            if not userinfo:
-                return None
-            iss = userinfo["iss"]
-            sub = userinfo["sub"]
+            logging.getLogger(__name__).debug("Could not get issuer URL from Access Token or cache.")
+            return None
+        if not sub:
+            return None
         return {
             "sub": sub,
             "iss": iss
         }
-
-    def get_userinfo_non_jwt(self, token):
-        logging.getLogger(__name__).debug(f"Trying all OPs that do not support JWTs...")
-        for iss in self.__non_jwt_ops:
-            logging.getLogger(__name__).debug(f"Trying OP URL: {iss}")
-            self.set_trusted_OP(iss)
-            userinfo = self.get_info_from_userinfo_endpoints(token)
-            self.iss = None
-            if userinfo:
-                userinfo["iss"] = iss
-                return userinfo
-        return None
