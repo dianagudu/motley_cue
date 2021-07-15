@@ -28,11 +28,11 @@ class Authorisation(Flaat):
 
     def info(self, request):
         # get OP from request
-        userinfo = self.get_uid_from_request(request)
-        op_url = userinfo.get("iss", None)
+        token = tokentools.get_access_token_from_request(request)
+        op_url = self.get_issuer_from_accesstoken(token)
         if op_url is None:
             return {
-                "content": "Bad Token: no issuer found in Access Token",
+                "content": "Bad Token: no issuer found in Access Token or cache",
                 "status_code": 400
             }
         op_authz = self.__authorisation.get(canonical_url(op_url), None)
