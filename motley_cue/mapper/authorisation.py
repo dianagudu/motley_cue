@@ -89,14 +89,14 @@ class Authorisation(Flaat):
             # get uid from request
             userinfo = self.get_uid_from_request(request)
             if userinfo is None:
-                logging.getLogger(__name__).error(self.get_last_error())
-                return MapperResponse(f"Something went wrong: {self.get_last_error()}", 401)
+                logging.getLogger(__name__).error(f"Could not use token to get userinfo from userinfo endpoints. Last error: {self.get_last_error()}.")
+                return MapperResponse(f"Forbidden: you are not authorised to access this service. Failed to use provided token to get userinfo.", 401)
             # get OP and sub from userinfo
             op_url = userinfo.get("iss", None)
             sub = userinfo.get("sub", None)
             if op_url is None:
                 logging.getLogger(__name__).error(self.get_last_error())
-                return MapperResponse(f"Bad Token: no issuer found in Access Token: {self.get_last_error()}", 401)
+                return MapperResponse(f"Bad Token: no issuer found in Access Token.", 401)
             # get authorisation info for this OP
             op_authz = self.__authorisation.get(canonical_url(op_url), None)
 
@@ -125,7 +125,7 @@ class Authorisation(Flaat):
             if len(authorised_users) > 0:
                 if sub is None:
                     logging.getLogger(__name__).error(self.get_last_error())
-                    return MapperResponse(f"Bad Token: no sub claim found in Access Token: {self.get_last_error()}", 401)
+                    return MapperResponse(f"Bad Token: no sub claim found in Access Token.", 401)
                 if sub in authorised_users:
                     logging.getLogger(__name__).debug(f"User {sub} is individually authorised by sub.")
 
@@ -192,14 +192,14 @@ class Authorisation(Flaat):
             # get uid from request
             userinfo = self.get_uid_from_request(request)
             if userinfo is None:
-                logging.getLogger(__name__).error(self.get_last_error())
-                return MapperResponse(f"Something went wrong: {self.get_last_error()}", 401)
+                logging.getLogger(__name__).error(f"Could not use token to get userinfo from userinfo endpoints. Last error: {self.get_last_error()}.")
+                return MapperResponse(f"Forbidden: you are not authorised to access this service. Failed to use provided token to get userinfo.", 401)
             # get OP and sub from userinfo
             op_url = userinfo.get("iss", None)
             sub = userinfo.get("sub", None)
             if op_url is None:
                 logging.getLogger(__name__).error(self.get_last_error())
-                return MapperResponse(f"Bad Token: no issuer found in Access Token: {self.get_last_error()}", 401)
+                return MapperResponse(f"Bad Token: no issuer found in Access Token.", 401)
             # get authorisation info for this OP
             op_authz = self.__authorisation.get(canonical_url(op_url), None)
             # if OP not supported:
@@ -213,7 +213,7 @@ class Authorisation(Flaat):
             if len(authorised_admins) > 0:
                 if sub is None:
                     logging.getLogger(__name__).error(self.get_last_error())
-                    return MapperResponse(f"Bad Token: no sub claim found in Access Token: {self.get_last_error()}", 401)
+                    return MapperResponse(f"Bad Token: no sub claim found in Access Token.", 401)
                 if sub in authorised_admins:
                     logging.getLogger(__name__).debug(f"Sub {sub} is an authorised admin.")
                     # get iss of user to suspend/resume from wrapped function params
@@ -266,11 +266,19 @@ class Authorisation(Flaat):
 
     def get_userinfo_from_request(self, request: Request):
         token = tokentools.get_access_token_from_request(request)
-        userinfo = self.get_info_from_userinfo_endpoints(token)
+        try:
+            userinfo = self.get_info_from_userinfo_endpoints(token)
+        except Exception as e:
+            logging.getLogger(__name__).debug(f"Exception while getting userinfo from userinfo endpoints: {e}")
+            return None
         if not userinfo:
             self.set_last_error("Could not get userinfo from userinfo endpoints.")
             return None
-        iss = self.get_issuer_from_accesstoken(token)
+        try:
+            iss = self.get_issuer_from_accesstoken(token)
+        except Exception as e:
+            logging.getLogger(__name__).debug(f"Exception while getting issuer from Access Token or cache: {e}")
+            return None
         if iss:
             logging.getLogger(__name__).debug(f"Found issuer URL in AT or cache: {iss}")
             # add issuer to userinfo  -> needed by feudalAdapter
@@ -293,7 +301,11 @@ class Authorisation(Flaat):
 
     def get_uid_from_request(self, request: Request):
         token = tokentools.get_access_token_from_request(request)
-        iss = self.get_issuer_from_accesstoken(token)
+        try:
+            iss = self.get_issuer_from_accesstoken(token)
+        except Exception as e:
+            logging.getLogger(__name__).debug(f"Exception while getting issuer from Access Token or cache: {e}")
+            return None
         if iss:
             logging.getLogger(__name__).debug(f"Found issuer URL in AT or cache: {iss}")
             try:
