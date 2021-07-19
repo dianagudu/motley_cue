@@ -77,6 +77,41 @@ class Authorisation(Flaat):
             "status_code": 200
         }
 
+    def authenticated_user_required(self, func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # get request from wrapped function params
+            request = kwargs.get("request", None)
+            if request is None:
+                self.set_last_error("No request object found.")
+                logging.getLogger(__name__).error(f"{self.get_last_error()}")
+                return MapperResponse(f"{self.get_last_error()}", 401)
+            # get uid from request
+            userinfo = self.get_uid_from_request(request)
+            if userinfo is None:
+                logging.getLogger(__name__).error(f"Could not use token to get userinfo from userinfo endpoints. Last error: {self.get_last_error()}.")
+                return MapperResponse(f"Forbidden: you are not authorised to access this service. Failed to use provided token to get userinfo.", 401)
+            # get OP and sub from userinfo
+            op_url = userinfo.get("iss", None)
+            sub = userinfo.get("sub", None)
+            if op_url is None:
+                logging.getLogger(__name__).error(self.get_last_error())
+                return MapperResponse(f"Bad Token: no issuer found in Access Token.", 401)
+            # get authorisation info for this OP
+            op_authz = self.__authorisation.get(canonical_url(op_url), None)
+
+            # if OP not supported:
+            if op_authz is None:
+                msg = f"The token issuer is not supported on this service: {op_url}"
+                logging.getLogger(__name__).error(msg)
+                return MapperResponse(msg, 403)
+
+            @self.login_required()
+            async def tmp(*args, **kwargs):
+                return await func(*args, **kwargs)
+            return tmp(*args, **kwargs)
+        return wrapper
+
     def authorised_user_required(self, func):
         @wraps(func)
         def wrapper(*args, **kwargs):

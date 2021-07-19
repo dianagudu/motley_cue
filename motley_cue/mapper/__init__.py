@@ -70,8 +70,8 @@ class Mapper:
     def info_authorisation(self, request):
         return MapperResponse(**self.__authorisation.info(request))
 
-    def login_required(self):
-        return self.__authorisation.login_required()
+    def authenticated_user_required(self, func):
+        return self.__authorisation.authenticated_user_required(func)
 
     def authorised_user_required(self, func):
         return self.__authorisation.authorised_user_required(func)
