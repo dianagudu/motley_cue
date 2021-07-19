@@ -34,7 +34,7 @@ async def info(request: Request):
 
 
 @api.get("/info/authorisation", dependencies=[Depends(mapper.user_security)])
-@mapper.login_required()
+@mapper.authenticated_user_required
 async def info_authorisation(request: Request):
     return mapper.info_authorisation(request)
 
