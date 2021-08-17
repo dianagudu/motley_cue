@@ -108,7 +108,7 @@ rpm_copy_output() {
 common_prepare_dirs
 
 case "$DIST" in
-    debian_buster|debian_bullseye|ubuntu_bionic)
+    debian_buster|debian_bullseye|ubuntu_bionic|debian_bookworm)
         debian_install_dependencies
         debian_build_package
         debian_copy_output
