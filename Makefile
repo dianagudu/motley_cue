@@ -76,7 +76,8 @@ dockerised_some_packages: dockerised_deb_debian_buster\
 
 .PHONY: dockerised_most_packages
 dockerised_most_packages: dockerised_deb_debian_buster\
-	dockerised_deb_debian_buster\
+	dockerised_deb_debian_bullseye\
+	dockerised_deb_debian_bookworm\
 	dockerised_rpm_centos7\
 	dockerised_rpm_centos8\
 	dockerised_rpm_opensuse_tumbleweed\
@@ -84,6 +85,7 @@ dockerised_most_packages: dockerised_deb_debian_buster\
 .PHONY: dockerised_all_packages
 dockerised_all_packages: dockerised_deb_debian_buster\
 	dockerised_deb_debian_bullseye\
+	dockerised_deb_debian_bookworm\
 	dockerised_deb_ubuntu_bionic\
 	dockerised_deb_ubuntu_focal\
 	dockerised_rpm_centos7\
@@ -97,6 +99,7 @@ docker_images: docker_centos8\
 	docker_centos7\
 	docker_debian_bullseye\
 	docker_debian_buster\
+	docker_debian_bookworm\
 	docker_ubuntu_bionic\
 	docker_ubuntu_focal\
 	docker_opensuse15.2\
@@ -123,6 +126,16 @@ docker_debian_bullseye:
 		"python3-virtualenv dh-virtualenv python3-venv devscripts git "\
 		"python3 python3-dev python3-pip python3-setuptools "| \
 	docker build --tag debian_bullseye -f - .  >> docker.log
+.PHONY: docker_debian_bookworm
+docker_debian_bookworm:
+	@echo -e "\ndebian_bookworm"
+	@echo -e "FROM debian:bookworm\n"\
+	"RUN apt-get update && "\
+		"apt-get -y upgrade && "\
+		"apt-get -y install build-essential dh-make quilt "\
+		"python3-virtualenv dh-virtualenv python3-venv devscripts git "\
+		"python3 python3-dev python3-pip python3-setuptools "| \
+	docker build --tag debian_bookworm -f - .  >> docker.log
 .PHONY: docker_ubuntu_bionic
 docker_ubuntu_bionic:
 	@echo -e "\nubuntu_bionic"
@@ -201,6 +214,7 @@ docker_clean:
 	docker image rm	ubuntu_focal || true
 	docker image rm debian_buster || true
 	docker image rm	debian_bullseye || true
+	docker image rm	debian_bookworm || true
 
 .PHONY: dockerised_deb_debian_buster
 dockerised_deb_debian_buster: docker_debian_buster
@@ -213,6 +227,12 @@ dockerised_deb_debian_bullseye: docker_debian_bullseye
 	@echo "Writing build log to $@.log"
 	@docker run --tty --rm -v ${DOCKER_BASE}:/home/build debian_bullseye \
 		/home/build/${PACKAGE}/build.sh ${PACKAGE} debian_bullseye ${PKG_NAME} > $@.log
+
+.PHONY: dockerised_deb_debian_bookworm
+dockerised_deb_debian_bookworm: docker_debian_bookworm
+	@echo "Writing build log to $@.log"
+	@docker run --tty --rm -v ${DOCKER_BASE}:/home/build debian_bookworm \
+		/home/build/${PACKAGE}/build.sh ${PACKAGE} debian_bookworm ${PKG_NAME} > $@.log
 
 .PHONY: dockerised_deb_ubuntu_bionic
 dockerised_deb_ubuntu_bionic: docker_ubuntu_bionic
@@ -269,6 +289,7 @@ publish-to-repo:
 	@scp ../results/centos8/* build@repo.data.kit.edu:/var/www/centos/centos8
 	@scp ../results/debian_buster/* build@repo.data.kit.edu:/var/www/debian/buster
 	@scp ../results/debian_bullseye/* build@repo.data.kit.edu:/var/www/debian/bullseye
+	@scp ../results/debian_bookworm/* build@repo.data.kit.edu:/var/www/debian/bookworm
 	@scp ../results/ubuntu_bionic/* build@repo.data.kit.edu:/var/www/ubuntu/bionic 
 	@scp ../results/ubuntu_focal/* build@repo.data.kit.edu:/var/www/ubuntu/focal
 	@scp ../results/opensuse15.2/* build@repo.data.kit.edu:/var/www/suse/opensuse-leap-15.2
