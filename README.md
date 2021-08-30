@@ -107,10 +107,9 @@ https://letsencrypt.org/.
 
 ## Usage
 
-In the following we assume the API at http://localhost:8080/.
+The full API specification is described in [API.md](API.md).
 
-The Swagger UI, for interactive exploration, and to call and test your API
-directly from the browser, can be reached at http://localhost:8080/docs.
+In the following we assume the API at http://localhost:8080/. The Swagger UI, for interactive exploration, and to call and test your API directly from the browser, can be reached at http://localhost:8080/docs.
 
 You'll need an OIDC AccessToken to authenticate. Check out the
 [oidc-agent](https://github.com/indigo-dc/oidc-agent) for that.
@@ -127,7 +126,7 @@ For example, if you generated an account named `egi` for the [EGI AAI](https://a
   ```
 - verify if a given username matches the local account mapped to your remote identity
   ```sh
-  http http://localhost:8080/verify_user\?username\=diana_gudu  "Authorization: Bearer `oidc-token egi`"
+  http http://localhost:8080/verify_user\?username\=someusername  "Authorization: Bearer `oidc-token egi`"
   ```
 - suspend your local account (e.g. if you suspect your account has been
 compromised):
@@ -135,6 +134,7 @@ compromised):
   http http://localhost:8080/user/suspend "Authorization: Bearer `oidc-token egi`"
   ```
 
+The following [document](https://git.scc.kit.edu/feudal/feudalAdapterLdf/-/blob/master/states.md) gives a complete overview of the different states a local account can be in, as well as the actions that can be performed on a local account.
 
 ## Building the package in a docker container
 
@@ -154,6 +154,10 @@ Where `<name>` can be one of:
 The resulting files are copied out of the build container to the `../results` folder.
 
 ## SSH Integration
+
+A detailed (and up-to-date) documentation of all the required components to enable SSH access via OIDC with on-the-fly account provisioning can be found at: https://github.com/EOSC-synergy/ssh-oidc.
+
+A quick summary below:
 
 ### PAM
 
