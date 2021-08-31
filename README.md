@@ -202,4 +202,4 @@ UsePam yes
 
 To ssh into a server that supports OIDC authentication, you'll need to trigger the deployment of a local account by calling the /deploy endpoint and then getting the local username.
 
-Or you can have a look at this SSH client wrapper that does all this for you: https://github.com/dianagudu/mc_ssh.
+Or you can have a look at this SSH client wrapper that does all this for you: https://github.com/dianagudu/mccli.
