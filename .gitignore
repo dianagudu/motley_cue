@@ -19,3 +19,4 @@ debian/*substvars
 *.swp
 .pc
 docker*log
+*.sqlite
