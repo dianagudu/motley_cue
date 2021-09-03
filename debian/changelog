@@ -1,4 +1,4 @@
-motley-cue (0.1.3-2) UNRELEASED; urgency=medium
+motley-cue (0.1.3-3) UNRELEASED; urgency=medium
 
   [ Marcus Hardt ]
   * Initial go for packageing
@@ -20,5 +20,7 @@ motley-cue (0.1.3-2) UNRELEASED; urgency=medium
   * Use flaat v0.14.2 and feudalAdapter v0.3.101
   * Fixes for getting issuer from AT/userinfo with AT (via flaat v0.14.5)
   * Fixes for admin actions and iss representation
+  * Disable assurance checking by default
+  * Include fixes in feudal for Python 3.6 support
 
- -- Diana Gudu <diana.gudu@kit.edu>  Wed, 21 Jul 2021 12:05:18 +0200
+ -- Diana Gudu <diana.gudu@kit.edu>  Fri, 03 Sep 2021 13:58:09 +0200
