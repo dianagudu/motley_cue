@@ -1,5 +1,4 @@
 venv/*
-doc/*
 *.egg-info/*
 */*.egg-info/*
 .eggs/*
