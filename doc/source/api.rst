@@ -2,3 +2,8 @@
 
 API
 ===
+
+API reference
+-------------
+
+.. openapi:: api/openapi.yml
