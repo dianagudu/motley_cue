@@ -182,6 +182,9 @@ html_sidebars = {
         'sourcelink.html', 'searchbox.html' ],
 }
 
+html_css_files = [
+    'css/fonts.css',
+]
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
