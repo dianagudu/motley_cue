@@ -1,0 +1,252 @@
+openapi: 3.0.2
+info:
+  title: motley cue API
+  version: 0.1.3
+paths:
+  "/user/":
+    get:
+      tags:
+      - user
+      summary: Read Root
+      operationId: read_root_user__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  "/user":
+    get:
+      tags:
+      - user
+      summary: Read Root
+      operationId: read_root_user_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  "/user/get_status":
+    get:
+      tags:
+      - user
+      summary: Get Status
+      operationId: get_status_user_get_status_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - HTTPBearer: []
+  "/user/deploy":
+    get:
+      tags:
+      - user
+      summary: Deploy
+      operationId: deploy_user_deploy_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - HTTPBearer: []
+  "/user/suspend":
+    get:
+      tags:
+      - user
+      summary: Suspend
+      operationId: suspend_user_suspend_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - HTTPBearer: []
+  "/admin/":
+    get:
+      tags:
+      - admin
+      summary: Read Root
+      operationId: read_root_admin__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  "/admin":
+    get:
+      tags:
+      - admin
+      summary: Read Root
+      operationId: read_root_admin_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  "/admin/suspend":
+    get:
+      tags:
+      - admin
+      summary: Suspend
+      operationId: suspend_admin_suspend_get
+      parameters:
+      - required: true
+        schema:
+          title: Sub
+          type: string
+        name: sub
+        in: query
+      - required: true
+        schema:
+          title: Iss
+          type: string
+        name: iss
+        in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/HTTPValidationError"
+      security:
+      - HTTPBearer: []
+  "/admin/resume":
+    get:
+      tags:
+      - admin
+      summary: Resume
+      operationId: resume_admin_resume_get
+      parameters:
+      - required: true
+        schema:
+          title: Sub
+          type: string
+        name: sub
+        in: query
+      - required: true
+        schema:
+          title: Iss
+          type: string
+        name: iss
+        in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/HTTPValidationError"
+      security:
+      - HTTPBearer: []
+  "/":
+    get:
+      summary: Read Root
+      operationId: read_root__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  "/info":
+    get:
+      summary: Info
+      operationId: info_info_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  "/info/authorisation":
+    get:
+      summary: Info Authorisation
+      operationId: info_authorisation_info_authorisation_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - HTTPBearer: []
+  "/verify_user":
+    get:
+      summary: Verify User
+      operationId: verify_user_verify_user_get
+      parameters:
+      - required: true
+        schema:
+          title: Username
+          type: string
+        name: username
+        in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/HTTPValidationError"
+      security:
+      - HTTPBearer: []
+components:
+  schemas:
+    HTTPValidationError:
+      title: HTTPValidationError
+      type: object
+      properties:
+        detail:
+          title: Detail
+          type: array
+          items:
+            "$ref": "#/components/schemas/ValidationError"
+    ValidationError:
+      title: ValidationError
+      required:
+      - loc
+      - msg
+      - type
+      type: object
+      properties:
+        loc:
+          title: Location
+          type: array
+          items:
+            type: string
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer
