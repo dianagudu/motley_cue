@@ -1,0 +1,275 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Running &#8212; motley_cue</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/fonts.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="_static/motley-cue.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="motley_cue.conf" href="configs/motley_cue_conf.html" />
+    <link rel="prev" title="Configuration" href="configuration.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+    <link rel="apple-touch-icon" href="_static/logos/motley-cue-notext.svg" />
+  
+  
+    <link rel="canonical" href="https://dianagudu.github.io/motley_cue/running.html"/>
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/logos/motley-cue.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">SSH client wrapper for SSH with OIDC access token</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=dianagudu&repo=motley_cue&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Running</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#development">Development</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#production">Production</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gunicorn">gunicorn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#systemd">systemd</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nginx">nginx</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#config-files">Config files</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ssh-integration.html">SSH Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">For developers</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="configuration.html" title="previous chapter">Configuration</a></li>
+      <li>Next: <a href="configs/motley_cue_conf.html" title="next chapter">motley_cue.conf</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="running">
+<span id="id1"></span><h1>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h1>
+<p>If you installed <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> using a package manager, you can simply start the service by:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>systemctl start motley-cue
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="api.html"><span class="doc">motley_cue API</span></a> will be available <a class="reference external" href="http://localhost:8080">http://localhost:8080</a>.</p>
+<p>It is highly recommended to use HTTPS. The nginx site file installed with the package also provides an example configuration for that in the comments (see section on <a class="reference internal" href="#nginx"><span class="std std-ref">how to manually configure nginx with motley_cue</span></a> for more details).</p>
+<p>You will also need certificates for your server. Probably the simplest way to do that is by using <a class="reference external" href="https://letsencrypt.org/">https://letsencrypt.org/</a>.</p>
+<section id="development">
+<h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
+<p>If you installed <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> with <code class="docutils literal notranslate"><span class="pre">pip</span></code>, for quick testing you can simply run it with <code class="docutils literal notranslate"><span class="pre">uvicorn</span></code> (as user with permissions to add users):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo motley_cue_uvicorn
+</pre></div>
+</div>
+<p>The API will then be available at <a class="reference external" href="http://localhost:8080">http://localhost:8080</a>.</p>
+</section>
+<section id="production">
+<span id="id2"></span><h2>Production<a class="headerlink" href="#production" title="Permalink to this headline">¶</a></h2>
+<p>This section describes how to run <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> in production if you installed it with <code class="docutils literal notranslate"><span class="pre">pip</span></code>.</p>
+<p>To set up the production environment, we recommended using:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">gunicorn</span></code>: manages multiple uvicorn worker processes, monitors and restarts crashed processes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">systemd</span></code>: service management and monitoring</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nginx</span></code>: HTTPS support, buffers slow clients and prevents DoS attacks</p></li>
+</ul>
+<p>The code examples below assume a python virtualenv at <code class="docutils literal notranslate"><span class="pre">/usr/lib/motley-cue</span></code>, where you have installed <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> and its dependencies. Adapt paths if necessary.</p>
+<section id="gunicorn">
+<h3>gunicorn<a class="headerlink" href="#gunicorn" title="Permalink to this headline">¶</a></h3>
+<p>To configure <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> to run with <code class="docutils literal notranslate"><span class="pre">gunicorn</span></code>, you will need two additional configuration files.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="configs/gunicorn_conf.html#gunicorn-conf"><span class="std std-ref">gunicorn.conf.py</span></a>: config file for gunicorn with sane default values.</p></li>
+<li><p><a class="reference internal" href="configs/motley_cue_env.html#motley-cue-env"><span class="std std-ref">motley_cue.env</span></a>: here you can set the environment variables used in the gunicorn config, such as the socket address gunicorn listens on (<code class="docutils literal notranslate"><span class="pre">BIND</span></code>), log file location or log level.</p></li>
+</ul>
+<p>Recommended locations for these files:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/usr/lib/motley-cue/etc/gunicorn/gunicorn.conf.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/etc/motley_cue/motley_cue.env</span></code></p></li>
+</ul>
+</section>
+<section id="systemd">
+<h3>systemd<a class="headerlink" href="#systemd" title="Permalink to this headline">¶</a></h3>
+<p>Create the <a class="reference internal" href="configs/motley_cue_service.html#motley-cue-service"><span class="std std-ref">service file</span></a> to run gunicorn under <code class="docutils literal notranslate"><span class="pre">systemd</span></code> and place it in <code class="docutils literal notranslate"><span class="pre">/lib/systemd/system/motley-cue.service</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">[</span>Unit<span class="o">]</span>
+<span class="nv">Description</span><span class="o">=</span>motley_cue with gunicorn service
+<span class="nv">Before</span><span class="o">=</span>nginx.service
+
+<span class="o">[</span>Service<span class="o">]</span>
+<span class="nv">User</span><span class="o">=</span>root
+<span class="nv">Group</span><span class="o">=</span>root
+<span class="nv">RuntimeDirectory</span><span class="o">=</span>motley_cue
+<span class="nv">WorkingDirectory</span><span class="o">=</span>/usr/lib/motley-cue
+<span class="nv">EnvironmentFile</span><span class="o">=</span>/etc/motley_cue/motley_cue.env
+<span class="nv">ExecStart</span><span class="o">=</span>/usr/lib/motley-cue/bin/gunicorn motley_cue.api:api -k <span class="s2">&quot;uvicorn.workers.UvicornWorker&quot;</span> --config /usr/lib/motley-cue/etc/gunicorn/gunicorn.conf.py
+<span class="nv">ExecReload</span><span class="o">=</span>/bin/kill -s HUP <span class="nv">$MAINPID</span>
+
+<span class="o">[</span>Install<span class="o">]</span>
+<span class="nv">WantedBy</span><span class="o">=</span>multi-user.target
+</pre></div>
+</div>
+<p>Start the service with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>systemctl start motley-cue
+</pre></div>
+</div>
+</section>
+<section id="nginx">
+<span id="id3"></span><h3>nginx<a class="headerlink" href="#nginx" title="Permalink to this headline">¶</a></h3>
+<p>An example <a class="reference internal" href="configs/nginx_motley_cue.html#nginx-motley-cue"><span class="std std-ref">site configuration</span></a> is provided below:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># # if you uncomment this block, make sure that the default site</span>
+<span class="c1"># # that might come with a clean nginx install is disabled</span>
+<span class="c1"># # i.e. rm /etc/nginx/sites-enabled/default</span>
+<span class="c1"># server {</span>
+<span class="c1">#     listen 80;</span>
+<span class="c1">#     server_name localhost;</span>
+<span class="c1">#     return 301 https://$server_name$request_uri;</span>
+<span class="c1"># }</span>
+
+server <span class="o">{</span>
+    listen <span class="m">8080</span><span class="p">;</span>
+    listen <span class="o">[</span>::<span class="o">]</span>:8080<span class="p">;</span>
+
+    <span class="c1"># # if you uncomment this block, make sure you remove the two directives above</span>
+    <span class="c1"># # also consider uncommenting the server block above for port 80 redirects to 443</span>
+    <span class="c1"># # alternatively, you could use port 8443 instead of 443, as this port is also</span>
+    <span class="c1"># # checked by default by the mccli client software.</span>
+    <span class="c1"># listen 443 ssl;</span>
+    <span class="c1"># listen [::]:443 ssl;</span>
+    <span class="c1"># ssl_certificate /etc/ssl/private/nginx.pem;</span>
+    <span class="c1"># ssl_certificate_key /etc/ssl/private/nginx.key;</span>
+
+    server_name _<span class="p">;</span>
+    location / <span class="o">{</span>
+        proxy_set_header X-Forwarded-For <span class="nv">$proxy_add_x_forwarded_for</span><span class="p">;</span>
+        proxy_set_header X-Forwarded-Proto <span class="nv">$scheme</span><span class="p">;</span>
+        proxy_set_header Host <span class="nv">$http_host</span><span class="p">;</span>
+        <span class="c1"># we don&#39;t want nginx trying to do something clever with</span>
+        <span class="c1"># redirects, we set the Host: header above already.</span>
+        proxy_redirect off<span class="p">;</span>
+        proxy_pass http://unix:/run/motley_cue/motley-cue.sock<span class="p">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Copy it to the appropriate location (e.g. <code class="docutils literal notranslate"><span class="pre">/etc/nginx/sites-enabled/nginx.motley_cue</span></code>) and reload <code class="docutils literal notranslate"><span class="pre">nginx</span></code>.</p>
+</section>
+<section id="config-files">
+<h3>Config files<a class="headerlink" href="#config-files" title="Permalink to this headline">¶</a></h3>
+<p>This is a list of the required configuration files, which are usually present when you install <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> with a package manager:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="configs/motley_cue_conf.html">/etc/motley_cue/motley_cue.conf</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configs/feudal_adapter_conf.html">/etc/motley_cue/feudal_adapter.conf</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configs/motley_cue_env.html">/etc/motley_cue/motley_cue.env</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configs/motley_cue_service.html">/lib/systemd/system/motley-cue.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configs/nginx_motley_cue.html">/etc/nginx/sites-available/nginx.motley_cue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configs/gunicorn_conf.html">/usr/lib/motley-cue/etc/gunicorn/gunicorn.conf.py</a></li>
+</ul>
+</div>
+</section>
+</section>
+</section>
+
+
+          </div>
+              <div class="related bottom">
+                &nbsp;
+  <nav id="rellinks">
+    <ul>
+        <li>
+          &larr;
+          <a href="configuration.html" title="Previous document">Configuration</a>
+        </li>
+        <li>
+          <a href="configs/motley_cue_conf.html" title="Next document">motley_cue.conf</a>
+          &rarr;
+        </li>
+    </ul>
+  </nav>
+              </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2021-present, Diana Gudu.
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

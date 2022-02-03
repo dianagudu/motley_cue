@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>nginx.motley_cue &#8212; motley_cue</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/fonts.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/motley-cue.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gunicorn.conf.py" href="gunicorn_conf.html" />
+    <link rel="prev" title="motley-cue.service" href="motley_cue_service.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+    <link rel="apple-touch-icon" href="../_static/logos/motley-cue-notext.svg" />
+  
+  
+    <link rel="canonical" href="https://dianagudu.github.io/motley_cue/configs/nginx_motley_cue.html"/>
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/logos/motley-cue.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">SSH client wrapper for SSH with OIDC access token</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=dianagudu&repo=motley_cue&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../running.html">Running</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../running.html#development">Development</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../running.html#production">Production</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../running.html#gunicorn">gunicorn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../running.html#systemd">systemd</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../running.html#nginx">nginx</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../running.html#config-files">Config files</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ssh-integration.html">SSH Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development.html">For developers</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../running.html">Running</a><ul>
+      <li>Previous: <a href="motley_cue_service.html" title="previous chapter">motley-cue.service</a></li>
+      <li>Next: <a href="gunicorn_conf.html" title="next chapter">gunicorn.conf.py</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="nginx-motley-cue">
+<span id="id1"></span><h1>nginx.motley_cue<a class="headerlink" href="#nginx-motley-cue" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># # if you uncomment this block, make sure that the default site</span>
+<span class="c1"># # that might come with a clean nginx install is disabled</span>
+<span class="c1"># # i.e. rm /etc/nginx/sites-enabled/default</span>
+<span class="c1"># server {</span>
+<span class="c1">#     listen 80;</span>
+<span class="c1">#     server_name localhost;</span>
+<span class="c1">#     return 301 https://$server_name$request_uri;</span>
+<span class="c1"># }</span>
+
+server <span class="o">{</span>
+    listen <span class="m">8080</span><span class="p">;</span>
+    listen <span class="o">[</span>::<span class="o">]</span>:8080<span class="p">;</span>
+
+    <span class="c1"># # if you uncomment this block, make sure you remove the two directives above</span>
+    <span class="c1"># # also consider uncommenting the server block above for port 80 redirects to 443</span>
+    <span class="c1"># # alternatively, you could use port 8443 instead of 443, as this port is also</span>
+    <span class="c1"># # checked by default by the mccli client software.</span>
+    <span class="c1"># listen 443 ssl;</span>
+    <span class="c1"># listen [::]:443 ssl;</span>
+    <span class="c1"># ssl_certificate /etc/ssl/private/nginx.pem;</span>
+    <span class="c1"># ssl_certificate_key /etc/ssl/private/nginx.key;</span>
+
+    server_name _<span class="p">;</span>
+    location / <span class="o">{</span>
+        proxy_set_header X-Forwarded-For <span class="nv">$proxy_add_x_forwarded_for</span><span class="p">;</span>
+        proxy_set_header X-Forwarded-Proto <span class="nv">$scheme</span><span class="p">;</span>
+        proxy_set_header Host <span class="nv">$http_host</span><span class="p">;</span>
+        <span class="c1"># we don&#39;t want nginx trying to do something clever with</span>
+        <span class="c1"># redirects, we set the Host: header above already.</span>
+        proxy_redirect off<span class="p">;</span>
+        proxy_pass http://unix:/run/motley_cue/motley-cue.sock<span class="p">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</section>
+
+
+          </div>
+              <div class="related bottom">
+                &nbsp;
+  <nav id="rellinks">
+    <ul>
+        <li>
+          &larr;
+          <a href="motley_cue_service.html" title="Previous document">motley-cue.service</a>
+        </li>
+        <li>
+          <a href="gunicorn_conf.html" title="Next document">gunicorn.conf.py</a>
+          &rarr;
+        </li>
+    </ul>
+  </nav>
+              </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2021-present, Diana Gudu.
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

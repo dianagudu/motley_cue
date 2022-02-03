@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>SSH Integration &#8212; motley_cue</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/fonts.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="_static/motley-cue.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="For developers" href="development.html" />
+    <link rel="prev" title="Usage" href="usage.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+    <link rel="apple-touch-icon" href="_static/logos/motley-cue-notext.svg" />
+  
+  
+    <link rel="canonical" href="https://dianagudu.github.io/motley_cue/ssh-integration.html"/>
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/logos/motley-cue.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">SSH client wrapper for SSH with OIDC access token</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=dianagudu&repo=motley_cue&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="running.html">Running</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SSH Integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#pam">PAM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#client">Client</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">For developers</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="usage.html" title="previous chapter">Usage</a></li>
+      <li>Next: <a href="development.html" title="next chapter">For developers</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="ssh-integration">
+<span id="id1"></span><h1>SSH Integration<a class="headerlink" href="#ssh-integration" title="Permalink to this headline">¶</a></h1>
+<p>A detailed documentation of all the required components to enable SSH access via OIDC with on-the-fly account provisioning can be found at: <a class="reference external" href="https://github.com/EOSC-synergy/ssh-oidc">https://github.com/EOSC-synergy/ssh-oidc</a>. A quick summary below.</p>
+<section id="pam">
+<h2>PAM<a class="headerlink" href="#pam" title="Permalink to this headline">¶</a></h2>
+<p>You’ll need <a class="reference external" href="https://git.man.poznan.pl/stash/scm/pracelab/pam.git">this</a> PAM module that supports OIDC authentication by prompting the user for a token instead of a password.</p>
+<p>You can also install it from the <a class="reference external" href="http://repo.data.kit.edu/">http://repo.data.kit.edu/</a> repo:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt-get install pam-ssh-oidc
+</pre></div>
+</div>
+<p>Check out the documentation for how to configure it. Make sure you set SSH to use the PAM module.</p>
+<p>In <code class="docutils literal notranslate"><span class="pre">/etc/pam.d/sshd</span></code> add on the first line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">auth</span>     <span class="n">sufficient</span> <span class="n">pam_oidc_token</span><span class="o">.</span><span class="n">so</span> <span class="n">config</span><span class="o">=/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">config</span><span class="o">.</span><span class="n">ini</span>
+</pre></div>
+</div>
+<p>and configure the verification endpoint to your motley_cue instance in <code class="docutils literal notranslate"><span class="pre">/etc/pam.d/config.ini</span></code>:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[user_verification]</span><span class="w"></span>
+<span class="na">local</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">false</span><span class="w"></span>
+<span class="na">verify_endpoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">$MOTLEY_CUE_ENDPOINT/verify_user</span><span class="w"></span>
+</pre></div>
+</div>
+<p>where MOTLEY_CUE_ENDPOINT=&lt;<a class="reference external" href="http://localhost:8080">http://localhost:8080</a>&gt; with a default installation.</p>
+<p>Finally, make sure you have in your <code class="docutils literal notranslate"><span class="pre">/etc/ssh/sshd_config</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ChallengeResponseAuthentication</span> <span class="n">yes</span>
+<span class="n">UsePam</span> <span class="n">yes</span>
+</pre></div>
+</div>
+</section>
+<section id="client">
+<h2>Client<a class="headerlink" href="#client" title="Permalink to this headline">¶</a></h2>
+<p>To SSH into a server that supports OIDC authentication, you’ll need to trigger the deployment of a local account by calling the <code class="docutils literal notranslate"><span class="pre">/user/deploy</span></code> endpoint and then get the local username via <code class="docutils literal notranslate"><span class="pre">/user/get_status</span></code>.</p>
+<p>Or you can have a look at <a class="reference external" href="https://dianagudu.github.io/mccli">mccli</a>, an SSH client wrapper that does all this for you and can integrate with the <code class="docutils literal notranslate"><span class="pre">oidc-agent</span></code>.</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related bottom">
+                &nbsp;
+  <nav id="rellinks">
+    <ul>
+        <li>
+          &larr;
+          <a href="usage.html" title="Previous document">Usage</a>
+        </li>
+        <li>
+          <a href="development.html" title="Next document">For developers</a>
+          &rarr;
+        </li>
+    </ul>
+  </nav>
+              </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2021-present, Diana Gudu.
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

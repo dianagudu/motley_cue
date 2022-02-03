@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Usage &#8212; motley_cue</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/fonts.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="_static/motley-cue.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SSH Integration" href="ssh-integration.html" />
+    <link rel="prev" title="gunicorn.conf.py" href="configs/gunicorn_conf.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+    <link rel="apple-touch-icon" href="_static/logos/motley-cue-notext.svg" />
+  
+  
+    <link rel="canonical" href="https://dianagudu.github.io/motley_cue/usage.html"/>
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/logos/motley-cue.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">SSH client wrapper for SSH with OIDC access token</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=dianagudu&repo=motley_cue&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="running.html">Running</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#api-authentication">API authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#api-calls">API calls</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ssh-integration.html">SSH Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">For developers</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="configs/gunicorn_conf.html" title="previous chapter">gunicorn.conf.py</a></li>
+      <li>Next: <a href="ssh-integration.html" title="next chapter">SSH Integration</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="usage">
+<span id="id1"></span><h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<p>The full API specification is described <a class="reference internal" href="api.html"><span class="doc">here</span></a>.</p>
+<section id="api-authentication">
+<h2>API authentication<a class="headerlink" href="#api-authentication" title="Permalink to this headline">¶</a></h2>
+<p>First, you’ll need an OIDC AccessToken to authenticate.</p>
+<p>You might want to check out the <a class="reference external" href="https://github.com/indigo-dc/oidc-agent">oidc-agent</a> for that. It is a daemon that can provide valid access tokens from any number of configured OIDC Providers (OPs).</p>
+<p>Once you get the <code class="docutils literal notranslate"><span class="pre">oidc-agent</span></code> running, configure an account for your preferred OP. For example, you can generate an account configuration for the <a class="reference external" href="https://aai.egi.eu/oidc">EGI AAI</a>  named <code class="docutils literal notranslate"><span class="pre">egi</span></code> as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oidc-gen --pub --iss https://aai.egi.eu/oidc --scope <span class="s2">&quot;openid profile email offline_access eduperson_entitlement eduperson_scoped_affiliation eduperson_unique_id&quot;</span> egi
+</pre></div>
+</div>
+<p>Then you can retrieve an access token with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oidc-token egi
+</pre></div>
+</div>
+<p>If you have another way to retrieve OIDC access tokens, don’t worry. You can pass the token directly.</p>
+</section>
+<section id="api-calls">
+<h2>API calls<a class="headerlink" href="#api-calls" title="Permalink to this headline">¶</a></h2>
+<p>In the following we assume the API at <a class="reference external" href="http://localhost:8080/">http://localhost:8080/</a>. The Swagger UI, for interactive exploration, and to call and test your API directly from the browser, can be reached at <a class="reference external" href="http://localhost:8080/docs">http://localhost:8080/docs</a>.</p>
+<p>Let’s take as an example your federated identity at <a class="reference external" href="https://aai.egi.eu/oidc">EGI Check-inEGI AAI</a>, for which you generated an oidc-agent account as specified above. You can perform several operations to manage your local account corresponding to your EGI identity. Below, some examples and their output:</p>
+<ul class="simple">
+<li><p>deploy a local account:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ http http://localhost:8080/user/deploy  <span class="s2">&quot;Authorization: Bearer `oidc-token egi`&quot;</span>
+<span class="o">{</span>
+  <span class="s2">&quot;credentials&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;commandline&quot;</span>: <span class="s2">&quot;ssh local_username001@localhost&quot;</span>,
+    <span class="s2">&quot;description&quot;</span>: <span class="s2">&quot;Local SSH Test Service&quot;</span>,
+    <span class="s2">&quot;login_help&quot;</span>: <span class="s2">&quot;Login via `mccli ssh {login_host}`.&quot;</span>,
+    <span class="s2">&quot;ssh_host&quot;</span>: <span class="s2">&quot;localhost&quot;</span>,
+    <span class="s2">&quot;ssh_user&quot;</span>: <span class="s2">&quot;local_username001&quot;</span>
+  <span class="o">}</span>,
+  <span class="s2">&quot;message&quot;</span>: <span class="s2">&quot;User was created and was added to groups group1,group2.&quot;</span>,
+  <span class="s2">&quot;state&quot;</span>: <span class="s2">&quot;deployed&quot;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>query the status of the local account, including your local username:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ http http://localhost:8080/user/get_status  <span class="s2">&quot;Authorization: Bearer `oidc-token egi`&quot;</span>
+<span class="o">{</span>
+  <span class="s2">&quot;message&quot;</span>: <span class="s2">&quot;username local_username001&quot;</span>,
+  <span class="s2">&quot;state&quot;</span>: <span class="s2">&quot;deployed&quot;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>verify if a given username matches the local account mapped to your remote identity</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ http http://localhost:8080/verify_user<span class="se">\?</span>username<span class="se">\=</span>local_username001  <span class="s2">&quot;Authorization: Bearer `oidc-token egi`&quot;</span>
+<span class="o">{</span>
+  <span class="s2">&quot;state&quot;</span>: <span class="s2">&quot;deployed&quot;</span>,
+  <span class="s2">&quot;verified&quot;</span>: <span class="nb">true</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>suspend your local account (e.g. if you suspect your account has been compromised):</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ http http://localhost:8080/user/suspend <span class="s2">&quot;Authorization: Bearer `oidc-token egi`&quot;</span>
+<span class="o">{</span>
+  <span class="s2">&quot;message&quot;</span>: <span class="s2">&quot;User &#39;c23***@https%3A%2F%2Faai.egi.eu%2Foidc%2F&#39; was suspended.&quot;</span>,
+  <span class="s2">&quot;state&quot;</span>: <span class="s2">&quot;suspended&quot;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>The following <a class="reference external" href="https://git.scc.kit.edu/feudal/feudalAdapterLdf/-/blob/master/states.md">document</a> gives a complete overview of the different states a local account can be in, as well as the actions that can be performed on a local account.</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related bottom">
+                &nbsp;
+  <nav id="rellinks">
+    <ul>
+        <li>
+          &larr;
+          <a href="configs/gunicorn_conf.html" title="Previous document">gunicorn.conf.py</a>
+        </li>
+        <li>
+          <a href="ssh-integration.html" title="Next document">SSH Integration</a>
+          &rarr;
+        </li>
+    </ul>
+  </nav>
+              </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2021-present, Diana Gudu.
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

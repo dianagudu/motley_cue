@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HTTP Routing Table &#8212; motley_cue</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/fonts.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="_static/motley-cue.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+    <link rel="apple-touch-icon" href="_static/logos/motley-cue-notext.svg" />
+  
+  
+    <link rel="canonical" href="https://dianagudu.github.io/motley_cue/http-routingtable.html"/>
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+
+    <script>
+      DOCUMENTATION_OPTIONS.COLLAPSE_INDEX = true;
+    </script>
+
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/logos/motley-cue.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">SSH client wrapper for SSH with OIDC access token</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=dianagudu&repo=motley_cue&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="running.html">Running</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ssh-integration.html">SSH Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">For developers</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+
+   <h1>HTTP Routing Table</h1>
+
+   <div class="modindex-jumpbox">
+   <a href="#cap-/"><strong>/</strong></a> | 
+   <a href="#cap-/admin"><strong>/admin</strong></a> | 
+   <a href="#cap-/info"><strong>/info</strong></a> | 
+   <a href="#cap-/user"><strong>/user</strong></a> | 
+   <a href="#cap-/verify_user"><strong>/verify_user</strong></a>
+   </div>
+
+   <table class="indextable modindextable">
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-/"><td></td><td>
+       <strong>/</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="api.html#get--"><code class="xref">GET /</code></a></td><td>
+       <em>Read Root</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-/admin"><td></td><td>
+       <strong>/admin</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="api.html#get--admin"><code class="xref">GET /admin</code></a></td><td>
+       <em>Read Root</em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="api.html#get--admin-"><code class="xref">GET /admin/</code></a></td><td>
+       <em>Read Root</em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="api.html#get--admin-resume"><code class="xref">GET /admin/resume</code></a></td><td>
+       <em>Resume</em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="api.html#get--admin-suspend"><code class="xref">GET /admin/suspend</code></a></td><td>
+       <em>Suspend</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-/info"><td></td><td>
+       <strong>/info</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="api.html#get--info"><code class="xref">GET /info</code></a></td><td>
+       <em>Info</em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="api.html#get--info-authorisation"><code class="xref">GET /info/authorisation</code></a></td><td>
+       <em>Info Authorisation</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-/user"><td></td><td>
+       <strong>/user</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="api.html#get--user"><code class="xref">GET /user</code></a></td><td>
+       <em>Read Root</em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="api.html#get--user-"><code class="xref">GET /user/</code></a></td><td>
+       <em>Read Root</em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="api.html#get--user-deploy"><code class="xref">GET /user/deploy</code></a></td><td>
+       <em>Deploy</em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="api.html#get--user-get_status"><code class="xref">GET /user/get_status</code></a></td><td>
+       <em>Get Status</em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="api.html#get--user-suspend"><code class="xref">GET /user/suspend</code></a></td><td>
+       <em>Suspend</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-/verify_user"><td></td><td>
+       <strong>/verify_user</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="api.html#get--verify_user"><code class="xref">GET /verify_user</code></a></td><td>
+       <em>Verify User</em></td></tr>
+   </table>
+
+
+          </div>
+              <div class="related bottom">
+                &nbsp;
+  <nav id="rellinks">
+    <ul>
+    </ul>
+  </nav>
+              </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2021-present, Diana Gudu.
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

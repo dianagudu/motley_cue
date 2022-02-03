@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Configuration &#8212; motley_cue</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/fonts.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="_static/motley-cue.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Running" href="running.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+    <link rel="apple-touch-icon" href="_static/logos/motley-cue-notext.svg" />
+  
+  
+    <link rel="canonical" href="https://dianagudu.github.io/motley_cue/configuration.html"/>
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/logos/motley-cue.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">SSH client wrapper for SSH with OIDC access token</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=dianagudu&repo=motley_cue&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-templates">Configuration templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#config-files-search-paths">Config files search paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#authorisation-configuration">Authorisation configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#account-creation-configuration">Account creation configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="running.html">Running</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ssh-integration.html">SSH Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">For developers</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="installation.html" title="previous chapter">Installation</a></li>
+      <li>Next: <a href="running.html" title="next chapter">Running</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="configuration">
+<span id="id1"></span><h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<p>Two configuration files are required:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">motley_cue.conf</span></code>: contains configuration options specific to the REST API</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">feudal_adapter.conf</span></code>: contains configuration options for the <a class="reference external" href="https://git.scc.kit.edu/feudal/feudalAdapterLdf">feudalAdapter</a></p></li>
+</ul>
+<section id="configuration-templates">
+<h2>Configuration templates<a class="headerlink" href="#configuration-templates" title="Permalink to this headline">¶</a></h2>
+<p>Example config files explaining the options are included with <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code>. If you installed it via package manager, they will be located at <code class="docutils literal notranslate"><span class="pre">/etc/motley_cue</span></code>.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="configs/motley_cue_conf.html#motley-cue-conf"><span class="std std-ref">motley_cue.conf</span></a></p></li>
+<li><p><a class="reference internal" href="configs/feudal_adapter_conf.html#feudal-adapter-conf"><span class="std std-ref">feudal_adapter.conf</span></a></p></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The default configuration might work well in most cases, but you have to configure the <a class="reference internal" href="#authorisation">authorisation</a> to enable any user to use your service.</p>
+</div>
+</section>
+<section id="config-files-search-paths">
+<h2>Config files search paths<a class="headerlink" href="#config-files-search-paths" title="Permalink to this headline">¶</a></h2>
+<p>The config files will be searched in several places. Once one is found no further config files will be considered.</p>
+<ul class="simple">
+<li><p><strong>motley_cue.conf</strong></p>
+<ul>
+<li><p>path configured via the environment variable <code class="docutils literal notranslate"><span class="pre">MOTLEY_CUE_CONFIG</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">./motley_cue.conf</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">$HOME/.config/motley_cue/motley_cue.conf</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/etc/motley_cue/motley_cue.conf</span></code></p></li>
+</ul>
+</li>
+<li><p><strong>feudal_adapter.conf</strong> (according to the <a class="reference external" href="https://git.scc.kit.edu/feudal/feudalAdapterLdf/-/tree/master#config-file-search-path">feudalAdapter documentation</a>)</p>
+<ul>
+<li><p>path configured via the environment variable <code class="docutils literal notranslate"><span class="pre">FEUDAL_ADAPTER_CONFIG</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">./feudal_adapter.conf</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">$HOME/.config/feudal_adapter.conf</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">$HOME/.config/feudal/feudal_adapter.conf</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/etc/feudal/feudal_adapter.conf</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="authorisation-configuration">
+<span id="authorisation"></span><h2>Authorisation configuration<a class="headerlink" href="#authorisation-configuration" title="Permalink to this headline">¶</a></h2>
+<p>You can configure who is allowed to use your service in <code class="docutils literal notranslate"><span class="pre">motley_cue.conf</span></code>.</p>
+<p>You can support multiple OPs and configure authorisation for each OP separately. There are three options to authorise users from the supported OPs:</p>
+<ul class="simple">
+<li><p><strong>authorise all</strong>: allow all users from a trusted OP</p></li>
+<li><p><strong>individual</strong>: authorise single users via their unique identifier given by the OIDC <code class="docutils literal notranslate"><span class="pre">sub</span></code> claim</p></li>
+<li><p><strong>VO-based</strong>: authorise users that are members of a specific VO (or a set of VOs)</p></li>
+</ul>
+<p>Below, a configuration block for one OP with default values.</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[authorisation.&lt;op shortname&gt;]</span><span class="w"></span>
+<span class="c1">## the complete URL for an OIDC provider. MANDATORY.</span><span class="w"></span>
+<span class="c1">## this becomes the iss claim in an access token.</span><span class="w"></span>
+<span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&lt;url&gt;</span><span class="w"></span>
+
+<span class="c1">## authorise all users from trusted OP, defaults to False if not specified</span><span class="w"></span>
+<span class="na">authorise_all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">False</span><span class="w"></span>
+
+<span class="c1">## list of VOs whose users are authorised to use the service</span><span class="w"></span>
+<span class="na">authorised_vos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[]</span><span class="w"></span>
+
+<span class="c1">## the OIDC claim containing the VOs specified above</span><span class="w"></span>
+<span class="na">vo_claim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">eduperson_entitlement</span><span class="w"></span>
+
+<span class="c1">## how many VOs need to be matched from the list, valid options: all, one, or an int</span><span class="w"></span>
+<span class="na">vo_match</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">one</span><span class="w"></span>
+
+<span class="c1">## list of individual users authorised to use the service</span><span class="w"></span>
+<span class="c1">## specified through OIDC &#39;sub&#39;, relative to the section&#39;s OP (&#39;iss&#39;)</span><span class="w"></span>
+<span class="na">authorised_users</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[]</span><span class="w"></span>
+
+<span class="c1">## list of authorised admins specified by OIDC &#39;sub&#39;</span><span class="w"></span>
+<span class="na">authorised_admins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[]</span><span class="w"></span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>The section name has to start with <code class="docutils literal notranslate"><span class="pre">authorisation.</span></code></p></li>
+<li><p>The OP URL must be specified</p></li>
+<li><p>A VO must be specified as a string or an entitlement according to the AARC guideline <a class="reference external" href="https://aarc-community.org/guidelines/aarc-g002">AARC-G002</a></p></li>
+<li><p>An individual user must be specified by its unique identifier at the OP (the <code class="docutils literal notranslate"><span class="pre">sub</span></code> claim)</p></li>
+</ul>
+</section>
+<section id="account-creation-configuration">
+<h2>Account creation configuration<a class="headerlink" href="#account-creation-configuration" title="Permalink to this headline">¶</a></h2>
+<p>This is handled by the feudal adapter in <code class="docutils literal notranslate"><span class="pre">feudal_adapter.conf</span></code> (see the <a class="reference external" href="https://git.scc.kit.edu/feudal/feudalAdapterLdf">documentation</a> for details).</p>
+<p>Pay close attention to the following configurations:</p>
+<ul class="simple">
+<li><p><strong>backend</strong>: how are the users managed locally (e.g. local UNIX accounts, LDAP, …)</p></li>
+<li><p><strong>assurance</strong>: specifying minimum acceptable assurance (according to the <a class="reference external" href="https://refeds.org/assurance">REFEDS Assurance Framework</a>)</p></li>
+<li><p><strong>username generator</strong>: how local usernames are generated for users (e.g. trying to honour incoming <code class="docutils literal notranslate"><span class="pre">preferred</span> <span class="pre">username</span></code> from the OP, or using pooled accounts with a custom prefix)</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+              <div class="related bottom">
+                &nbsp;
+  <nav id="rellinks">
+    <ul>
+        <li>
+          &larr;
+          <a href="installation.html" title="Previous document">Installation</a>
+        </li>
+        <li>
+          <a href="running.html" title="Next document">Running</a>
+          &rarr;
+        </li>
+    </ul>
+  </nav>
+              </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2021-present, Diana Gudu.
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
