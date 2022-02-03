@@ -1,0 +1,7 @@
+motley-cue
+sphinx
+sphinxcontrib-apidoc
+sphinx-copybutton
+sphinxcontrib-openapi
+mistune<2.0.0
+m2r==0.2.1
