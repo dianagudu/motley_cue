@@ -95,16 +95,17 @@ An example :ref:`site configuration <nginx_motley_cue>` is provided below:
 Copy it to the appropriate location (e.g. ``/etc/nginx/sites-enabled/nginx.motley_cue``) and reload ``nginx``.
 
 
-..
-    Config files
-    ------------
+Config files
+^^^^^^^^^^^^
 
-    .. toctree::
-    :maxdepth: 2
+This is a list of the required configuration files, which are usually present when you install ``motley_cue`` with a package manager:
 
-    configs/motley_cue_conf
-    configs/feudal_adapter_conf
-    configs/motley_cue_service
-    configs/motley_cue_env
-    configs/nginx_motley_cue
-    configs/gunicorn_conf
+.. toctree::
+    :maxdepth: 1
+
+    /etc/motley_cue/motley_cue.conf  <configs/motley_cue_conf>
+    /etc/motley_cue/feudal_adapter.conf <configs/feudal_adapter_conf>
+    /etc/motley_cue/motley_cue.env <configs/motley_cue_env>
+    /lib/systemd/system/motley-cue.service <configs/motley_cue_service>
+    /etc/nginx/sites-available/nginx.motley_cue <configs/nginx_motley_cue>
+    /usr/lib/motley-cue/etc/gunicorn/gunicorn.conf.py <configs/gunicorn_conf>
