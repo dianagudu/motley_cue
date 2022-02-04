@@ -108,11 +108,11 @@ html_show_sourcelink = True
 # documentation.
 html_theme_options = {
     'description': 'SSH client wrapper for SSH with OIDC access token',
-    'logo': 'logos/motley-cue.svg',
+    'logo': 'logos/motley-cue.png',
     'github_user': 'dianagudu',
     'github_repo': 'motley_cue',
     'canonical_url': 'https://dianagudu.github.io/motley_cue/',
-    'touch_icon': 'logos/motley-cue-notext.svg',
+    'touch_icon': 'logos/motley-cue-notext.png',
     'show_relbar_bottom': True,
     'show_relbar_top': False,
     'show_powered_by': False,
@@ -160,7 +160,7 @@ html_static_path = [
     '_static/logos/motley-cue.ico'
 ]
 
-#html_logo = '_static/logos/motley-cue-white.svg'
+#html_logo = '_static/logos/motley-cue-white.png'
 
 html_favicon = '_static/logos/motley-cue.ico'
 
@@ -247,7 +247,7 @@ latex_documents = [
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-#latex_logo = "_static/logos/motley-cue.svg"
+#latex_logo = "_static/logos/motley-cue.png"
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
