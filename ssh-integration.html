@@ -121,6 +121,8 @@
 <p>You’ll need <a class="reference external" href="https://git.man.poznan.pl/stash/scm/pracelab/pam.git">this</a> PAM module that supports OIDC authentication by prompting the user for a token instead of a password.</p>
 <p>You can also install it from the <a class="reference external" href="http://repo.data.kit.edu/">http://repo.data.kit.edu/</a> repo:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt-get install pam-ssh-oidc
+or
+yum install pam-ssh-oidc
 </pre></div>
 </div>
 <p>Check out the documentation for how to configure it. Make sure you set SSH to use the PAM module.</p>
@@ -140,6 +142,7 @@
 <span class="n">UsePam</span> <span class="n">yes</span>
 </pre></div>
 </div>
+<p>Note that this may enable password based logins that you need to disable separately.</p>
 </section>
 <section id="client">
 <h2>Client<a class="headerlink" href="#client" title="Permalink to this headline">¶</a></h2>

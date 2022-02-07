@@ -119,8 +119,8 @@
 <span id="id1"></span><h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
 <p>Two configuration files are required:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">motley_cue.conf</span></code>: contains configuration options specific to the REST API</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">feudal_adapter.conf</span></code>: contains configuration options for the <a class="reference external" href="https://git.scc.kit.edu/feudal/feudalAdapterLdf">feudalAdapter</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">motley_cue.conf</span></code>: contains configuration options relating to <a class="reference internal" href="#authorisation">authorisation</a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">feudal_adapter.conf</span></code>: contains configuration options relating to the <a class="reference internal" href="#account-creation">account creation</a>.</p></li>
 </ul>
 <section id="configuration-templates">
 <h2>Configuration templates<a class="headerlink" href="#configuration-templates" title="Permalink to this headline">¶</a></h2>
@@ -195,12 +195,12 @@
 <ul class="simple">
 <li><p>The section name has to start with <code class="docutils literal notranslate"><span class="pre">authorisation.</span></code></p></li>
 <li><p>The OP URL must be specified</p></li>
-<li><p>A VO must be specified as a string or an entitlement according to the AARC guideline <a class="reference external" href="https://aarc-community.org/guidelines/aarc-g002">AARC-G002</a></p></li>
+<li><p>A VO must be specified as a string or an entitlement according to the AARC guideline <a class="reference external" href="https://aarc-community.org/guidelines/aarc-g002">AARC-G002</a> (or <a class="reference external" href="https://aarc-community.org/guidelines/aarc-g069">AARC-G069</a>, once it is published)</p></li>
 <li><p>An individual user must be specified by its unique identifier at the OP (the <code class="docutils literal notranslate"><span class="pre">sub</span></code> claim)</p></li>
 </ul>
 </section>
 <section id="account-creation-configuration">
-<h2>Account creation configuration<a class="headerlink" href="#account-creation-configuration" title="Permalink to this headline">¶</a></h2>
+<span id="account-creation"></span><h2>Account creation configuration<a class="headerlink" href="#account-creation-configuration" title="Permalink to this headline">¶</a></h2>
 <p>This is handled by the feudal adapter in <code class="docutils literal notranslate"><span class="pre">feudal_adapter.conf</span></code> (see the <a class="reference external" href="https://git.scc.kit.edu/feudal/feudalAdapterLdf">documentation</a> for details).</p>
 <p>Pay close attention to the following configurations:</p>
 <ul class="simple">

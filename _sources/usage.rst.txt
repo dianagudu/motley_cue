@@ -13,7 +13,7 @@ First, you'll need an OIDC AccessToken to authenticate.
 
 You might want to check out the `oidc-agent <https://github.com/indigo-dc/oidc-agent>`_ for that. It is a daemon that can provide valid access tokens from any number of configured OIDC Providers (OPs).
 
-Once you get the ``oidc-agent`` running, configure an account for your preferred OP. For example, you can generate an account configuration for the `EGI AAI <https://aai.egi.eu/oidc>`_  named ``egi`` as follows: 
+Once you have ``oidc-agent`` running, configure an account for your preferred OP. For example, you can generate an account configuration for the `EGI AAI <https://aai.egi.eu/oidc>`_  named ``egi`` as follows: 
 
 .. code-block:: bash
 
@@ -24,6 +24,8 @@ Then you can retrieve an access token with:
 .. code-block:: bash
 
   oidc-token egi
+
+There are `oidc-agent gitbook pages <https://indigo-dc.gitbook.io/oidc-agent/user/oidc-gen/provider>` that provide detailed information for creating account configurations with many other OPs.
 
 If you have another way to retrieve OIDC access tokens, don't worry. You can pass the token directly.
 

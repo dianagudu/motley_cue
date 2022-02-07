@@ -138,7 +138,8 @@
 </section>
 <section id="production">
 <span id="id2"></span><h2>Production<a class="headerlink" href="#production" title="Permalink to this headline">¶</a></h2>
-<p>This section describes how to run <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> in production if you installed it with <code class="docutils literal notranslate"><span class="pre">pip</span></code>.</p>
+<p>This section describes how to run <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> in production if you installed it with <code class="docutils literal notranslate"><span class="pre">pip</span></code>.
+If you used the package, these configuration options are already applied.</p>
 <p>To set up the production environment, we recommended using:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">gunicorn</span></code>: manages multiple uvicorn worker processes, monitors and restarts crashed processes</p></li>
@@ -146,6 +147,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">nginx</span></code>: HTTPS support, buffers slow clients and prevents DoS attacks</p></li>
 </ul>
 <p>The code examples below assume a python virtualenv at <code class="docutils literal notranslate"><span class="pre">/usr/lib/motley-cue</span></code>, where you have installed <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> and its dependencies. Adapt paths if necessary.</p>
+<p>Templates for all referred configuration files are provided with either the package or the <code class="docutils literal notranslate"><span class="pre">pip</span></code> installation.</p>
 <section id="gunicorn">
 <h3>gunicorn<a class="headerlink" href="#gunicorn" title="Permalink to this headline">¶</a></h3>
 <p>To configure <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> to run with <code class="docutils literal notranslate"><span class="pre">gunicorn</span></code>, you will need two additional configuration files.</p>
@@ -226,7 +228,7 @@ server <span class="o">{</span>
 </section>
 <section id="config-files">
 <h3>Config files<a class="headerlink" href="#config-files" title="Permalink to this headline">¶</a></h3>
-<p>This is a list of the required configuration files, which are usually present when you install <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> with a package manager:</p>
+<p>This is the list of the required configuration files, which are usually present when you install <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> with a package manager:</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="configs/motley_cue_conf.html">/etc/motley_cue/motley_cue.conf</a></li>

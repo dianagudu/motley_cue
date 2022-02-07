@@ -120,7 +120,7 @@
 <h2>API authentication<a class="headerlink" href="#api-authentication" title="Permalink to this headline">¶</a></h2>
 <p>First, you’ll need an OIDC AccessToken to authenticate.</p>
 <p>You might want to check out the <a class="reference external" href="https://github.com/indigo-dc/oidc-agent">oidc-agent</a> for that. It is a daemon that can provide valid access tokens from any number of configured OIDC Providers (OPs).</p>
-<p>Once you get the <code class="docutils literal notranslate"><span class="pre">oidc-agent</span></code> running, configure an account for your preferred OP. For example, you can generate an account configuration for the <a class="reference external" href="https://aai.egi.eu/oidc">EGI AAI</a>  named <code class="docutils literal notranslate"><span class="pre">egi</span></code> as follows:</p>
+<p>Once you have <code class="docutils literal notranslate"><span class="pre">oidc-agent</span></code> running, configure an account for your preferred OP. For example, you can generate an account configuration for the <a class="reference external" href="https://aai.egi.eu/oidc">EGI AAI</a>  named <code class="docutils literal notranslate"><span class="pre">egi</span></code> as follows:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oidc-gen --pub --iss https://aai.egi.eu/oidc --scope <span class="s2">&quot;openid profile email offline_access eduperson_entitlement eduperson_scoped_affiliation eduperson_unique_id&quot;</span> egi
 </pre></div>
 </div>
@@ -128,6 +128,7 @@
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oidc-token egi
 </pre></div>
 </div>
+<p>There are <cite>oidc-agent gitbook pages &lt;https://indigo-dc.gitbook.io/oidc-agent/user/oidc-gen/provider&gt;</cite> that provide detailed information for creating account configurations with many other OPs.</p>
 <p>If you have another way to retrieve OIDC access tokens, don’t worry. You can pass the token directly.</p>
 </section>
 <section id="api-calls">
