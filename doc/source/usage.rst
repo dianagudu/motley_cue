@@ -25,7 +25,7 @@ Then you can retrieve an access token with:
 
   oidc-token egi
 
-There are `oidc-agent gitbook pages <https://indigo-dc.gitbook.io/oidc-agent/user/oidc-gen/provider>` that provide detailed information for creating account configurations with many other OPs.
+There are `oidc-agent gitbook pages <https://indigo-dc.gitbook.io/oidc-agent/user/oidc-gen/provider>`_ that provide detailed information for creating account configurations with many other OPs.
 
 If you have another way to retrieve OIDC access tokens, don't worry. You can pass the token directly.
 
