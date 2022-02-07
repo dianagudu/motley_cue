@@ -44,6 +44,8 @@ Finally, make sure you have in your ``/etc/ssh/sshd_config``:
     ChallengeResponseAuthentication yes
     UsePam yes
 
+Note that this may enable password based logins that you need to disable separately.
+
 Client
 ------
 
