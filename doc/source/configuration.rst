@@ -5,8 +5,8 @@ Configuration
 
 Two configuration files are required:
 
-- ``motley_cue.conf``: contains configuration options specific to the REST API
-- ``feudal_adapter.conf``: contains configuration options for the `feudalAdapter <https://git.scc.kit.edu/feudal/feudalAdapterLdf>`_
+- ``motley_cue.conf``: contains configuration options relating to `authorisation`.
+- ``feudal_adapter.conf``: contains configuration options relating to the `account creation`.
 
 
 Configuration templates
@@ -89,6 +89,9 @@ Below, a configuration block for one OP with default values.
 - The OP URL must be specified
 - A VO must be specified as a string or an entitlement according to the AARC guideline `AARC-G002 <https://aarc-community.org/guidelines/aarc-g002>`_
 - An individual user must be specified by its unique identifier at the OP (the ``sub`` claim)
+
+
+.. _account creation:
 
 Account creation configuration
 -------------------------------
