@@ -36,6 +36,7 @@ Production
 ----------
 
 This section describes how to run ``motley_cue`` in production if you installed it with ``pip``.
+If you used the package, these configuration options are already applied.
 
 To set up the production environment, we recommended using:
 
@@ -45,6 +46,8 @@ To set up the production environment, we recommended using:
 
 
 The code examples below assume a python virtualenv at ``/usr/lib/motley-cue``, where you have installed ``motley_cue`` and its dependencies. Adapt paths if necessary.
+
+Templates for all referred configuration files are provided with either the package or the ``pip`` installation.
 
 ..
  You can change the port and other nginx settings by editing ``/etc/nginx/sites-enabled/nginx.motley_cue``.
@@ -98,7 +101,7 @@ Copy it to the appropriate location (e.g. ``/etc/nginx/sites-enabled/nginx.motle
 Config files
 ^^^^^^^^^^^^
 
-This is a list of the required configuration files, which are usually present when you install ``motley_cue`` with a package manager:
+This is the list of the required configuration files, which are usually present when you install ``motley_cue`` with a package manager:
 
 .. toctree::
     :maxdepth: 1
