@@ -15,6 +15,8 @@ You can also install it from the http://repo.data.kit.edu/ repo:
 .. code-block:: bash
 
     apt-get install pam-ssh-oidc
+    or
+    yum install pam-ssh-oidc
 
 
 Check out the documentation for how to configure it. Make sure you set SSH to use the PAM module.
