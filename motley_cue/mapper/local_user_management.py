@@ -68,7 +68,7 @@ class LocalUserManager():
                 state = result["content"]["state"]
                 if state != States.not_deployed.name and state != States.unknown.name:
                     local_username = result["content"]["message"].split()[1]
-        except Exception:
+        except Exception as e:
             logging.getLogger(__name__).warning(f"Could not verify token for username {username}: {e}")
         return {
             "state": state,
