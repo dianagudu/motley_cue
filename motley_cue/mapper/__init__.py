@@ -80,8 +80,10 @@ class Mapper:
         return self.__authorisation.authorised_admin_required(func)
 
     def deploy(self, request: Request):
-        userinfo = self.__authorisation.get_userinfo_from_request(request)
-        return MapperResponse(**self.__lum.deploy(userinfo))
+        user_infos = self.__authorisation.get_user_infos_from_request(request)
+        if user_infos is None:
+            return MapperResponse("No user infos", 401)
+        return MapperResponse(**self.__lum.deploy(user_infos.user_info))
 
     def get_status(self, request: Request):
         userinfo = self.__authorisation.get_uid_from_request(request)
