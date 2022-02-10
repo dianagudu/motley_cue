@@ -5,7 +5,8 @@ from flaat import Flaat, tokentools
 from aarc_g002_entitlement import Aarc_g002_entitlement, Aarc_g002_entitlement_Error
 
 from .config import canonical_url, to_bool, to_list
-from .utils import MapperResponse, EXACT_OP_URLS
+from .exceptions import Unauthorised, BadRequest
+from .utils import AuthorisationType, EXACT_OP_URLS
 
 
 class Authorisation(Flaat):
@@ -31,50 +32,40 @@ class Authorisation(Flaat):
         token = tokentools.get_access_token_from_request(request)
         op_url = self.get_issuer_from_accesstoken(token)
         if op_url is None:
-            return {
-                "content": "Bad Token: no issuer found in Access Token or cache",
-                "status_code": 400
-            }
+            raise Unauthorised("Could not determine token issuer. Token is not a JWT or OP not supported.")
         op_authz = self.__authorisation.get(canonical_url(op_url), None)
         # if OP not supported
         if op_authz is None:
             return {
-                "content": {
-                    "OP": op_url,
-                    "info": "OP is not supported or provided URL is invalid"
-                },
-                "status_code": 200
+                "OP": op_url,
+                **AuthorisationType.not_supported.description()
             }
         # if all users from this OP are authorised
         if to_bool(op_authz.get('authorise_all', 'False')):
             return {
-                "content": {
-                    "OP": op_url,
-                    "info": "All users from this OP are authorised"
-                },
-                "status_code": 200
+                "OP": op_url,
+                **AuthorisationType.all_users.description()
             }
         # if authorised VOs are specified
         authorised_vos = to_list(op_authz.get('authorised_vos', '[]'))
         if len(authorised_vos) > 0:
             return {
-                "content": {
-                    "OP": op_url,
-                    "info": "VO-based authorisation",
-                    "description": f"Users who are in {str(op_authz['vo_match'])} of the supported VOs are authorised",
-                    "supported VOs": authorised_vos
-                },
-                "status_code": 200
-            }
-        # OP is supported but no authorisation is configured
-        # (or individual users are authorised, but we don't print those)
-        return {
-            "content": {
                 "OP": op_url,
-                "info": "OP is supported but no VO-based or OP-wide authorisation configured.",
-                "description": "Users might still be authorised on an individual basis. Please contact the service administrator to request access."
-            },
-            "status_code": 200
+                **AuthorisationType.vo_based.description(vo_match=str(op_authz['vo_match'])),
+                "supported_VOs": authorised_vos
+            }
+        # if individual users are specified
+        authorised_users = to_list(op_authz.get('authorised_users', '[]'))
+        if len(authorised_users) > 0:
+            return {
+                "OP": op_url,
+                **AuthorisationType.individual_users.description(),
+            }
+
+        # OP is supported but no authorisation is configured
+        return {
+            "OP": op_url,
+            **AuthorisationType.not_configured.description()
         }
 
     def authenticated_user_required(self, func):
@@ -85,18 +76,18 @@ class Authorisation(Flaat):
             if request is None:
                 self.set_last_error("No request object found.")
                 logging.getLogger(__name__).error(f"{self.get_last_error()}")
-                return MapperResponse(f"{self.get_last_error()}", 401)
+                raise BadRequest(f"{self.get_last_error()}")
             # get uid from request
             userinfo = self.get_uid_from_request(request)
             if userinfo is None:
                 logging.getLogger(__name__).error(f"Could not use token to get userinfo from userinfo endpoints. Last error: {self.get_last_error()}.")
-                return MapperResponse(f"Forbidden: you are not authorised to access this service. Failed to use provided token to get userinfo.", 401)
+                raise Unauthorised("Failed to use provided token to get token issuer or sub.")
             # get OP and sub from userinfo
             op_url = userinfo.get("iss", None)
             sub = userinfo.get("sub", None)
             if op_url is None:
                 logging.getLogger(__name__).error(self.get_last_error())
-                return MapperResponse(f"Bad Token: no issuer found in Access Token.", 401)
+                raise Unauthorised("Could not determine token issuer. Token is not a JWT or OP not supported.")
             # get authorisation info for this OP
             op_authz = self.__authorisation.get(canonical_url(op_url), None)
 
@@ -104,7 +95,7 @@ class Authorisation(Flaat):
             if op_authz is None:
                 msg = f"The token issuer is not supported on this service: {op_url}"
                 logging.getLogger(__name__).error(msg)
-                return MapperResponse(msg, 403)
+                raise Unauthorised(msg)
 
             @self.login_required()
             async def tmp(*args, **kwargs):
@@ -120,18 +111,18 @@ class Authorisation(Flaat):
             if request is None:
                 self.set_last_error("No request object found.")
                 logging.getLogger(__name__).error(f"{self.get_last_error()}")
-                return MapperResponse(f"{self.get_last_error()}", 401)
+                raise BadRequest(f"{self.get_last_error()}")
             # get uid from request
             userinfo = self.get_uid_from_request(request)
             if userinfo is None:
                 logging.getLogger(__name__).error(f"Could not use token to get userinfo from userinfo endpoints. Last error: {self.get_last_error()}.")
-                return MapperResponse(f"Forbidden: you are not authorised to access this service. Failed to use provided token to get userinfo.", 401)
+                raise Unauthorised("Failed to use provided token to get token issuer or sub.")
             # get OP and sub from userinfo
             op_url = userinfo.get("iss", None)
             sub = userinfo.get("sub", None)
             if op_url is None:
                 logging.getLogger(__name__).error(self.get_last_error())
-                return MapperResponse(f"Bad Token: no issuer found in Access Token.", 401)
+                raise Unauthorised("Could not determine token issuer. Token is not a JWT or OP not supported.")
             # get authorisation info for this OP
             op_authz = self.__authorisation.get(canonical_url(op_url), None)
 
@@ -139,7 +130,7 @@ class Authorisation(Flaat):
             if op_authz is None:
                 msg = f"The token issuer is not supported on this service: {op_url}"
                 logging.getLogger(__name__).error(msg)
-                return MapperResponse(msg, 403)
+                raise Unauthorised(msg)
 
             # if all users from this OP are authorised,
             # it is sufficient to require login, which validates the token
@@ -160,7 +151,7 @@ class Authorisation(Flaat):
             if len(authorised_users) > 0:
                 if sub is None:
                     logging.getLogger(__name__).error(self.get_last_error())
-                    return MapperResponse(f"Bad Token: no sub claim found in Access Token.", 401)
+                    raise Unauthorised("Could not determine user's 'sub' claim.")
                 if sub in authorised_users:
                     logging.getLogger(__name__).debug(f"User {sub} is individually authorised by sub.")
 
@@ -212,7 +203,7 @@ class Authorisation(Flaat):
             # user not authorised
             logging.getLogger(__name__).error(
                 f"User {sub} from {op_url} was not authorised to access the service.")
-            return MapperResponse("Forbidden: you are not authorised to access this service", 403)
+            raise Unauthorised("You are not authorised to access this service.")
         return wrapper
 
     def authorised_admin_required(self, func):
@@ -223,32 +214,32 @@ class Authorisation(Flaat):
             if request is None:
                 self.set_last_error("No request object found.")
                 logging.getLogger(__name__).error(f"{self.get_last_error()}")
-                return MapperResponse(f"{self.get_last_error()}", 401)
+                raise BadRequest(f"{self.get_last_error()}")
             # get uid from request
             userinfo = self.get_uid_from_request(request)
             if userinfo is None:
                 logging.getLogger(__name__).error(f"Could not use token to get userinfo from userinfo endpoints. Last error: {self.get_last_error()}.")
-                return MapperResponse(f"Forbidden: you are not authorised to access this service. Failed to use provided token to get userinfo.", 401)
+                raise Unauthorised("Failed to use provided token to get token issuer or sub.")
             # get OP and sub from userinfo
             op_url = userinfo.get("iss", None)
             sub = userinfo.get("sub", None)
             if op_url is None:
                 logging.getLogger(__name__).error(self.get_last_error())
-                return MapperResponse(f"Bad Token: no issuer found in Access Token.", 401)
+                raise Unauthorised(f"Could not determine token issuer. Token is not a JWT or OP not supported.")
             # get authorisation info for this OP
             op_authz = self.__authorisation.get(canonical_url(op_url), None)
             # if OP not supported:
             if op_authz is None:
                 msg = f"The token issuer is not supported on this service: {op_url}"
                 logging.getLogger(__name__).error(msg)
-                return MapperResponse(msg, 403)
+                raise Unauthorised(msg)
 
             # check if sub in request is authorised to be admin
             authorised_admins = to_list(op_authz.get('authorised_admins', '[]'))
             if len(authorised_admins) > 0:
                 if sub is None:
                     logging.getLogger(__name__).error(self.get_last_error())
-                    return MapperResponse(f"Bad Token: no sub claim found in Access Token.", 401)
+                    raise Unauthorised("Could not determine admin user's 'sub' claim.")
                 if sub in authorised_admins:
                     logging.getLogger(__name__).debug(f"Sub {sub} is an authorised admin.")
                     # get iss of user to suspend/resume from wrapped function params
@@ -256,7 +247,7 @@ class Authorisation(Flaat):
                     if user_iss is None:
                         self.set_last_error("Bad Request: No user issuer provided.")
                         logging.getLogger(__name__).error(f"{self.get_last_error()}")
-                        return MapperResponse(f"{self.get_last_error()}", 400)
+                        raise BadRequest(f"{self.get_last_error()}")
                     # check if admin's issuer matches user's issuer
                     logging.getLogger(__name__).debug(f"Checking if admin {sub} is authorised for given user's iss, i.e. "
                                                       f"{user_iss} == {op_url}: "
@@ -289,14 +280,14 @@ class Authorisation(Flaat):
                             return await func(*args, **kwargs)
                         return tmp(*args, **kwargs)
                     else:
-                        msg = "Forbidden: you are not authorised to perform actions on users from other OPs"
+                        msg = "You are not authorised to perform actions on users from other OPs."
                         logging.getLogger(__name__).error(f"Admin {sub} from {op_url} is not authorised to perform actions on users from other OPs (i.e. {user_iss})")
-                        return MapperResponse(msg, 403)
+                        raise Unauthorised(msg)
             else:
                 logging.getLogger(__name__).debug("No admins authorised by sub.")
 
             logging.getLogger(__name__).error(f"User {sub} from {op_url} is not authorised as admin on this service")
-            return MapperResponse("Forbidden: you are not authorised as admin on this service", 403)
+            raise Unauthorised("You are not authorised as admin on this service.")
         return wrapper
 
     def get_userinfo_from_request(self, request: Request):

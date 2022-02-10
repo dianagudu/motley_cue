@@ -7,6 +7,8 @@ from ldf_adapter.config import CONFIG as LDF_ADAPTER_CONFIG
 from ldf_adapter.results import ExceptionalResult, Rejection
 from ldf_adapter import User
 
+from .exceptions import Unauthorised, InternalServerError
+
 
 class States(Enum):
     deployed = 0,
@@ -64,12 +66,12 @@ class LocalUserManager():
             logging.getLogger(__name__).info(
                 f"Attempting to verify if local username for userinfo {userinfo} is '{username}'")
             result = self.get_status(userinfo)
-            if result["status_code"] == 200:
-                state = result["content"]["state"]
-                if state != States.not_deployed.name and state != States.unknown.name:
-                    local_username = result["content"]["message"].split()[1]
-        except Exception:
+            state = result["state"]
+            if state != States.not_deployed.name and state != States.unknown.name:
+                local_username = result["message"].split()[1]
+        except Exception as e:
             logging.getLogger(__name__).warning(f"Could not verify token for username {username}: {e}")
+            raise InternalServerError("Something went wrong.")
         return {
             "state": state,
             "verified": (local_username == username)
@@ -78,13 +80,7 @@ class LocalUserManager():
     def _reach_state(self, userinfo, state_target: States):
         if userinfo is None:
             logging.getLogger(__name__).error("Something went wrong when trying to get userinfo for feudal.")
-            return {
-                "content": {
-                    "state": States.unknown.name,
-                    "message": "Something went wrong when trying to retrieve user info."
-                },
-                "status_code": 500
-            }
+            raise InternalServerError("Something went wrong when trying to retrieve user info.")
         # build input for feudalAdapter
         data = {
             "state_target": state_target.name,
@@ -95,25 +91,17 @@ class LocalUserManager():
         try:
             result = User(data).reach_state(data['state_target'])
         except ExceptionalResult as result:
+            msg="Reached state '{state}': {message}".format(**result.attributes)
+            logging.getLogger(__name__).warning(msg)
             if isinstance(result, Rejection):
-                status_code = 403  # forbidden
+                raise Unauthorised(msg)
             else:
-                status_code = 500  # internal server error
-            result = result.attributes
-            logging.getLogger(__name__).warning(
-                "Reached state '{state}': {message}".format(**result))
-            return {
-                "content": result,
-                "status_code": status_code
-            }
+                raise InternalServerError(msg)
         else:
             result = result.attributes
             logging.getLogger(__name__).info(
                 "Reached state '{state}': {message}".format(**result))
-            return {
-                "content": result,
-                "status_code": 200
-            }
+            return result
 
     def _admin_action(self, sub: str, iss: str, action: AdminActions):
         data = {
@@ -135,22 +123,14 @@ class LocalUserManager():
             elif action == AdminActions.undeploy:
                 result = User(data).reach_state(States.not_deployed.name)
         except ExceptionalResult as result:
+            msg="Reached state '{state}': {message}".format(**result.attributes)
+            logging.getLogger(__name__).warning(msg)
             if isinstance(result, Rejection):
-                status_code = 403  # forbidden
+                raise Unauthorised(msg)
             else:
-                status_code = 500  # internal server error
-            result = result.attributes
-            logging.getLogger(__name__).warning(
-                "Reached state '{state}': {message}".format(**result))
-            return {
-                "content": result,
-                "status_code": status_code
-            }
+                raise InternalServerError(msg)
         else:
             result = result.attributes
             logging.getLogger(__name__).info(
                 "Reached state '{state}': {message}".format(**result))
-            return {
-                "content": result,
-                "status_code": 200
-            }
+            return result
