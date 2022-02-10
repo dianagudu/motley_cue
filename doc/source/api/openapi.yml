@@ -1,25 +1,22 @@
 openapi: 3.0.2
 info:
-  title: motley cue API
-  version: 0.1.3
+  title: motley_cue
+  description: A service for mapping OIDC identities to local identities
+  version: 0.1.4.dev33
 paths:
-  "/user/":
+  /user:
     get:
       tags:
-      - user
+        - user
       summary: Read Root
-      operationId: read_root_user__get
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema: {}
-  "/user":
-    get:
-      tags:
-      - user
-      summary: Read Root
+      description: 'Retrieve user API information:
+
+
+        * description
+
+        * available endpoints
+
+        * security'
       operationId: read_root_user_get
       responses:
         '200':
@@ -27,65 +24,181 @@ paths:
           content:
             application/json:
               schema: {}
-  "/user/get_status":
+  /user/get_status:
     get:
       tags:
-      - user
+        - user
       summary: Get Status
+      description: 'Get information about your local account:
+
+
+        * **state**: one of the supported states, such as deployed, not_deployed,
+        suspended.
+
+        * **message**: could contain additional information, such as the local username
+
+
+        Requires an authorised user.'
       operationId: get_status_user_get_status_get
+      parameters:
+        - description: OIDC Access Token
+          required: true
+          schema:
+            title: Authorization
+            type: string
+            description: OIDC Access Token
+          name: Authorization
+          in: header
       responses:
         '200':
           description: Successful Response
           content:
             application/json:
-              schema: {}
+              schema:
+                $ref: '#/components/schemas/FeudalResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
       security:
-      - HTTPBearer: []
-  "/user/deploy":
+        - HTTPBearer: []
+  /user/deploy:
     get:
       tags:
-      - user
+        - user
       summary: Deploy
+      description: 'Provision a local account.
+
+
+        Requires an authorised user.'
       operationId: deploy_user_deploy_get
+      parameters:
+        - description: OIDC Access Token
+          required: true
+          schema:
+            title: Authorization
+            type: string
+            description: OIDC Access Token
+          name: Authorization
+          in: header
       responses:
         '200':
           description: Successful Response
           content:
             application/json:
-              schema: {}
+              schema:
+                $ref: '#/components/schemas/FeudalResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
       security:
-      - HTTPBearer: []
-  "/user/suspend":
+        - HTTPBearer: []
+  /user/suspend:
     get:
       tags:
-      - user
+        - user
       summary: Suspend
+      description: 'Suspends a local account.
+
+
+        Requires an authorised user.'
       operationId: suspend_user_suspend_get
+      parameters:
+        - description: OIDC Access Token
+          required: true
+          schema:
+            title: Authorization
+            type: string
+            description: OIDC Access Token
+          name: Authorization
+          in: header
       responses:
         '200':
           description: Successful Response
           content:
             application/json:
-              schema: {}
+              schema:
+                $ref: '#/components/schemas/FeudalResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
       security:
-      - HTTPBearer: []
-  "/admin/":
+        - HTTPBearer: []
+  /admin:
     get:
       tags:
-      - admin
+        - admin
       summary: Read Root
-      operationId: read_root_admin__get
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema: {}
-  "/admin":
-    get:
-      tags:
-      - admin
-      summary: Read Root
+      description: 'Retrieve admin API information:
+
+
+        * description
+
+        * available endpoints
+
+        * security'
       operationId: read_root_admin_get
       responses:
         '200':
@@ -93,75 +206,162 @@ paths:
           content:
             application/json:
               schema: {}
-  "/admin/suspend":
+  /admin/suspend:
     get:
       tags:
-      - admin
+        - admin
       summary: Suspend
+      description: 'Suspends a local account mapped to given OIDC account -- uniquely
+
+        identified by issuer and subject claims.
+
+
+        Requires a user with admin rights.
+
+        '
       operationId: suspend_admin_suspend_get
       parameters:
-      - required: true
-        schema:
-          title: Sub
-          type: string
-        name: sub
-        in: query
-      - required: true
-        schema:
-          title: Iss
-          type: string
-        name: iss
-        in: query
+        - description: sub claim of the user to be suspended
+          required: true
+          schema:
+            title: Sub
+            type: string
+            description: sub claim of the user to be suspended
+          name: sub
+          in: query
+        - description: OIDC provider of user to be suspended
+          required: true
+          schema:
+            title: Iss
+            type: string
+            description: OIDC provider of user to be suspended
+          name: iss
+          in: query
+        - description: OIDC Access Token
+          required: true
+          schema:
+            title: Authorization
+            type: string
+            description: OIDC Access Token
+          name: Authorization
+          in: header
       responses:
         '200':
           description: Successful Response
           content:
             application/json:
-              schema: {}
+              schema:
+                $ref: '#/components/schemas/FeudalResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
         '422':
           description: Validation Error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/HTTPValidationError"
+                $ref: '#/components/schemas/HTTPValidationError'
       security:
-      - HTTPBearer: []
-  "/admin/resume":
+        - HTTPBearer: []
+  /admin/resume:
     get:
       tags:
-      - admin
+        - admin
       summary: Resume
+      description: 'Resumes a suspended local account mapped to given OIDC account
+        -- uniquely
+
+        identified by issuer and subject claims.
+
+
+        Requires a user with admin rights.
+
+        '
       operationId: resume_admin_resume_get
       parameters:
-      - required: true
-        schema:
-          title: Sub
-          type: string
-        name: sub
-        in: query
-      - required: true
-        schema:
-          title: Iss
-          type: string
-        name: iss
-        in: query
+        - description: sub claim of the user to be suspended
+          required: true
+          schema:
+            title: Sub
+            type: string
+            description: sub claim of the user to be suspended
+          name: sub
+          in: query
+        - description: OIDC provider of user to be suspended
+          required: true
+          schema:
+            title: Iss
+            type: string
+            description: OIDC provider of user to be suspended
+          name: iss
+          in: query
+        - description: OIDC Access Token
+          required: true
+          schema:
+            title: Authorization
+            type: string
+            description: OIDC Access Token
+          name: Authorization
+          in: header
       responses:
         '200':
           description: Successful Response
           content:
             application/json:
-              schema: {}
+              schema:
+                $ref: '#/components/schemas/FeudalResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
         '422':
           description: Validation Error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/HTTPValidationError"
+                $ref: '#/components/schemas/HTTPValidationError'
       security:
-      - HTTPBearer: []
-  "/":
+        - HTTPBearer: []
+  /:
     get:
       summary: Read Root
+      description: 'Retrieve general API information:
+
+
+        * description
+
+        * available endpoints
+
+        * security'
       operationId: read_root__get
       responses:
         '200':
@@ -169,55 +369,175 @@ paths:
           content:
             application/json:
               schema: {}
-  "/info":
+  /info:
     get:
       summary: Info
+      description: 'Retrieve service-specific information:
+
+
+        * login info
+
+        * supported OPs'
       operationId: info_info_get
       responses:
         '200':
           description: Successful Response
           content:
             application/json:
-              schema: {}
-  "/info/authorisation":
+              schema:
+                $ref: '#/components/schemas/Info'
+  /info/authorisation:
     get:
       summary: Info Authorisation
+      description: 'Retrieve authorisation information for specific OP.
+
+
+        Requires:
+
+
+        * that the OP is supported
+
+        * authentication with this OP'
       operationId: info_authorisation_info_authorisation_get
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema: {}
-      security:
-      - HTTPBearer: []
-  "/verify_user":
-    get:
-      summary: Verify User
-      operationId: verify_user_verify_user_get
       parameters:
-      - required: true
-        schema:
-          title: Username
-          type: string
-        name: username
-        in: query
+        - description: OIDC Access Token
+          required: true
+          schema:
+            title: Authorization
+            type: string
+            description: OIDC Access Token
+          name: Authorization
+          in: header
       responses:
         '200':
           description: Successful Response
           content:
             application/json:
-              schema: {}
+              schema:
+                $ref: '#/components/schemas/InfoAuthorisation'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
         '422':
           description: Validation Error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/HTTPValidationError"
+                $ref: '#/components/schemas/HTTPValidationError'
       security:
-      - HTTPBearer: []
+        - HTTPBearer: []
+  /verify_user:
+    get:
+      summary: Verify User
+      description: 'Verify that the authenticated user has a local account with the
+        given **username**.
+
+
+        Requires the user to be authorised on the service.
+
+        '
+      operationId: verify_user_verify_user_get
+      parameters:
+        - description: username to compare to local username
+          required: true
+          schema:
+            title: Username
+            type: string
+            description: username to compare to local username
+          name: username
+          in: query
+        - description: OIDC Access Token
+          required: true
+          schema:
+            title: Authorization
+            type: string
+            description: OIDC Access Token
+          name: Authorization
+          in: header
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyUser'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientError'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+        - HTTPBearer: []
 components:
   schemas:
+    ClientError:
+      title: ClientError
+      required:
+        - detail
+      type: object
+      properties:
+        detail:
+          title: Detail
+          type: string
+    FeudalResponse:
+      title: FeudalResponse
+      required:
+        - state
+        - message
+      type: object
+      properties:
+        state:
+          title: State
+          type: string
+          example: deployed
+        message:
+          title: Message
+          type: string
+          example: User was created and was added to groups wlcg.
+        credentials:
+          title: Credentials
+          type: object
+          default: {}
+          example:
+            commandline: ssh wlcg001@localhost
+            description: Local SSH Test Service
+            login_help: Login via `mccli ssh {login_host}`.
+            ssh_host: localhost
+            ssh_user: wlcg001
     HTTPValidationError:
       title: HTTPValidationError
       type: object
@@ -226,13 +546,61 @@ components:
           title: Detail
           type: array
           items:
-            "$ref": "#/components/schemas/ValidationError"
+            $ref: '#/components/schemas/ValidationError'
+    Info:
+      title: Info
+      required:
+        - login_info
+        - supported_OPs
+      type: object
+      properties:
+        login_info:
+          title: Login Info
+          type: object
+          example:
+            description: Local SSH Test Service
+            login_help: Login via `mccli ssh {login_host}`.
+            ssh_host: localhost
+        supported_OPs:
+          title: Supported Ops
+          type: array
+          items: {}
+          example:
+            - https://aai.egi.eu/oidc
+            - https://login.helmholtz.de/oauth2
+    InfoAuthorisation:
+      title: InfoAuthorisation
+      required:
+        - OP
+        - authorisation_type
+        - authorisation_info
+      type: object
+      properties:
+        OP:
+          title: Op
+          type: string
+          example: https://wlcg.cloud.cnaf.infn.it/
+        authorisation_type:
+          title: Authorisation Type
+          type: string
+          example: VO-based
+        authorisation_info:
+          title: Authorisation Info
+          type: string
+          example: Users who are in one of the supported VOs are authorised
+        supported_VOs:
+          title: Supported Vos
+          type: array
+          items: {}
+          default: []
+          example:
+            - /wlcg
     ValidationError:
       title: ValidationError
       required:
-      - loc
-      - msg
-      - type
+        - loc
+        - msg
+        - type
       type: object
       properties:
         loc:
@@ -246,7 +614,23 @@ components:
         type:
           title: Error Type
           type: string
+    VerifyUser:
+      title: VerifyUser
+      required:
+        - state
+        - verified
+      type: object
+      properties:
+        state:
+          title: State
+          type: string
+          example: deployed
+        verified:
+          title: Verified
+          type: boolean
+          example: true
   securitySchemes:
     HTTPBearer:
       type: http
+      description: OIDC Access Token
       scheme: bearer
