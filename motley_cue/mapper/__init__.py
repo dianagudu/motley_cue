@@ -10,7 +10,6 @@ from fastapi.security import HTTPBearer
 from .config import Config
 from .authorisation import Authorisation
 from .local_user_management import LocalUserManager
-from .utils import MapperResponse
 
 
 class Mapper:
@@ -43,8 +42,8 @@ class Mapper:
                             format=log_format,
                             datefmt='%Y-%m-%d %H:%M:%S')
 
-        self.__user_security = HTTPBearer()
-        self.__admin_security = HTTPBearer()
+        self.__user_security = HTTPBearer(description="OIDC Access Token")
+        self.__admin_security = HTTPBearer(description="OIDC Access Token")
         self.__authorisation = Authorisation(self.__config)
         self.__lum = LocalUserManager()
 
@@ -62,13 +61,13 @@ class Mapper:
 
     def info(self):
         # here we return service name, description, supported OPs
-        return MapperResponse({
-            "login info": self.__lum.login_info(),
-            "supported OPs": self.__authorisation.trusted_op_list,
-        })
+        return {
+            "login_info": self.__lum.login_info(),
+            "supported_OPs": self.__authorisation.trusted_op_list,
+        }
 
     def info_authorisation(self, request):
-        return MapperResponse(**self.__authorisation.info(request))
+        return self.__authorisation.info(request)
 
     def authenticated_user_required(self, func):
         return self.__authorisation.authenticated_user_required(func)
@@ -81,22 +80,22 @@ class Mapper:
 
     def deploy(self, request: Request):
         userinfo = self.__authorisation.get_userinfo_from_request(request)
-        return MapperResponse(**self.__lum.deploy(userinfo))
+        return self.__lum.deploy(userinfo)
 
     def get_status(self, request: Request):
         userinfo = self.__authorisation.get_uid_from_request(request)
-        return MapperResponse(**self.__lum.get_status(userinfo))
+        return self.__lum.get_status(userinfo)
 
     def suspend(self, request: Request):
         userinfo = self.__authorisation.get_uid_from_request(request)
-        return MapperResponse(**self.__lum.suspend(userinfo))
+        return self.__lum.suspend(userinfo)
 
     def admin_suspend(self, sub: str, iss: str):
-        return MapperResponse(**self.__lum.admin_suspend(sub, iss))
+        return self.__lum.admin_suspend(sub, iss)
 
     def admin_resume(self, sub: str, iss: str):
-        return MapperResponse(**self.__lum.admin_resume(sub, iss))
+        return self.__lum.admin_resume(sub, iss)
 
     def verify_user(self, request: Request, username: str):
         userinfo = self.__authorisation.get_uid_from_request(request)
-        return MapperResponse(self.__lum.verify_user(userinfo, username))
+        return self.__lum.verify_user(userinfo, username)
