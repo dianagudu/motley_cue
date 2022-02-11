@@ -30,7 +30,7 @@ class AuthorisedUserRequirement(AuthRequirement):
         if op_authz is None:
             return CheckResult(False, "OP is not configured")
 
-        return op_authz.get_user_requirement.is_satisfied_by(user_infos)
+        return op_authz.get_user_requirement().is_satisfied_by(user_infos)
 
 
 class AuthorisedAdminRequirement(AuthRequirement):
@@ -69,9 +69,9 @@ class Authorisation(Flaat):
             ),
         ]
 
-    def info(self, request) -> dict:
+    def info(self, request: Request) -> dict:
         # get OP from request
-        user_infos = self.authenticate_user(request)
+        user_infos = self.get_user_infos_from_request(request)
         if user_infos is None:
             return {
                 "content": "No user infos",
