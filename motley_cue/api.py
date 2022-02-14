@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Depends, Request, Query, Header
 from fastapi.exceptions import RequestValidationError
-from fastapi.openapi.utils import get_openapi
 
 from .dependencies import mapper, settings
 from .routers import user, admin

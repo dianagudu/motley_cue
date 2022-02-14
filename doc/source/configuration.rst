@@ -103,3 +103,26 @@ Pay close attention to the following configurations:
 - **backend**: how are the users managed locally (e.g. local UNIX accounts, LDAP, ...)
 - **assurance**: specifying minimum acceptable assurance (according to the `REFEDS Assurance Framework <https://refeds.org/assurance>`_)
 - **username generator**: how local usernames are generated for users (e.g. trying to honour incoming ``preferred username`` from the OP, or using pooled accounts with a custom prefix)
+
+
+.. _additional_configurations:
+
+Additional configurations
+-------------------------
+
+By default, the Swagger documentation for the REST API is disabled. You can enable it in ``motley_cue.conf``, and change its location:
+
+.. code-block:: ini
+
+  ## enable swagger documentation -- default: False
+  enable_docs = True
+  ## location of swagger docs -- default: /docs
+  docs_url = /api/v1/docs
+
+
+If ``motley_cue`` is running on ``localhost``, these settings will enable the interactive Swagger docs at http://localhost:8080/api/v1/docs:
+
+.. image:: _static/images/swagger_docs.png
+  :width: 80%
+  :align: center
+  :alt: Swagger docs
