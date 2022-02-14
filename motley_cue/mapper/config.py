@@ -13,6 +13,11 @@ class Config():
         self.__log_file = config_parser['mapper'].get(
             'log_file', None
         )
+        # swagger docs
+        if config_parser['mapper'].get("enable_docs", False):
+            self.__docs_url = config_parser['mapper'].get("docs_url", "/docs")
+        else:
+            self.__docs_url = None
         # trusted OPs
         authz_sections = [section for section in config_parser.sections()
                           if section.startswith("authorisation")]
@@ -43,6 +48,10 @@ class Config():
     @property
     def log_level(self):
         return self.__log_level
+
+    @property
+    def docs_url(self):
+        return self.__docs_url
 
     @property
     def verbosity(self):
