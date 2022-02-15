@@ -46,7 +46,7 @@
 
 
 
-<p class="blurb">SSH client wrapper for SSH with OIDC access token</p>
+<p class="blurb">A service for mapping OIDC identities to local identities</p>
 
 
 
@@ -70,10 +70,7 @@
 <li class="toctree-l1"><a class="reference internal" href="development.html">For developers</a></li>
 </ul>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#api-reference">API reference</a></li>
-</ul>
-</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a></li>
 </ul>
 
 <div class="relations">
@@ -112,25 +109,16 @@
             
   <section id="api">
 <span id="id1"></span><h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
-<section id="api-reference">
-<h2>API reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h2>
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/</span></span><a class="headerlink" href="#get--user-" title="Permalink to this definition">¶</a></dt>
-<dd><p><strong>Read Root</strong></p>
-<dl class="field-list simple">
-<dt class="field-odd">Status Codes</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Successful Response</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user</span></span><a class="headerlink" href="#get--user" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Read Root</strong></p>
+<p>Retrieve user API information:</p>
+<ul class="simple">
+<li><p>description</p></li>
+<li><p>available endpoints</p></li>
+<li><p>security</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Status Codes</dt>
 <dd class="field-odd"><ul class="simple">
@@ -144,10 +132,26 @@
 <dt class="sig sig-object http" id="get--user-get_status">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/get_status</span></span><a class="headerlink" href="#get--user-get_status" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Get Status</strong></p>
+<p>Get information about your local account:</p>
+<ul class="simple">
+<li><p><strong>state</strong>: one of the supported states, such as deployed, not_deployed, suspended.</p></li>
+<li><p><strong>message</strong>: could contain additional information, such as the local username</p></li>
+</ul>
+<p>Requires an authorised user.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Status Codes</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Successful Response</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Bad Request</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2">401 Unauthorized</a></span> – Unauthorized</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden</p></li>
+<li><p><span><a class="reference external" href="https://tools.ietf.org/html/rfc4918#section-11.2">422 Unprocessable Entity</a></span> – Validation Error</p></li>
+</ul>
+</dd>
+<dt class="field-even">Request Headers</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>Authorization</strong> – OIDC Access Token
+(Required)</p></li>
 </ul>
 </dd>
 </dl>
@@ -157,10 +161,22 @@
 <dt class="sig sig-object http" id="get--user-deploy">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/deploy</span></span><a class="headerlink" href="#get--user-deploy" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Deploy</strong></p>
+<p>Provision a local account.</p>
+<p>Requires an authorised user.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Status Codes</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Successful Response</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Bad Request</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2">401 Unauthorized</a></span> – Unauthorized</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden</p></li>
+<li><p><span><a class="reference external" href="https://tools.ietf.org/html/rfc4918#section-11.2">422 Unprocessable Entity</a></span> – Validation Error</p></li>
+</ul>
+</dd>
+<dt class="field-even">Request Headers</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>Authorization</strong> – OIDC Access Token
+(Required)</p></li>
 </ul>
 </dd>
 </dl>
@@ -170,23 +186,22 @@
 <dt class="sig sig-object http" id="get--user-suspend">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/suspend</span></span><a class="headerlink" href="#get--user-suspend" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Suspend</strong></p>
+<p>Suspends a local account.</p>
+<p>Requires an authorised user.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Status Codes</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Successful Response</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Bad Request</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2">401 Unauthorized</a></span> – Unauthorized</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden</p></li>
+<li><p><span><a class="reference external" href="https://tools.ietf.org/html/rfc4918#section-11.2">422 Unprocessable Entity</a></span> – Validation Error</p></li>
 </ul>
 </dd>
-</dl>
-</dd></dl>
-
-<dl class="http get">
-<dt class="sig sig-object http" id="get--admin-">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/admin/</span></span><a class="headerlink" href="#get--admin-" title="Permalink to this definition">¶</a></dt>
-<dd><p><strong>Read Root</strong></p>
-<dl class="field-list simple">
-<dt class="field-odd">Status Codes</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Successful Response</p></li>
+<dt class="field-even">Request Headers</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>Authorization</strong> – OIDC Access Token
+(Required)</p></li>
 </ul>
 </dd>
 </dl>
@@ -196,6 +211,12 @@
 <dt class="sig sig-object http" id="get--admin">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/admin</span></span><a class="headerlink" href="#get--admin" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Read Root</strong></p>
+<p>Retrieve admin API information:</p>
+<ul class="simple">
+<li><p>description</p></li>
+<li><p>available endpoints</p></li>
+<li><p>security</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Status Codes</dt>
 <dd class="field-odd"><ul class="simple">
@@ -209,17 +230,31 @@
 <dt class="sig sig-object http" id="get--admin-suspend">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/admin/suspend</span></span><a class="headerlink" href="#get--admin-suspend" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Suspend</strong></p>
+<p>Suspends a local account mapped to given OIDC account – uniquely
+identified by issuer and subject claims.</p>
+<p>Requires a user with admin rights.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sub</strong> (<em>string</em>) – (Required)</p></li>
-<li><p><strong>iss</strong> (<em>string</em>) – (Required)</p></li>
+<li><p><strong>sub</strong> (<em>string</em>) – sub claim of the user to be suspended
+(Required)</p></li>
+<li><p><strong>iss</strong> (<em>string</em>) – OIDC provider of user to be suspended
+(Required)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes</dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Successful Response</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Bad Request</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2">401 Unauthorized</a></span> – Unauthorized</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden</p></li>
 <li><p><span><a class="reference external" href="https://tools.ietf.org/html/rfc4918#section-11.2">422 Unprocessable Entity</a></span> – Validation Error</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Request Headers</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Authorization</strong> – OIDC Access Token
+(Required)</p></li>
 </ul>
 </dd>
 </dl>
@@ -229,17 +264,31 @@
 <dt class="sig sig-object http" id="get--admin-resume">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/admin/resume</span></span><a class="headerlink" href="#get--admin-resume" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Resume</strong></p>
+<p>Resumes a suspended local account mapped to given OIDC account – uniquely
+identified by issuer and subject claims.</p>
+<p>Requires a user with admin rights.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sub</strong> (<em>string</em>) – (Required)</p></li>
-<li><p><strong>iss</strong> (<em>string</em>) – (Required)</p></li>
+<li><p><strong>sub</strong> (<em>string</em>) – sub claim of the user to be suspended
+(Required)</p></li>
+<li><p><strong>iss</strong> (<em>string</em>) – OIDC provider of user to be suspended
+(Required)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes</dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Successful Response</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Bad Request</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2">401 Unauthorized</a></span> – Unauthorized</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden</p></li>
 <li><p><span><a class="reference external" href="https://tools.ietf.org/html/rfc4918#section-11.2">422 Unprocessable Entity</a></span> – Validation Error</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Request Headers</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Authorization</strong> – OIDC Access Token
+(Required)</p></li>
 </ul>
 </dd>
 </dl>
@@ -249,6 +298,12 @@
 <dt class="sig sig-object http" id="get--">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/</span></span><a class="headerlink" href="#get--" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Read Root</strong></p>
+<p>Retrieve general API information:</p>
+<ul class="simple">
+<li><p>description</p></li>
+<li><p>available endpoints</p></li>
+<li><p>security</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Status Codes</dt>
 <dd class="field-odd"><ul class="simple">
@@ -262,6 +317,11 @@
 <dt class="sig sig-object http" id="get--info">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/info</span></span><a class="headerlink" href="#get--info" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Info</strong></p>
+<p>Retrieve service-specific information:</p>
+<ul class="simple">
+<li><p>login info</p></li>
+<li><p>supported OPs</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Status Codes</dt>
 <dd class="field-odd"><ul class="simple">
@@ -275,10 +335,26 @@
 <dt class="sig sig-object http" id="get--info-authorisation">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/info/authorisation</span></span><a class="headerlink" href="#get--info-authorisation" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Info Authorisation</strong></p>
+<p>Retrieve authorisation information for specific OP.</p>
+<p>Requires:</p>
+<ul class="simple">
+<li><p>that the OP is supported</p></li>
+<li><p>authentication with this OP</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Status Codes</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Successful Response</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Bad Request</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2">401 Unauthorized</a></span> – Unauthorized</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden</p></li>
+<li><p><span><a class="reference external" href="https://tools.ietf.org/html/rfc4918#section-11.2">422 Unprocessable Entity</a></span> – Validation Error</p></li>
+</ul>
+</dd>
+<dt class="field-even">Request Headers</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>Authorization</strong> – OIDC Access Token
+(Required)</p></li>
 </ul>
 </dd>
 </dl>
@@ -288,22 +364,33 @@
 <dt class="sig sig-object http" id="get--verify_user">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/verify_user</span></span><a class="headerlink" href="#get--verify_user" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Verify User</strong></p>
+<p>Verify that the authenticated user has a local account with the given <strong>username</strong>.</p>
+<p>Requires the user to be authorised on the service.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>username</strong> (<em>string</em>) – (Required)</p></li>
+<li><p><strong>username</strong> (<em>string</em>) – username to compare to local username
+(Required)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes</dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Successful Response</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Bad Request</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2">401 Unauthorized</a></span> – Unauthorized</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden</p></li>
 <li><p><span><a class="reference external" href="https://tools.ietf.org/html/rfc4918#section-11.2">422 Unprocessable Entity</a></span> – Validation Error</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Request Headers</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Authorization</strong> – OIDC Access Token
+(Required)</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
-</section>
 </section>
 
 

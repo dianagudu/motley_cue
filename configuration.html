@@ -47,7 +47,7 @@
 
 
 
-<p class="blurb">SSH client wrapper for SSH with OIDC access token</p>
+<p class="blurb">A service for mapping OIDC identities to local identities</p>
 
 
 
@@ -69,6 +69,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#config-files-search-paths">Config files search paths</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#authorisation-configuration">Authorisation configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#account-creation-configuration">Account creation configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-configurations">Additional configurations</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="running.html">Running</a></li>
@@ -208,6 +209,18 @@
 <li><p><strong>assurance</strong>: specifying minimum acceptable assurance (according to the <a class="reference external" href="https://refeds.org/assurance">REFEDS Assurance Framework</a>)</p></li>
 <li><p><strong>username generator</strong>: how local usernames are generated for users (e.g. trying to honour incoming <code class="docutils literal notranslate"><span class="pre">preferred</span> <span class="pre">username</span></code> from the OP, or using pooled accounts with a custom prefix)</p></li>
 </ul>
+</section>
+<section id="additional-configurations">
+<span id="id2"></span><h2>Additional configurations<a class="headerlink" href="#additional-configurations" title="Permalink to this headline">¶</a></h2>
+<p>By default, the Swagger documentation for the REST API is disabled. You can enable it in <code class="docutils literal notranslate"><span class="pre">motley_cue.conf</span></code>, and change its location:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1">## enable swagger documentation -- default: False</span><span class="w"></span>
+<span class="na">enable_docs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span><span class="w"></span>
+<span class="c1">## location of swagger docs -- default: /docs</span><span class="w"></span>
+<span class="na">docs_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/api/v1/docs</span><span class="w"></span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> is running on <code class="docutils literal notranslate"><span class="pre">localhost</span></code>, these settings will enable the interactive Swagger docs at <a class="reference external" href="http://localhost:8080/api/v1/docs">http://localhost:8080/api/v1/docs</a>:</p>
+<a class="reference internal image-reference" href="_images/swagger_docs.png"><img alt="Swagger docs" class="align-center" src="_images/swagger_docs.png" style="width: 80%;" /></a>
 </section>
 </section>
 
