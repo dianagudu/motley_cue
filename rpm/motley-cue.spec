@@ -6,10 +6,16 @@ Release: %{rel}
 
 Summary: Mapper Oidc To Local idEntitY with loCal User managEment
 Group: Misc
-License: MIT-License
-URL: https://github.com/dianagudu/motley_cue.git
-Source0: motley-cue.tar
+License: MIT
+URL: https://github.com/dianagudu/motley_cue
+Source0: motley-cue.tar.gz
 Patch0: logfiles.patch
+AutoReq: no
+
+# OpenSUSE likes to have a Group
+%if 0%{?suse_version} > 0
+Group: System/Libraries
+%endif
 
 %if 0%{?centos} == 7
 BuildRequires: python3-setuptools >= 39, python36 >= 3.6, python3-pip >= 9.0, python36-devel >= 3.6

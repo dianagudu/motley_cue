@@ -320,7 +320,7 @@ deb: cleanapi create_obj_dir_structure preparedeb
 srctar: virtualenv
 	(cd ..; tar czf $(SRC_TAR) --exclude-vcs --exclude=.pc $(PKG_NAME_UNDERSCORES) --transform='s^${PKG_NAME_UNDERSCORES}^${PKG_NAME}-$(VERSION)^')
 	mkdir -p rpm/rpmbuild/SOURCES
-	mv $(SRC_TAR) rpm/rpmbuild/SOURCES/
+	mv ../$(SRC_TAR) rpm/rpmbuild/SOURCES/
 	cp rpm/logfiles.patch rpm/rpmbuild/SOURCES/
 
 .PHONY: virtualenv # called from specfile
