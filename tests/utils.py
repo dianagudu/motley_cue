@@ -1,81 +1,111 @@
-import os
+from typing import Callable, List, Dict
+from fastapi import Request
+from starlette.datastructures import Headers
+
+from .test_env import MC_TOKEN
 
 
 class Endpoint():
-    def __init__(self, endpoint, keys=None, children=None, protected=False):
-        self.endpoint = endpoint
-        self.keys = keys
+    def __init__(
+            self, url: str, valid_response: Dict,
+            children: List = [], params: List = [],
+            mapper_method: str = "",
+            protected: bool = False):
+        self.url = url
         self.children = children
+        self.params = params
         self.protected = protected
+        self.mapper_method = mapper_method
+        self.valid_response = valid_response
+        self.callback_valid = lambda *x: valid_response
 
 
 Info = Endpoint(
-    endpoint="/info",
-    keys=["login info", "supported OPs"]
+    url="/info",
+    valid_response={"login_info": "", "supported_OPs": []},
+    mapper_method="info"
 )
 
 InfoAuthorisation = Endpoint(
-    endpoint="/info/authorisation",
-    keys=["OP", "description", "info"],
+    url="/info/authorisation",
+    valid_response={"OP": "", "authorisation_type": "", "authorisation_info": ""},
+    mapper_method="info_authorisation",
     protected=True
 )
 
 VerifyUser = Endpoint(
-    endpoint="/verify_user",
-    keys=["status", "verified"],
+    url="/verify_user",
+    valid_response={"state": "", "verified": False},
+    params=["username"],
+    mapper_method="verify_user",
     protected=True
 )
 
 User = Endpoint(
-    endpoint="/user",
-    keys=["description", "endpoints", "usage"],
+    url="/user",
+    valid_response={"description": "", "endpoints": {}, "usage": ""},
     children=[
-        Endpoint(child_url, child_keys, protected=True)
-        for child_url, child_keys in [
-            ("/user/deploy", None),
-            ("/user/get_status", ["state", "message"]),
-            ("/user/suspend", ["state", "message"])
+        Endpoint(child_url, valid_response=child_resp, mapper_method=child_mapper_method, protected=True)
+        for child_url, child_resp, child_mapper_method in [
+            ("/user/deploy", {"state": "", "message": "", "credentials": {}}, "deploy"),
+            ("/user/get_status", {"state": "", "message": ""}, "get_status"),
+            ("/user/suspend", {"state": "", "message": ""}, "suspend")
         ]
     ]
 )
 
 Admin = Endpoint(
-    endpoint="/admin",
-    keys=["description", "endpoints", "usage"],
+    url="/admin",
+    valid_response={"description": "", "endpoints": {}, "usage": ""},
     children=[
-        Endpoint(child_url, child_keys, protected=True)
-        for child_url, child_keys in [
-            ("/admin/suspend", ["state", "message"]),
-            ("/admin/resume", ["state", "message"])
+        Endpoint(
+            url=child_url, valid_response=child_resp,
+            params=["iss", "sub"], mapper_method=child_mapper_method, protected=True
+        ) for child_url, child_resp, child_mapper_method in [
+            ("/admin/suspend", {"state": "", "message": ""}, "admin_suspend"),
+            ("/admin/resume", {"state": "", "message": ""}, "admin_resume")
         ]
     ]
 )
 
 Root = Endpoint(
-    endpoint="/",
-    keys=["description", "endpoints", "usage"],
+    url="/",
+    valid_response={"description": "", "endpoints": {}, "usage": ""},
     children=[Info, InfoAuthorisation, User, Admin, VerifyUser]
 )
 
 
-def getListOfEndpoints(endpoint, protected=False):
+def getListOfEndpoints(endpoint: Endpoint, condition: Callable[[Endpoint], bool]) -> List[Endpoint]:
     endpoints = []
-    if endpoint.protected == protected:
+    if condition(endpoint):
         endpoints += [endpoint]
     if endpoint.children:
         for child in endpoint.children:
-            endpoints += getListOfEndpoints(child, protected)
+            endpoints += getListOfEndpoints(child, condition)
     return endpoints
 
 
-PUBLIC_ENDPOINTS = getListOfEndpoints(Root, False)
-PROTECTED_ENDPOINTS = getListOfEndpoints(Root, True)
+PUBLIC_ENDPOINTS = getListOfEndpoints(Root, condition=lambda x: not x.protected)
+PROTECTED_ENDPOINTS = getListOfEndpoints(Root, condition=lambda x: x.protected)
+QUERY_ENDPOINTS = getListOfEndpoints(Root, condition=lambda x: len(x.params)>0)
 
-TOKEN = {
-    "BADTOKEN": "BADTOKEN",
-    "NOT_SUPPORTED": os.getenv("KIT_TOKEN"),
-    "SUPPORTED_NOT_AUTHORISED": os.getenv("DEEP_TOKEN"),
-    "AUTHORISE_ALL": os.getenv("WLCG_TOKEN"),
-    "INDIVIDUAL": os.getenv("EGI_TOKEN"),
-    "VO_BASED": os.getenv("HELMHOLTZ_DEV_TOKEN")
-}
+
+def build_query_string(params: Dict = {}) -> str:
+    return "&".join(["=".join(x) for x in params.items()])
+
+
+def build_request(token: str = None, params: Dict = {}) -> Request:
+    if token is None:
+        headers = {}
+    else:
+        headers = Headers({"Authorization": f"Bearer {token}"}).raw
+    return Request({
+        "type": "http",
+        "headers": headers,
+        "path": "/"
+        # "query_string": bytes(build_query_string(params), "utf-8"),
+    })
+
+
+MC_HEADERS = {"Authorization": f"Bearer {MC_TOKEN}"}
+MC_REQUEST = build_request(MC_TOKEN)

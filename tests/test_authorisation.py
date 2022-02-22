@@ -1,41 +1,76 @@
 import pytest
+import decorator
+from fastapi import Request
 
-from motley_cue.dependencies import mapper
-from .utils import InfoAuthorisation, TOKEN
+from motley_cue.mapper.exceptions import Unauthorised
 
-
-@pytest.mark.parametrize("token,status_code,info_str", [
-    (TOKEN["BADTOKEN"], 401, None),
-    (TOKEN["NOT_SUPPORTED"], 401, None),
-    (TOKEN["SUPPORTED_NOT_AUTHORISED"], 200, "supported but not authorised"),
-    (TOKEN["AUTHORISE_ALL"], 200, "authorise all"),
-    (TOKEN["VO_BASED"], 200, "VO-based authorisation"),
-    (TOKEN["INDIVIDUAL"], 200, "individual authorisation")
-], ids=TOKEN.keys())
-def test_info_authorisation(test_api, token, status_code, info_str):
-    headers = {"Authorization": f"Bearer {token}"}
-    response = test_api.get(InfoAuthorisation.endpoint, headers=headers)
-    assert response.status_code == status_code
-    if info_str:
-        assert set(response.json().keys()).issuperset(
-            set(InfoAuthorisation.keys))
-        assert response.json()["info"] == info_str
+from .utils import InfoAuthorisation, MC_REQUEST
+from .configs import *
 
 
-@pytest.mark.parametrize("token,status_code", [
-    (TOKEN["BADTOKEN"], 401),
-    (TOKEN["NOT_SUPPORTED"], 403),
-    (TOKEN["SUPPORTED_NOT_AUTHORISED"], 403),
-    (TOKEN["AUTHORISE_ALL"], 200),
-    (TOKEN["VO_BASED"], 200),
-    (TOKEN["INDIVIDUAL"], 200)
-], ids=TOKEN.keys())
-def test_require_authorised_user(test_api, monkeypatch, token, status_code):
-    def mock_get_status(request):
-        return {"test": "OK"}
-    monkeypatch.setattr(mapper, "get_status", mock_get_status)
-    headers = {"Authorization": f"Bearer {token}"}
-    response = test_api.get("/user/get_status", headers=headers)
-    assert response.status_code == status_code
-    if status_code == 200:
-        assert response.json()["test"] == "OK"
+@pytest.mark.parametrize("config_file", [
+    CONFIG_SUPPORTED_NOT_AUTHORISED,
+    CONFIG_AUTHORISE_ALL,
+    CONFIG_INDIVIDUAL,
+    CONFIG_VO_BASED
+], ids=[
+    "CONFIG_SUPPORTED_NOT_AUTHORISED",
+    "CONFIG_AUTHORISE_ALL",
+    "CONFIG_INDIVIDUAL",
+    "CONFIG_VO_BASED"
+])
+def test_info_authorisation(test_authorisation):
+    response = test_authorisation.info(MC_REQUEST)
+    assert set(InfoAuthorisation.valid_response.keys()) <= set(response.keys())
+
+@pytest.mark.parametrize("config_file", [CONFIG_NOT_SUPPORTED])
+def test_info_authorisation_not_supported(test_authorisation):
+    with pytest.raises(Unauthorised):
+        test_authorisation.info(MC_REQUEST)
+
+
+@pytest.mark.parametrize("config_file", [CONFIG_AUTHORISE_ALL, CONFIG_VO_BASED, CONFIG_INDIVIDUAL])
+def test_require_authorised_user_success(test_authorisation):
+    async def view_func(request: Request):
+        _ = request
+        return {"message": "Success"}
+    
+    assert test_authorisation.authorised_user_required(view_func)(request=MC_REQUEST) == {"message": "Success"}
+
+
+@pytest.mark.parametrize("config_file", [CONFIG_NOT_SUPPORTED, CONFIG_SUPPORTED_NOT_AUTHORISED])
+def test_require_authorised_user_fail(test_authorisation):
+    async def view_func(request: Request):
+        _ = request
+        return {"message": "Success"}
+    
+    with pytest.raises(Unauthorised):
+        test_authorisation.authorised_user_required(view_func)(request=MC_REQUEST)
+
+
+@pytest.mark.parametrize("config_file", [CONFIG_ADMIN, CONFIG_ADMIN_FOR_ALL])
+def test_require_authorised_admin_success(test_authorisation):
+    async def view_func(request: Request, iss: str):
+        _ = request
+        _ = iss
+        return {"message": "Success"}
+    
+    assert test_authorisation.authorised_admin_required(view_func)(
+        request=MC_REQUEST, iss=MC_ISS
+    ) == {"message": "Success"}
+
+
+@pytest.mark.parametrize("config_file", [CONFIG_SUPPORTED_NOT_AUTHORISED, CONFIG_ADMIN])
+def test_require_authorised_admin_fail(test_authorisation):
+    async def view_func(request: Request, iss: str):
+        _ = request
+        _ = iss
+        return {"message": "Success"}
+    
+    with pytest.raises(Unauthorised):
+        test_authorisation.authorised_admin_required(view_func)(
+            request=MC_REQUEST, iss="another iss"
+        )
+
+# test_get_userinfo_from_request
+# test_get_uid_from_request
