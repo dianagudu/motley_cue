@@ -109,3 +109,4 @@ def build_request(token: str = None, params: Dict = {}) -> Request:
 
 MC_HEADERS = {"Authorization": f"Bearer {MC_TOKEN}"}
 MC_REQUEST = build_request(MC_TOKEN)
+MC_BAD_REQUEST = build_request("badtoken")
