@@ -4,7 +4,7 @@ from fastapi import Request
 from flaat import Flaat, tokentools
 from aarc_g002_entitlement import Aarc_g002_entitlement, Aarc_g002_entitlement_Error
 
-from .config import canonical_url, to_bool, to_list
+from .config import Config, canonical_url, to_bool, to_list
 from .exceptions import Unauthorised, BadRequest
 from .utils import AuthorisationType, EXACT_OP_URLS
 
@@ -19,7 +19,7 @@ class Authorisation(Flaat):
     - stringify authorisation info
     """
 
-    def __init__(self, config):
+    def __init__(self, config: Config):
         super().__init__()
         super().set_web_framework("fastapi")
         super().set_cache_lifetime(120)  # seconds; default is 300
@@ -27,10 +27,18 @@ class Authorisation(Flaat):
         super().set_verbosity(config.verbosity)
         self.__authorisation = config.authorisation
 
+    @property
+    def authorisation(self):
+        return self.__authorisation
+
     def info(self, request):
         # get OP from request
         token = tokentools.get_access_token_from_request(request)
-        op_url = self.get_issuer_from_accesstoken(token)
+        try:
+            op_url = self.get_issuer_from_accesstoken(token)
+        except Exception as e:
+            logging.getLogger(__name__).debug(e)
+            op_url = None
         if op_url is None:
             raise Unauthorised("Could not determine token issuer. Token is not a JWT or OP not supported.")
         op_authz = self.__authorisation.get(canonical_url(op_url), None)

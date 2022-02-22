@@ -2,7 +2,7 @@ from typing import Optional
 from pydantic import BaseSettings
 
 from .version import __version__
-from .mapper import Mapper
+from .mapper import Mapper, Config
 
 
 class Settings(BaseSettings):
@@ -14,5 +14,5 @@ class Settings(BaseSettings):
     redoc_url: Optional[str] = None
 
 
-mapper = Mapper()
+mapper = Mapper(Config.from_files([]))
 settings = Settings(docs_url=mapper.config.docs_url)  # only the Swagger docs can be enabled and configured, ReDoc is disabled
