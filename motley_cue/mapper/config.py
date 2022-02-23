@@ -2,20 +2,27 @@ import os
 import logging
 from pathlib import Path
 from configparser import ConfigParser
+from typing import List
+
+from .exceptions import InternalException
 
 
 class Config():
     def __init__(self, config_parser):
+        try:
+            config_mapper = config_parser['mapper']
+        except:
+            raise InternalException("No [mapper] configuration found in configuration file!")
         # log level
-        self.__log_level = config_parser['mapper'].get(
+        self.__log_level = config_mapper.get(
             'log_level', logging.WARNING)
         # log file
-        self.__log_file = config_parser['mapper'].get(
+        self.__log_file = config_mapper.get(
             'log_file', None
         )
         # swagger docs
-        if config_parser['mapper'].get("enable_docs", False):
-            self.__docs_url = config_parser['mapper'].get("docs_url", "/docs")
+        if config_mapper.get("enable_docs", False):
+            self.__docs_url = config_mapper.get("docs_url", "/docs")
         else:
             self.__docs_url = None
         # trusted OPs
@@ -76,18 +83,16 @@ class Config():
             return 1
 
     @staticmethod
-    def from_default_files():
-        return Config.from_files(Config._reload_motley_cue_configs())
-
-    @staticmethod
-    def from_files(list_of_config_files):
+    def from_files(list_of_config_files: List):
+        list_of_config_files.extend(Config._reload_motley_cue_configs())
         config_parser = ConfigParser()
-        for f in list_of_config_files:
+        for filename in list_of_config_files:
+            f = Path(filename)
             if f.exists():
                 files_read = config_parser.read(f)
                 logging.getLogger(__name__).debug(F"Read config from {files_read}")
-                break
-        return Config(config_parser)
+                return Config(config_parser)
+        raise InternalException(f"No configuration file found at given or default locations: {list_of_config_files}")
 
     @staticmethod
     def _reload_motley_cue_configs():
@@ -106,8 +111,8 @@ class Config():
         if filename:
             files += [Path(filename)]
         files += [
-            Path('motley_cue.conf'),
-            Path.home()/'.config'/'motley_cue'/'motley_cue.conf'
+            Path("motley_cue.conf").absolute(),
+            Path("~/.config/motley_cue/motley_cue.conf").expanduser()
         ]
         files += [Path("/etc/motley_cue/motley_cue.conf")]
         return files
@@ -131,16 +136,25 @@ def canonical_url(url):
 def to_bool(bool_str):
     """Convert a string to bool.
     """
-    return True if bool_str.lower() == 'true' else False
+    if bool_str.lower() == "true":
+        return True
+    elif bool_str.lower() == "false":
+        return False
+    else:
+        raise InternalException(f"Error reading config file: unrecognised boolean value {bool_str}.")
 
 
 def to_list(list_str):
     """Convert a string to a list.
     """
-    # strip list of square brackets and remove all whitespace
+    # remove all whitespace
     stripped_list_str = list_str.replace("\n", "")\
-        .replace(" ", "").replace("\t", "")\
-        .strip("][").rstrip(",")
+        .replace(" ", "").replace("\t", "")
+    # strip list of square brackets
+    if stripped_list_str.startswith("[") and stripped_list_str.endswith("]"):
+        stripped_list_str = stripped_list_str[1:-1].strip(",")
+    else:
+        raise InternalException(f"Could not parse string as list, must be contained in square brackets: {list_str}")
     # check empty list
     if stripped_list_str == "":
         return []

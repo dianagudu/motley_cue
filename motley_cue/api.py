@@ -1,12 +1,14 @@
 from fastapi import FastAPI, Depends, Request, Query, Header
 from fastapi.exceptions import RequestValidationError
+from pydantic import ValidationError
 
-from .dependencies import mapper, settings
+from .dependencies import mapper, Settings
 from .routers import user, admin
 from .models import Info, InfoAuthorisation, VerifyUser, responses
-from .mapper.exceptions import validation_exception_handler
+from .mapper.exceptions import validation_exception_handler, request_validation_exception_handler
 
 
+settings = Settings(docs_url=mapper.config.docs_url)
 api = FastAPI(
     title=settings.title,
     description=settings.description,
@@ -17,12 +19,11 @@ api = FastAPI(
 )
 
 api.include_router(user.api,
-                   prefix="/user",
                    tags=["user"])
 api.include_router(admin.api,
-                   prefix="/admin",
                    tags=["admin"])
-api.add_exception_handler(RequestValidationError, validation_exception_handler)
+api.add_exception_handler(RequestValidationError, request_validation_exception_handler)
+api.add_exception_handler(ValidationError, validation_exception_handler)
 
 
 @api.get("/")

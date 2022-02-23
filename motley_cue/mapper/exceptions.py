@@ -1,3 +1,4 @@
+from pydantic import ValidationError
 from fastapi import Request
 from fastapi.exceptions import HTTPException, RequestValidationError
 from starlette.responses import JSONResponse
@@ -38,7 +39,6 @@ class MissingParameter(JSONResponse):
     and informative message.
     """
     def __init__(self, exc: RequestValidationError):
-        print(str(exc), exc.errors())
         errors = exc.errors()
         no_errors = len(errors)
         message = f"{no_errors} request validation error{'' if no_errors == 1 else 's'}: " + \
@@ -48,7 +48,27 @@ class MissingParameter(JSONResponse):
         super().__init__(status_code=HTTP_400_BAD_REQUEST, content={"detail": message})
 
 
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
+class InternalException(Exception):
+    """Wrapper for internal errors
+    """
+    def __init__(self, message) -> None:
+        self.message = message
+        super().__init__(message)
+
+
+async def validation_exception_handler(request: Request, exc: ValidationError):
+    """Replacement callback for handling RequestValidationError exceptions.
+
+    :param request: request object that caused the RequestValidationError
+    :param exc: RequestValidationError containing validation errors
+    """
+    return JSONResponse(
+        status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "Could not validate response model."}
+    )
+
+
+async def request_validation_exception_handler(request: Request, exc: RequestValidationError):
     """Replacement callback for handling RequestValidationError exceptions.
 
     :param request: request object that caused the RequestValidationError

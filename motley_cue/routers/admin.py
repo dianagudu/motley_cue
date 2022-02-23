@@ -4,7 +4,7 @@ from ..dependencies import mapper
 from ..models import FeudalResponse, responses
 
 
-api = APIRouter()
+api = APIRouter(prefix="/admin")
 
 
 @api.get("")
@@ -20,8 +20,8 @@ async def read_root():
         "description": "This is the admin API for mapping remote identities to local identities.",
         "usage": "All endpoints are available using an OIDC Access Token as a bearer token and need subject and issuer of account to be modified, via 'sub' and 'iss' variables.",
         "endpoints": {
-            "/suspend": "Suspends a local account.",
-            "/resume": "Restores a suspended local account."
+            f"{api.prefix}/suspend": "Suspends a local account.",
+            f"{api.prefix}/resume": "Restores a suspended local account."
         }
     }
 

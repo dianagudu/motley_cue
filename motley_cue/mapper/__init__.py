@@ -17,12 +17,8 @@ class Mapper:
     as well as interfacing with the local user management
     """
 
-    def __init__(self, config_file=None):
-        if config_file is None:
-            self.__config = Config.from_default_files()
-        else:
-            self.__config = Config.from_files([config_file])
-
+    def __init__(self, config: Config):
+        self.__config = config
         # configure logging
         if self.__config.log_file is None or \
                 self.__config.log_file == "/dev/stderr":
@@ -46,6 +42,10 @@ class Mapper:
         self.__admin_security = HTTPBearer(description="OIDC Access Token")
         self.__authorisation = Authorisation(self.__config)
         self.__lum = LocalUserManager()
+
+    @property
+    def authorisation(self):
+        return self.__authorisation
 
     @property
     def config(self):

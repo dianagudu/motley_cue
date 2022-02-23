@@ -1,1 +1,6 @@
 pylint
+pytest>=5.4.3
+pytest-cov>=2.10.0
+pytest-env
+python-dotenv
+liboidcagent
