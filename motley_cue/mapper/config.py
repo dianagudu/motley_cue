@@ -136,16 +136,25 @@ def canonical_url(url):
 def to_bool(bool_str):
     """Convert a string to bool.
     """
-    return True if bool_str.lower() == 'true' else False
+    if bool_str.lower() == "true":
+        return True
+    elif bool_str.lower() == "false":
+        return False
+    else:
+        raise InternalException(f"Error reading config file: unrecognised boolean value {bool_str}.")
 
 
 def to_list(list_str):
     """Convert a string to a list.
     """
-    # strip list of square brackets and remove all whitespace
+    # remove all whitespace
     stripped_list_str = list_str.replace("\n", "")\
-        .replace(" ", "").replace("\t", "")\
-        .strip("][").rstrip(",")
+        .replace(" ", "").replace("\t", "")
+    # strip list of square brackets
+    if stripped_list_str.startswith("[") and stripped_list_str.endswith("]"):
+        stripped_list_str = stripped_list_str[1:-1].strip(",")
+    else:
+        raise InternalException(f"Could not parse string as list, must be contained in square brackets: {list_str}")
     # check empty list
     if stripped_list_str == "":
         return []
