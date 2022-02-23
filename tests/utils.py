@@ -2,6 +2,8 @@ from typing import Callable, List, Dict
 from fastapi import Request
 from starlette.datastructures import Headers
 
+from ldf_adapter.results import Deployed, NotDeployed, Result, Status, Failure, Rejection, Question, Questionnaire
+
 from .test_env import MC_TOKEN
 
 
@@ -110,3 +112,37 @@ def build_request(token: str = None, params: Dict = {}) -> Request:
 MC_HEADERS = {"Authorization": f"Bearer {MC_TOKEN}"}
 MC_REQUEST = build_request(MC_TOKEN)
 MC_BAD_REQUEST = build_request("badtoken")
+
+
+class MockUser:
+    def __init__(self, data) -> None:
+        pass
+
+
+def mock_failure() -> Callable[..., Result]:
+    return lambda *x: (_ for _ in ()).throw(Failure(message=""))
+
+
+def mock_rejection() -> Callable[..., Result]:
+    return lambda *x: (_ for _ in ()).throw(Rejection(message=""))
+
+
+def mock_exception() -> Callable[..., Result]:
+    return lambda *x: (_ for _ in ()).throw(Exception())
+
+
+def mock_status_result(state: str, username: str = "") -> Callable[..., Result]:
+    if username == "":
+        message = "No message"
+    else:
+        message = f"username {username}"
+    return lambda *x: Status(state=state, message=message)
+
+
+def mock_deployed_result(username: str = "") -> Callable[..., Result]:
+    credentials = {"ssh_user": username}
+    message = "User was created and was added to groups."
+    return lambda *x: Deployed(credentials=credentials, message=message)
+
+def mock_not_deployed_result() -> Callable[..., Result]:
+    return lambda *x: NotDeployed(message="")

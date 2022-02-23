@@ -59,7 +59,7 @@ class LocalUserManager():
             login_info = {}
         return login_info
 
-    def verify_user(self, userinfo, username):
+    def verify_user(self, userinfo, username: str):
         state = "unknown"
         local_username = None
         try:
@@ -74,7 +74,7 @@ class LocalUserManager():
             raise InternalServerError("Something went wrong.")
         return {
             "state": state,
-            "verified": (local_username == username)
+            "verified": (local_username == username and username is not None)
         }
 
     def _reach_state(self, userinfo, state_target: States):
@@ -97,6 +97,8 @@ class LocalUserManager():
                 raise Unauthorised(msg)
             else:
                 raise InternalServerError(msg)
+        except Exception:
+            raise InternalServerError(f"Something went wrong when trying to reach state {data['state_target']}")
         else:
             result = result.attributes
             logging.getLogger(__name__).info(
@@ -129,6 +131,8 @@ class LocalUserManager():
                 raise Unauthorised(msg)
             else:
                 raise InternalServerError(msg)
+        except Exception:
+            raise InternalServerError(f"Something went wrong with admin action {action.name}.")
         else:
             result = result.attributes
             logging.getLogger(__name__).info(

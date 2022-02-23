@@ -3,6 +3,8 @@ from typing import Callable, Dict
 import pytest
 from starlette.testclient import TestClient
 
+from .utils import MockUser
+
 
 @pytest.fixture()
 def test_api(config_file, method_to_patch: str, callback: Callable[..., Dict], monkeypatch):
@@ -35,7 +37,23 @@ def test_authorisation(config_file: ConfigParser):
 
 
 @pytest.fixture()
-def test_local_user_manager():
-    from motley_cue.mapper import local_user_management
-    lum = local_user_management.LocalUserManager()
-    yield lum
+def test_local_user_manager(monkeypatch):
+    with monkeypatch.context() as mp:
+        from motley_cue.mapper import local_user_management
+        lum = local_user_management.LocalUserManager()
+        yield lum
+
+
+@pytest.fixture()
+def test_local_user_manager_patched(monkeypatch, mocker: Callable[[str, str], Callable]):
+    with monkeypatch.context() as mp:
+        # mock User class to only contain a mock reach_state method,
+        # which returns a valid response, either successful or failed
+        from ldf_adapter import User
+        mp.setattr(User, "__init__", MockUser.__init__)
+        mp.setattr(User, "reach_state", mocker)
+        mp.setattr(User, "resume", mocker)
+
+        from motley_cue.mapper import local_user_management
+        lum = local_user_management.LocalUserManager()
+        yield lum
