@@ -33,7 +33,6 @@ def test_api(config_file, method_to_patch: str, callback: Callable[..., Dict], m
             del sys.modules[m]
 
 
-
 @pytest.fixture()
 def test_authorisation(config_file: ConfigParser):
     from motley_cue.mapper import authorisation, config
@@ -62,17 +61,32 @@ def test_local_user_manager_patched(monkeypatch, mocker: Callable[[str, str], Ca
         lum = local_user_management.LocalUserManager()
         yield lum
 
+
 @pytest.fixture()
 def test_unauthorised():
     from motley_cue.mapper.exceptions import Unauthorised
     return Unauthorised
+
 
 @pytest.fixture()
 def test_bad_request():
     from motley_cue.mapper.exceptions import BadRequest
     return BadRequest
 
+
 @pytest.fixture()
 def test_internal_server_error():
     from motley_cue.mapper.exceptions import InternalServerError
     return InternalServerError
+
+
+@pytest.fixture()
+def test_internal_exception():
+    from motley_cue.mapper.exceptions import InternalException
+    return InternalException
+
+
+@pytest.fixture()
+def test_config():
+    from motley_cue.mapper import config
+    return config

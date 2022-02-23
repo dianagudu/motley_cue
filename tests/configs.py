@@ -55,7 +55,9 @@ CONFIG_VO_BASED = load_config(f"""
 {CONFIG_BASE}
 [authorisation.OP]
 op_url = {MC_ISS}
-authorised_vos = {MC_VO}
+authorised_vos = [
+        {MC_VO}
+    ]
 vo_claim = {MC_VO_CLAIM}
 """)
 
@@ -87,4 +89,10 @@ CONFIG_CUSTOM_DOC = load_config("""
 [mapper]
 enable_docs = True
 docs_url = /api/v1/docs
+""")
+
+CONFIG_INVALID_CUSTOM_DOC = load_config("""
+[mapper]
+enable_docs = True
+docs_url = docs
 """)
