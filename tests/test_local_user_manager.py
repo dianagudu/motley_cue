@@ -1,6 +1,5 @@
 import pytest
 
-from motley_cue.mapper.exceptions import Unauthorised, InternalServerError
 from .utils import mock_deployed_result, mock_exception, mock_not_deployed_result, mock_status_result
 from .utils import mock_failure, mock_rejection, mock_exception
 from .test_env import MC_ISS, MC_SUB
@@ -23,13 +22,15 @@ def test_deploy_success(test_local_user_manager_patched):
     assert set(response.keys()) == set(["state", "message", "credentials"])
 
 
-@pytest.mark.parametrize("mocker,exception_type", [
-    (mock_failure(), InternalServerError),
-    (mock_rejection(), Unauthorised),
-    (mock_exception(), InternalServerError)
-])
-def test_deploy_fail(test_local_user_manager_patched, exception_type):
-    with pytest.raises(exception_type):
+@pytest.mark.parametrize("mocker", [mock_failure(), mock_exception()])
+def test_deploy_fail(test_local_user_manager_patched, test_internal_server_error):
+    with pytest.raises(test_internal_server_error):
+        test_local_user_manager_patched.deploy({})
+
+
+@pytest.mark.parametrize("mocker", [mock_rejection()])
+def test_deploy_reject(test_local_user_manager_patched, test_unauthorised):
+    with pytest.raises(test_unauthorised):
         test_local_user_manager_patched.deploy({})
 
 
@@ -45,11 +46,9 @@ def test_get_status_success(test_local_user_manager_patched):
     assert set(response.keys()) == set(["state", "message"])
 
 
-@pytest.mark.parametrize("mocker,exception_type", [
-    (mock_exception(), InternalServerError)
-])
-def test_get_status_fail(test_local_user_manager_patched, exception_type):
-    with pytest.raises(exception_type):
+@pytest.mark.parametrize("mocker", [mock_exception()])
+def test_get_status_fail(test_local_user_manager_patched, test_internal_server_error):
+    with pytest.raises(test_internal_server_error):
         test_local_user_manager_patched.get_status({})
 
 
@@ -65,11 +64,9 @@ def test_suspend_success(test_local_user_manager_patched):
     assert set(response.keys()) == set(["state", "message"])
 
 
-@pytest.mark.parametrize("mocker,exception_type", [
-    (mock_exception(), InternalServerError)
-])
-def test_suspend_fail(test_local_user_manager_patched, exception_type):
-    with pytest.raises(exception_type):
+@pytest.mark.parametrize("mocker", [mock_exception()])
+def test_suspend_fail(test_local_user_manager_patched, test_internal_server_error):
+    with pytest.raises(test_internal_server_error):
         test_local_user_manager_patched.suspend({})
 
 
@@ -85,11 +82,9 @@ def test_admin_suspend_success(test_local_user_manager_patched):
     assert set(response.keys()) == set(["state", "message"])
 
 
-@pytest.mark.parametrize("mocker,exception_type", [
-    (mock_exception(), InternalServerError)
-])
-def test_admin_suspend_fail(test_local_user_manager_patched, exception_type):
-    with pytest.raises(exception_type):
+@pytest.mark.parametrize("mocker", [mock_exception()])
+def test_admin_suspend_fail(test_local_user_manager_patched, test_internal_server_error):
+    with pytest.raises(test_internal_server_error):
         test_local_user_manager_patched.admin_suspend(sub=MC_SUB, iss=MC_ISS)
 
 
@@ -105,11 +100,9 @@ def test_admin_resume_success(test_local_user_manager_patched):
     assert set(response.keys()) == set(["state", "message"])
 
 
-@pytest.mark.parametrize("mocker,exception_type", [
-    (mock_exception(), InternalServerError)
-])
-def test_admin_resume_fail(test_local_user_manager_patched, exception_type):
-    with pytest.raises(exception_type):
+@pytest.mark.parametrize("mocker", [mock_exception()])
+def test_admin_resume_fail(test_local_user_manager_patched, test_internal_server_error):
+    with pytest.raises(test_internal_server_error):
         test_local_user_manager_patched.admin_resume(sub=MC_SUB, iss=MC_ISS)
 
 
@@ -128,14 +121,15 @@ def test_verify_user_success(test_local_user_manager_patched, username: str, ver
     assert response["verified"] == verified
 
 
-@pytest.mark.parametrize("mocker,exception_type, username", [
-    (mocker(), InternalServerError, username)
+@pytest.mark.parametrize("mocker,username", [
+    (mocker(), username)
         for mocker in [mock_exception, mock_rejection, mock_failure]
         for username in ["any_username", "", None]
 ])
-def test_verify_user_fail(test_local_user_manager_patched, exception_type, username: str):
-    with pytest.raises(exception_type):
+def test_verify_user_fail(test_local_user_manager_patched, test_internal_server_error, username: str):
+    with pytest.raises(test_internal_server_error):
         test_local_user_manager_patched.verify_user({}, username)
+
 
 @pytest.mark.parametrize("mocker", [
     mock_deployed_result(),
@@ -148,7 +142,7 @@ def test_verify_user_fail(test_local_user_manager_patched, exception_type, usern
     mock_rejection(),
     mock_exception()
 ])
-def test_reach_state_no_userinfo(test_local_user_manager_patched):
-    with pytest.raises(InternalServerError):
+def test_reach_state_no_userinfo(test_local_user_manager_patched, test_internal_server_error):
+    with pytest.raises(test_internal_server_error):
         state = 0  # any number (of State type)
         test_local_user_manager_patched._reach_state(None, state)

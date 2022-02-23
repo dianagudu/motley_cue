@@ -83,10 +83,10 @@ def test_no_doc_apis(test_api):
     assert response.status_code == 200
 
 
-# @pytest.mark.parametrize("config_file,doc_url",
-#     [(CONFIG_DOC_ENABLED, "/docs"), (CONFIG_CUSTOM_DOC, "/api/v1/docs")],
-#     ids=["docs_enabled", "custom_docs"])
-# @pytest.mark.parametrize("method_to_patch,callback", [("", lambda *x: {})], ids=[""])
-# def test_doc_apis(test_api, doc_url):
-#     response = test_api.get(doc_url)
-#     assert response.status_code == 200
+@pytest.mark.parametrize("config_file,doc_url",
+    [(CONFIG_DOC_ENABLED, "/docs"), (CONFIG_CUSTOM_DOC, "/api/v1/docs")],
+    ids=["docs_enabled", "custom_docs"])
+@pytest.mark.parametrize("method_to_patch,callback", [("", lambda *x: {})], ids=[""])
+def test_doc_apis(test_api, doc_url):
+    response = test_api.get(doc_url)
+    assert response.status_code == 200

@@ -1,9 +1,5 @@
 from typing import Dict
 import pytest
-import decorator
-from fastapi import Request
-
-from motley_cue.mapper.exceptions import Unauthorised, BadRequest
 
 from .utils import InfoAuthorisation, MC_REQUEST, MC_BAD_REQUEST
 from .test_env import MC_ISS, MC_SUB
@@ -30,8 +26,8 @@ def test_info_authorisation(test_authorisation):
     assert set(InfoAuthorisation.valid_response.keys()) <= set(response.keys())
 
 @pytest.mark.parametrize("config_file", [CONFIG_NOT_SUPPORTED])
-def test_info_authorisation_not_supported(test_authorisation):
-    with pytest.raises(Unauthorised):
+def test_info_authorisation_not_supported(test_authorisation, test_unauthorised):
+    with pytest.raises(test_unauthorised):
         test_authorisation.info(MC_REQUEST)
 
 
@@ -41,35 +37,35 @@ def test_require_authorised_user_success(test_authorisation):
 
 
 @pytest.mark.parametrize("config_file", [CONFIG_NOT_SUPPORTED, CONFIG_SUPPORTED_NOT_AUTHORISED])
-def test_require_authorised_user_fail(test_authorisation):
-    with pytest.raises(Unauthorised):
+def test_require_authorised_user_fail(test_authorisation, test_unauthorised, test_bad_request):
+    with pytest.raises(test_unauthorised):
         test_authorisation.authorised_user_required(view_func)(request=MC_REQUEST)
 
-    with pytest.raises(Unauthorised):
+    with pytest.raises(test_unauthorised):
         test_authorisation.authorised_user_required(view_func)(request=MC_BAD_REQUEST)
 
-    with pytest.raises(BadRequest):
+    with pytest.raises(test_bad_request):
         test_authorisation.authorised_user_required(view_func)(request=None)
 
-    with pytest.raises(BadRequest):
+    with pytest.raises(test_bad_request):
         test_authorisation.authorised_user_required(view_func)()
 
 
 @pytest.mark.parametrize("config_file", [CONFIG_ADMIN])
-def test_require_authorised_admin(test_authorisation):
+def test_require_authorised_admin(test_authorisation, test_unauthorised):
     assert test_authorisation.authorised_admin_required(view_func)(
         request=MC_REQUEST, iss=MC_ISS
     ) == {"message": "Success"}
 
-    with pytest.raises(Unauthorised):
+    with pytest.raises(test_unauthorised):
         test_authorisation.authorised_admin_required(view_func)(request=MC_REQUEST, iss="")
 
-    with pytest.raises(Unauthorised):
+    with pytest.raises(test_unauthorised):
         test_authorisation.authorised_admin_required(view_func)(request=MC_BAD_REQUEST, iss=MC_ISS)
 
 
 @pytest.mark.parametrize("config_file", [CONFIG_ADMIN_FOR_ALL])
-def test_require_authorised_admin_for_all(test_authorisation):
+def test_require_authorised_admin_for_all(test_authorisation, test_unauthorised):
     assert test_authorisation.authorised_admin_required(view_func)(
         request=MC_REQUEST, iss=MC_ISS
     ) == {"message": "Success"}
@@ -78,40 +74,40 @@ def test_require_authorised_admin_for_all(test_authorisation):
         request=MC_REQUEST, iss=""
     ) == {"message": "Success"}
 
-    with pytest.raises(Unauthorised):
+    with pytest.raises(test_unauthorised):
         test_authorisation.authorised_admin_required(view_func)(request=MC_BAD_REQUEST, iss=MC_ISS)
 
 
 @pytest.mark.parametrize("config_file", [CONFIG_ADMIN, CONFIG_ADMIN_FOR_ALL])
-def test_require_authorised_admin_bad_request(test_authorisation):
-    with pytest.raises(BadRequest):
+def test_require_authorised_admin_bad_request(test_authorisation, test_bad_request):
+    with pytest.raises(test_bad_request):
         test_authorisation.authorised_admin_required(view_func)(request=MC_REQUEST, iss=None)
 
-    with pytest.raises(BadRequest):
+    with pytest.raises(test_bad_request):
         test_authorisation.authorised_admin_required(view_func)(request=MC_REQUEST)
 
-    with pytest.raises(BadRequest):
+    with pytest.raises(test_bad_request):
         test_authorisation.authorised_admin_required(view_func)(request=None, iss="")
 
-    with pytest.raises(BadRequest):
+    with pytest.raises(test_bad_request):
         test_authorisation.authorised_admin_required(view_func)(request=None)
 
-    with pytest.raises(BadRequest):
+    with pytest.raises(test_bad_request):
         test_authorisation.authorised_admin_required(view_func)()
 
 
 @pytest.mark.parametrize("config_file", [CONFIG_NOT_SUPPORTED])
-def test_require_authenticated_user_fail(test_authorisation):
-    with pytest.raises(Unauthorised):
+def test_require_authenticated_user_fail(test_authorisation, test_unauthorised, test_bad_request):
+    with pytest.raises(test_unauthorised):
         test_authorisation.authenticated_user_required(view_func)(request=MC_REQUEST)
 
-    with pytest.raises(Unauthorised):
+    with pytest.raises(test_unauthorised):
         test_authorisation.authenticated_user_required(view_func)(request=MC_BAD_REQUEST)
 
-    with pytest.raises(BadRequest):
+    with pytest.raises(test_bad_request):
         test_authorisation.authenticated_user_required(view_func)(request=None)
 
-    with pytest.raises(BadRequest):
+    with pytest.raises(test_bad_request):
         test_authorisation.authenticated_user_required(view_func)()
 
 

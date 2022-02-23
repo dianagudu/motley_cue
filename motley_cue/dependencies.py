@@ -15,4 +15,3 @@ class Settings(BaseSettings):
 
 
 mapper = Mapper(Config.from_files([]))
-settings = Settings(docs_url=mapper.config.docs_url)  # only the Swagger docs can be enabled and configured, ReDoc is disabled

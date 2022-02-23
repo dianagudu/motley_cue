@@ -2,6 +2,7 @@ from configparser import ConfigParser
 from typing import Callable, Dict
 import pytest
 from starlette.testclient import TestClient
+import sys
 
 from .utils import MockUser
 
@@ -24,9 +25,13 @@ def test_api(config_file, method_to_patch: str, callback: Callable[..., Dict], m
 
         # import FastAPI object here to make sure its decorators are based on monkeypatched mapper
         from motley_cue.api import api
-        print(api.docs_url)
         test_api = TestClient(api)
         yield test_api
+
+        # unload all motley_cue modules
+        for m in [x for x in sys.modules if x.startswith("motley_cue")]:
+            del sys.modules[m]
+
 
 
 @pytest.fixture()
@@ -37,11 +42,10 @@ def test_authorisation(config_file: ConfigParser):
 
 
 @pytest.fixture()
-def test_local_user_manager(monkeypatch):
-    with monkeypatch.context() as mp:
-        from motley_cue.mapper import local_user_management
-        lum = local_user_management.LocalUserManager()
-        yield lum
+def test_local_user_manager():
+    from motley_cue.mapper import local_user_management
+    lum = local_user_management.LocalUserManager()
+    yield lum
 
 
 @pytest.fixture()
@@ -57,3 +61,18 @@ def test_local_user_manager_patched(monkeypatch, mocker: Callable[[str, str], Ca
         from motley_cue.mapper import local_user_management
         lum = local_user_management.LocalUserManager()
         yield lum
+
+@pytest.fixture()
+def test_unauthorised():
+    from motley_cue.mapper.exceptions import Unauthorised
+    return Unauthorised
+
+@pytest.fixture()
+def test_bad_request():
+    from motley_cue.mapper.exceptions import BadRequest
+    return BadRequest
+
+@pytest.fixture()
+def test_internal_server_error():
+    from motley_cue.mapper.exceptions import InternalServerError
+    return InternalServerError
