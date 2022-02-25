@@ -1,8 +1,11 @@
-import os
-import logging
-from pathlib import Path
+from __future__ import annotations
 from configparser import ConfigParser
-from typing import List
+from typing import List, Optional
+import logging
+import os
+from pathlib import Path
+
+from flaat.requirements import IsTrue, OneOf, Requirement, Unsatisfiable, get_vo_requirement
 
 from .exceptions import InternalException
 
@@ -159,3 +162,50 @@ def to_list(list_str):
     if stripped_list_str == "":
         return []
     return [v.strip('"').strip("'") for v in stripped_list_str.split(",")]
+
+
+class OPAuthZ:
+    def __init__(self, op_authz: dict):
+        self.op_url = canonical_url(op_authz.get("op_url",""))
+        self.authorise_all = to_bool(op_authz.get("authorise_all","False"))
+        self.authorise_admins_for_all_ops = to_bool(op_authz.get("authorise_admins_for_all_ops","False"))
+        self.authorised_users = to_list(op_authz.get("authorised_users", "[]"))
+        self.authorised_admins = to_list(op_authz.get("authorised_admins", "[]"))
+        self.authorised_vos = to_list(op_authz.get("authorised_vos", "[]"))
+        self.vo_claim = op_authz.get("vo_claim", "")
+        self.vo_match = op_authz.get("vo_match", "")
+
+    @classmethod
+    def load(cls, authorisation, user_infos) -> Optional[OPAuthZ]:
+        op_authz = authorisation.get(canonical_url(user_infos.issuer), None)
+        if op_authz is None:
+            return None
+        return cls(op_authz)
+
+    def get_user_requirement(self) -> Requirement:
+        req = OneOf()
+        if self.authorise_all:
+            user_has_same_issuer = (
+                lambda user_infos: canonical_url(user_infos.issuer) == self.op_url
+            )
+            req.add_requirement(IsTrue(user_has_same_issuer))
+
+        if len(self.authorised_vos) > 0:
+            vo_claim = self.vo_claim
+            vo_match = self.vo_match
+            req.add_requirement(
+                get_vo_requirement(self.authorised_vos, claim=vo_claim, match=vo_match)
+            )
+
+        if len(self.authorised_users) > 0:
+            user_has_sub = lambda user_infos: user_infos.subject in self.authorised_users
+            req.add_requirement(IsTrue(user_has_sub))
+
+        return req
+
+    def get_admin_requirement(self) -> Requirement:
+        if len(self.authorised_admins) > 0:
+            user_has_sub = lambda user_infos: user_infos.subject in self.authorised_admins
+            return IsTrue(user_has_sub)
+
+        return Unsatisfiable()

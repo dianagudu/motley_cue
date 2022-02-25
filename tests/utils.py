@@ -96,8 +96,8 @@ def build_query_string(params: Dict = {}) -> str:
     return "&".join(["=".join(x) for x in params.items()])
 
 
-def build_request(token: str = None, params: Dict = {}) -> Request:
-    if token is None:
+def build_request(token: str = "", params: Dict = {}) -> Request:
+    if token == "":
         headers = {}
     else:
         headers = Headers({"Authorization": f"Bearer {token}"}).raw

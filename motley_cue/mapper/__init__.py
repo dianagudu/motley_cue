@@ -10,6 +10,7 @@ from fastapi.security import HTTPBearer
 from .config import Config
 from .authorisation import Authorisation
 from .local_user_management import LocalUserManager
+from .exceptions import Unauthorised
 
 
 class Mapper:
@@ -79,8 +80,10 @@ class Mapper:
         return self.__authorisation.authorised_admin_required(func)
 
     def deploy(self, request: Request):
-        userinfo = self.__authorisation.get_userinfo_from_request(request)
-        return self.__lum.deploy(userinfo)
+        user_infos = self.__authorisation.get_user_infos_from_request(request)
+        if user_infos is None:
+            raise Unauthorised(message="No user infos")
+        return self.__lum.deploy(user_infos.user_info)
 
     def get_status(self, request: Request):
         userinfo = self.__authorisation.get_uid_from_request(request)
