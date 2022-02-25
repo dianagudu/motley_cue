@@ -1,5 +1,4 @@
 from typing import Dict
-from fastapi import responses
 import pytest
 
 from .utils import InfoAuthorisation, MC_REQUEST, MC_BAD_REQUEST
