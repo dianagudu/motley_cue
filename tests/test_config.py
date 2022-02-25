@@ -1,5 +1,7 @@
 import pytest
 
+from .configs import CONFIG_CUSTOM_DOC, CONFIG_DOC_ENABLED, CONFIG_INVALID, CONFIG_NOT_SUPPORTED
+
 
 @pytest.mark.parametrize("url", [
     "http://aai.egi.com/oidc",
@@ -55,3 +57,17 @@ def test_to_bool(test_config, bool_str, real_bool):
 def test_to_bool_invalid(test_config, test_internal_exception, bool_str):
     with pytest.raises(test_internal_exception):
         test_config.to_bool(bool_str)
+
+
+def test_invalid_config(test_config):
+    with pytest.raises(test_config.InternalException):
+        test_config.Config(CONFIG_INVALID)
+
+
+@pytest.mark.parametrize("config_parser,docs_url", [
+    (CONFIG_NOT_SUPPORTED, None),
+    (CONFIG_DOC_ENABLED, "/docs"),
+    (CONFIG_CUSTOM_DOC, "/api/v1/docs")
+])
+def test_docs_url(test_config, config_parser, docs_url):
+    assert test_config.Config(config_parser).docs_url == docs_url

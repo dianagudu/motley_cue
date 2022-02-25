@@ -3,39 +3,14 @@ import pytest
 
 from .utils import InfoAuthorisation, MC_REQUEST, MC_BAD_REQUEST
 from .test_env import MC_ISS, MC_SUB, MC_TOKEN
-from .configs import CONFIGS
+from .configs import CONFIGS, CONFIGS_AUTHENTICATED_USERS, CONFIGS_AUTHORISED_USERS, CONFIGS_AUTHORISED_ADMINS
 
 
 async def view_func(*args, **kwargs):
     return {"message": "Success"}
 
 
-configs_authenticated_users = [
-    "SUPPORTED_NOT_AUTHORISED",
-    "AUTHORISE_ALL",
-    "INDIVIDUAL",
-    "VO_BASED"
-]
-
-configs_authorised_users = [
-    "AUTHORISE_ALL",
-    "INDIVIDUAL",
-    "VO_BASED"
-]
-
-configs_not_authorised_users = [
-    "NOT_SUPPORTED",
-    "SUPPORTED_NOT_AUTHORISED"
-]
-
-configs_authorised_admins = [
-    "ADMIN",
-    "ADMIN_FOR_ALL"
-]
-
-
-@pytest.mark.parametrize("config_file", [CONFIGS[c] for c in configs_authenticated_users],
-    ids=configs_authenticated_users)
+@pytest.mark.parametrize("config_file", CONFIGS_AUTHENTICATED_USERS.values(), ids=CONFIGS_AUTHENTICATED_USERS.keys())
 def test_info_authorisation(test_authorisation):
     response = test_authorisation.info(MC_REQUEST)
     assert set(InfoAuthorisation.valid_response.keys()) <= set(response.keys())
@@ -47,8 +22,7 @@ def test_info_authorisation_not_supported(test_authorisation, test_unauthorised)
         test_authorisation.info(MC_REQUEST)
 
 
-@pytest.mark.parametrize("config_file", [CONFIGS[c] for c in configs_authorised_users],
-    ids=configs_authorised_users)
+@pytest.mark.parametrize("config_file", CONFIGS_AUTHORISED_USERS.values(), ids=CONFIGS_AUTHORISED_USERS.keys())
 async def test_require_authorised_user_success(test_authorisation):
     assert await test_authorisation.authorised_user_required(view_func)(
         request=MC_REQUEST
@@ -88,15 +62,13 @@ async def test_require_authorised_admin_fail(test_authorisation):
     assert response.status_code == 403
 
 
-@pytest.mark.parametrize("config_file", [CONFIGS[c] for c in configs_authorised_admins],
-    ids=configs_authorised_admins)
+@pytest.mark.parametrize("config_file", CONFIGS_AUTHORISED_ADMINS.values(), ids=CONFIGS_AUTHORISED_ADMINS.keys())
 async def test_require_authorised_admin_bad_request(test_authorisation):
     response = await test_authorisation.authorised_admin_required(view_func)(request=MC_BAD_REQUEST, iss="anything")
     assert response.status_code == 401
 
 
-@pytest.mark.parametrize("config_file", [CONFIGS[c] for c in configs_authenticated_users],
-    ids=configs_authenticated_users)
+@pytest.mark.parametrize("config_file", CONFIGS_AUTHENTICATED_USERS.values(), ids=CONFIGS_AUTHENTICATED_USERS.keys())
 async def test_require_authenticated_user_success(test_authorisation):
     assert await test_authorisation.authenticated_user_required(view_func)(
         request=MC_REQUEST
@@ -115,8 +87,7 @@ async def test_require_authenticated_user_bad_request(test_authorisation):
     assert response.status_code == 401
 
 
-@pytest.mark.parametrize("config_file", [CONFIGS[c] for c in configs_authenticated_users],
-    ids=configs_authenticated_users)
+@pytest.mark.parametrize("config_file", CONFIGS_AUTHENTICATED_USERS.values(), ids=CONFIGS_AUTHENTICATED_USERS.keys())
 def test_get_user_infos_from_access_token_success(test_authorisation):
     response = test_authorisation.get_user_infos_from_access_token(access_token=MC_TOKEN)
     assert response.subject == MC_SUB
@@ -129,8 +100,7 @@ def test_get_user_infos_from_access_token_fail(test_authorisation):
     assert test_authorisation.get_user_infos_from_access_token(access_token=None) == None
 
 
-@pytest.mark.parametrize("config_file", [CONFIGS[c] for c in configs_authenticated_users],
-    ids=configs_authenticated_users)
+@pytest.mark.parametrize("config_file", CONFIGS_AUTHENTICATED_USERS.values(), ids=CONFIGS_AUTHENTICATED_USERS.keys())
 def test_get_uid_from_request_success(test_authorisation):
     response = test_authorisation.get_uid_from_request(request=MC_REQUEST)
     assert isinstance(response, Dict)

@@ -5,11 +5,11 @@ from pydantic import ValidationError
 from .utils import PUBLIC_ENDPOINTS, PROTECTED_ENDPOINTS, QUERY_ENDPOINTS, Info
 from .utils import MC_HEADERS, build_query_string
 from .test_env import MC_ISS
-from .configs import CONFIG_AUTHORISE_ALL, CONFIG_INDIVIDUAL, CONFIG_SUPPORTED_NOT_AUTHORISED, CONFIG_NOT_SUPPORTED, CONFIG_VO_BASED
+from .configs import CONFIGS_AUTHENTICATED_USERS, CONFIG_NOT_SUPPORTED
 from .configs import CONFIG_DOC_ENABLED, CONFIG_CUSTOM_DOC, CONFIG_INVALID_CUSTOM_DOC
 
 
-@pytest.mark.parametrize("config_file", [CONFIG_SUPPORTED_NOT_AUTHORISED, CONFIG_NOT_SUPPORTED, CONFIG_AUTHORISE_ALL])
+@pytest.mark.parametrize("config_file", CONFIGS_AUTHENTICATED_USERS.values(), ids=CONFIGS_AUTHENTICATED_USERS.keys())
 @pytest.mark.parametrize("endpoint,method_to_patch,callback",
     [(e, "", e.callback_valid) for e in PUBLIC_ENDPOINTS],
     ids=[x.url for x in PUBLIC_ENDPOINTS])
@@ -24,18 +24,16 @@ def test_public_endpoints_no_patch(test_api, endpoint):
 
 
 @pytest.mark.parametrize("config_file,supported_ops", [
-    *[(cf, [MC_ISS.rstrip("/")]) for cf in [
-        CONFIG_SUPPORTED_NOT_AUTHORISED, CONFIG_AUTHORISE_ALL, CONFIG_INDIVIDUAL, CONFIG_VO_BASED
-    ]],
+    *[(cf, [MC_ISS.rstrip("/")]) for cf in CONFIGS_AUTHENTICATED_USERS.values()],
     (CONFIG_NOT_SUPPORTED, [])
-])
+], ids=[*CONFIGS_AUTHENTICATED_USERS.keys(), "NOT_SUPPORTED"])
 @pytest.mark.parametrize("method_to_patch,callback", [("", Info.callback_valid)])
 def test_info_endpoint(test_api, supported_ops):
     response = test_api.get(Info.url)
     assert [url.rstrip("/") for url in response.json()["supported_OPs"]] == supported_ops
 
 
-@pytest.mark.parametrize("config_file", [CONFIG_SUPPORTED_NOT_AUTHORISED])
+@pytest.mark.parametrize("config_file", CONFIGS_AUTHENTICATED_USERS.values(), ids=CONFIGS_AUTHENTICATED_USERS.keys())
 @pytest.mark.parametrize(
     "endpoint,method_to_patch,callback",
     [(e, e.mapper_method, e.callback_valid) for e in PROTECTED_ENDPOINTS],
@@ -45,7 +43,7 @@ def test_protected_endpoints_missing_token(test_api, endpoint):
     assert response.status_code == 403
 
 
-@pytest.mark.parametrize("config_file", [CONFIG_SUPPORTED_NOT_AUTHORISED])
+@pytest.mark.parametrize("config_file", CONFIGS_AUTHENTICATED_USERS.values(), ids=CONFIGS_AUTHENTICATED_USERS.keys())
 @pytest.mark.parametrize(
     "endpoint,method_to_patch,callback",
     [(e, e.mapper_method, e.callback_valid) for e in QUERY_ENDPOINTS],
@@ -55,7 +53,7 @@ def test_query_endpoints_missing_params(test_api, endpoint):
     assert response.status_code == 400
 
 
-@pytest.mark.parametrize("config_file", [CONFIG_SUPPORTED_NOT_AUTHORISED])
+@pytest.mark.parametrize("config_file", CONFIGS_AUTHENTICATED_USERS.values(), ids=CONFIGS_AUTHENTICATED_USERS.keys())
 @pytest.mark.parametrize(
     "endpoint,method_to_patch,callback",
     [(e, e.mapper_method, e.callback_valid) for e in PROTECTED_ENDPOINTS],
@@ -69,7 +67,7 @@ def test_protected_endpoints_with_token(test_api, endpoint):
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize("config_file", [CONFIG_SUPPORTED_NOT_AUTHORISED])
+@pytest.mark.parametrize("config_file", CONFIGS_AUTHENTICATED_USERS.values(), ids=CONFIGS_AUTHENTICATED_USERS.keys())
 @pytest.mark.parametrize(
     "endpoint,method_to_patch,callback",
     [(e, e.mapper_method, lambda *x: {}) for e in PROTECTED_ENDPOINTS],
@@ -83,7 +81,7 @@ def test_invalid_response_models(test_api, endpoint):
     assert response.status_code == 500
 
 
-@pytest.mark.parametrize("config_file", [CONFIG_SUPPORTED_NOT_AUTHORISED])
+@pytest.mark.parametrize("config_file", CONFIGS_AUTHENTICATED_USERS.values(), ids=CONFIGS_AUTHENTICATED_USERS.keys())
 @pytest.mark.parametrize("method_to_patch,callback", [("", lambda *x: {})])
 def test_no_doc_apis(test_api):
     response = test_api.get("/docs")
