@@ -2,9 +2,11 @@
 """
 import logging
 from enum import Enum
- # pylint: disable=wrong-import-position
+
+# pylint: disable=wrong-import-position
 from feudal_globalconfig import globalconfig
-globalconfig.config['parse_commandline_args'] = False
+
+globalconfig.config["parse_commandline_args"] = False
 from ldf_adapter.config import CONFIG as LDF_ADAPTER_CONFIG
 from ldf_adapter.results import ExceptionalResult, Rejection
 from ldf_adapter import User
@@ -14,6 +16,7 @@ from .exceptions import Unauthorised, InternalServerError
 
 class States(Enum):
     """Possible states for local accounts"""
+
     # pylint: disable=invalid-name
     # for compatibility with feudal state names
     deployed = 0
@@ -27,18 +30,19 @@ class States(Enum):
 
 class AdminActions(Enum):
     """Possible actions for admins on local accounts"""
+
     SUSPEND = 0
     RESUME = 1
     UNDEPLOY = 2
 
 
-class LocalUserManager():
+class LocalUserManager:
     """Interface to local user management"""
+
     # pylint: disable=no-self-use
     # for future configurable LUM
     def __init__(self):
-        """Creates local user management object.
-        """
+        """Creates local user management object."""
         # might be a good idea to add config params here,
         # e.g. feudal config if the adapter would support it
         # or supported states, etc...
@@ -64,14 +68,13 @@ class LocalUserManager():
         return self._admin_action(sub, iss, AdminActions.RESUME)
 
     def login_info(self):
-        """Returns a dict containing the login information for the configured feudal backend.
-        """
+        """Returns a dict containing the login information for the configured feudal backend."""
         try:
             login_info = dict(
-                    LDF_ADAPTER_CONFIG[
-                        f"backend.{LDF_ADAPTER_CONFIG['ldf_adapter']['backend']}.login_info"
-                    ]
-                )
+                LDF_ADAPTER_CONFIG[
+                    f"backend.{LDF_ADAPTER_CONFIG['ldf_adapter']['backend']}.login_info"
+                ]
+            )
         except Exception:  # pylint: disable=broad-except
             login_info = {}
         return login_info
@@ -87,19 +90,21 @@ class LocalUserManager():
         try:
             logging.getLogger(__name__).info(
                 "Attempting to verify if local username for userinfo %s is '%s'",
-                userinfo, username)
+                userinfo,
+                username,
+            )
             result = self.get_status(userinfo)
             state = result["state"]
             if state not in [States.not_deployed.name, States.unknown.name]:
                 local_username = result["message"].split()[1]
         except Exception as ex:
             logging.getLogger(__name__).warning(
-                "Could not verify token for username %s: %s",
-                username, ex)
+                "Could not verify token for username %s: %s", username, ex
+            )
             raise InternalServerError("Something went wrong.") from ex
         return {
             "state": state,
-            "verified": (local_username == username and username is not None)
+            "verified": (local_username == username and username is not None),
         }
 
     def _reach_state(self, userinfo, state_target: States):
@@ -108,8 +113,11 @@ class LocalUserManager():
         """
         if userinfo is None:
             logging.getLogger(__name__).error(
-                "Something went wrong when trying to get userinfo for feudal.")
-            raise InternalServerError("Something went wrong when trying to retrieve user info.")
+                "Something went wrong when trying to get userinfo for feudal."
+            )
+            raise InternalServerError(
+                "Something went wrong when trying to retrieve user info."
+            )
         # build input for feudalAdapter
         data = {
             "state_target": state_target.name,
@@ -118,9 +126,9 @@ class LocalUserManager():
             },
         }
         try:
-            result = User(data).reach_state(data['state_target'])
+            result = User(data).reach_state(data["state_target"])
         except ExceptionalResult as result:
-            msg=f"Reached state '{result.attributes['state']}': {result.attributes['message']}"
+            msg = f"Reached state '{result.attributes['state']}': {result.attributes['message']}"
             logging.getLogger(__name__).warning(msg)
             if isinstance(result, Rejection):
                 raise Unauthorised(msg) from result
@@ -132,25 +140,21 @@ class LocalUserManager():
         else:
             result = result.attributes
             logging.getLogger(__name__).info(
-                "Reached state '%s': %s", result["state"], result["message"])
+                "Reached state '%s': %s", result["state"], result["message"]
+            )
             return result
 
     def _admin_action(self, sub: str, iss: str, action: AdminActions):
         """Interfaces with the Feudal Adapter s.t. the given admin action is applied
         to the local account of the OIDC user given by sub and iss.
         """
-        data = {
-            "user": {
-                "userinfo": {
-                    "sub": sub,
-                    "iss": iss
-                }
-            }
-        }
+        data = {"user": {"userinfo": {"sub": sub, "iss": iss}}}
         try:
             logging.getLogger(__name__).info(
                 "Attempting to perform admin action '%s' on user: [sub: %s, iss: %s]",
-                action.name, sub, iss
+                action.name,
+                sub,
+                iss,
             )
             if action == AdminActions.SUSPEND:
                 result = User(data).reach_state(States.suspended.name)
@@ -159,7 +163,7 @@ class LocalUserManager():
             elif action == AdminActions.UNDEPLOY:
                 result = User(data).reach_state(States.not_deployed.name)
         except ExceptionalResult as result:
-            msg=f"Reached state '{result.attributes['state']}': {result.attributes['message']}"
+            msg = f"Reached state '{result.attributes['state']}': {result.attributes['message']}"
             logging.getLogger(__name__).warning(msg)
             if isinstance(result, Rejection):
                 raise Unauthorised(msg) from result
@@ -171,5 +175,6 @@ class LocalUserManager():
         else:
             result = result.attributes
             logging.getLogger(__name__).info(
-                "Reached state '%s': %s", result["state"], result["message"])
+                "Reached state '%s': %s", result["state"], result["message"]
+            )
             return result

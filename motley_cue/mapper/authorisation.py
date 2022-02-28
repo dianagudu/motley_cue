@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 # We dynamically load the requirement in is_satisfied_by
 class AuthRequirement(Requirement):
     """Base class for authorisation requirements corresponding to an OP."""
+
     # pylint: disable=too-few-public-methods
     def __init__(self, authorisation: dict):
         self.authorisation = authorisation
@@ -29,8 +30,10 @@ class AuthRequirement(Requirement):
 
 class AuthenticatedUserRequirement(AuthRequirement):
     """Requirement for a user to be able to login at the OP."""
+
     # pylint: disable=too-few-public-methods
     def is_satisfied_by(self, user_infos: UserInfos) -> CheckResult:
+        """override method to use configured authorisation"""
         op_authz = OPAuthZ.load(self.authorisation, user_infos)
         if op_authz is None:
             return CheckResult(False, "OP is not configured")
@@ -40,8 +43,10 @@ class AuthenticatedUserRequirement(AuthRequirement):
 
 class AuthorisedUserRequirement(AuthRequirement):
     """Requirement for a user to meet the configured authorisation for the OP."""
+
     # pylint: disable=too-few-public-methods
     def is_satisfied_by(self, user_infos: UserInfos) -> CheckResult:
+        """override method to use configured authorisation"""
         op_authz = OPAuthZ.load(self.authorisation, user_infos)
         if op_authz is None:
             return CheckResult(False, "OP is not configured")
@@ -51,8 +56,10 @@ class AuthorisedUserRequirement(AuthRequirement):
 
 class AuthorisedAdminRequirement(AuthRequirement):
     """Requirement for an admin to meet the configured authorisation for the OP."""
+
     # pylint: disable=too-few-public-methods
     def is_satisfied_by(self, user_infos: UserInfos) -> CheckResult:
+        """override method to use configured authorisation"""
         op_authz = OPAuthZ.load(self.authorisation, user_infos)
         if op_authz is None:
             return CheckResult(False, "OP is not configured")
@@ -62,13 +69,17 @@ class AuthorisedAdminRequirement(AuthRequirement):
 
 class AuthorisationType(Enum):
     """Class to describe authorisation for an OP."""
+
     NOT_SUPPORTED = ("not supported", "OP is not supported.")
-    NOT_CONFIGURED = ("not configured", "OP is supported but no authorisation is configured.")
+    NOT_CONFIGURED = (
+        "not configured",
+        "OP is supported but no authorisation is configured.",
+    )
     ALL_USERS = ("all users", "All users from this OP are authorised.")
     INDIVIDUAL_USERS = (
         "individual users",
-        "Users are authorised on an individual basis. "\
-        "Please contact a service administrator to request access."
+        "Users are authorised on an individual basis. "
+        "Please contact a service administrator to request access.",
     )
     VO_BASED = ("VO-based", "Users who are in {} of the supported VOs are authorised")
 
@@ -81,7 +92,7 @@ class AuthorisationType(Enum):
         """Return a description of the authorisation as a dict"""
         return {
             "authorisation_type": self.__mode,
-            "authorisation_info": self.__info.format(vo_match)
+            "authorisation_info": self.__info.format(vo_match),
         }
 
 
@@ -130,20 +141,17 @@ class Authorisation(Flaat):
         if op_authz is None:
             return {
                 "OP": user_infos.issuer,
-                **AuthorisationType.NOT_SUPPORTED.description()
+                **AuthorisationType.NOT_SUPPORTED.description(),
             }
         # if all users from this OP are authorised
         if op_authz.authorise_all:
-            return {
-                "OP": op_authz.op_url,
-                **AuthorisationType.ALL_USERS.description()
-            }
+            return {"OP": op_authz.op_url, **AuthorisationType.ALL_USERS.description()}
         # if authorised VOs are specified
         if len(op_authz.authorised_vos) > 0:
             return {
                 "OP": op_authz.op_url,
                 **AuthorisationType.VO_BASED.description(vo_match=op_authz.vo_match),
-                "supported_VOs": op_authz.authorised_vos
+                "supported_VOs": op_authz.authorised_vos,
             }
         # if individual users are specified
         if len(op_authz.authorised_users) > 0:
@@ -153,10 +161,7 @@ class Authorisation(Flaat):
             }
 
         # OP is supported but no authorisation is configured
-        return {
-            "OP": op_authz.op_url,
-            **AuthorisationType.NOT_CONFIGURED.description()
-        }
+        return {"OP": op_authz.op_url, **AuthorisationType.NOT_CONFIGURED.description()}
 
     def authenticated_user_required(self, func):
         """Decorator that only allows users from supported OPs.
@@ -176,6 +181,7 @@ class Authorisation(Flaat):
         configured authorisation requirements.
         OIDC Access Token should be found in request headers.
         """
+
         def _check_request(user_infos: UserInfos, *_, **kwargs) -> CheckResult:
             user_iss = kwargs.get("iss", "")
             if user_iss != "":
@@ -189,7 +195,7 @@ class Authorisation(Flaat):
                 ):
                     return CheckResult(
                         False,
-                        f"Admin {user_infos} is not authorised to manage "\
+                        f"Admin {user_infos} is not authorised to manage "
                         f"users of issuer '{user_iss}'",
                     )
 
@@ -202,11 +208,14 @@ class Authorisation(Flaat):
         )
         return auth_flow.decorate_view_func(func)
 
-    def get_user_infos_from_access_token(self, access_token, issuer_hint="") -> Optional[UserInfos]:
-        """Get a (flaat) UserInfos object from given OIDC Access Token.
-        """
+    def get_user_infos_from_access_token(
+        self, access_token, issuer_hint=""
+    ) -> Optional[UserInfos]:
+        """Get a (flaat) UserInfos object from given OIDC Access Token."""
         try:
-            user_infos = super().get_user_infos_from_access_token(access_token, issuer_hint)
+            user_infos = super().get_user_infos_from_access_token(
+                access_token, issuer_hint
+            )
         except Exception:  # pylint: disable=broad-except
             return None
         if (

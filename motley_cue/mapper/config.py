@@ -7,14 +7,20 @@ import logging
 import os
 from pathlib import Path
 
-from flaat.requirements import IsTrue, OneOf, Requirement, Unsatisfiable, get_vo_requirement
+from flaat.requirements import (
+    IsTrue,
+    OneOf,
+    Requirement,
+    Unsatisfiable,
+    get_vo_requirement,
+)
 
 from .exceptions import InternalException
 
 
-class Config():
-    """Class for motley_cue configuration.
-    """
+class Config:
+    """Class for motley_cue configuration."""
+
     def __init__(self, config_parser):
         """Create a configuration object from a ConfigParser.
 
@@ -25,34 +31,35 @@ class Config():
             InternalException: if configuration does not contain mandatory section [mapper]
         """
         try:
-            config_mapper = config_parser['mapper']
+            config_mapper = config_parser["mapper"]
         except Exception as ex:
             raise InternalException(
                 "No [mapper] configuration found in configuration file!"
             ) from ex
         # log level
-        self.__log_level = config_mapper.get(
-            'log_level', logging.WARNING)
+        self.__log_level = config_mapper.get("log_level", logging.WARNING)
         # log file
-        self.__log_file = config_mapper.get(
-            'log_file', None
-        )
+        self.__log_file = config_mapper.get("log_file", None)
         # swagger docs
         if config_mapper.get("enable_docs", False):
             self.__docs_url = config_mapper.get("docs_url", "/docs")
         else:
             self.__docs_url = None
         # trusted OPs
-        authz_sections = [section for section in config_parser.sections()
-                          if section.startswith("authorisation")]
+        authz_sections = [
+            section
+            for section in config_parser.sections()
+            if section.startswith("authorisation")
+        ]
         self.__trusted_ops = []
         self.__authorisation = {}
         for section in authz_sections:
-            op_url = config_parser[section].get('op_url', None)
+            op_url = config_parser[section].get("op_url", None)
             if op_url is not None:
                 self.__trusted_ops.append(op_url)
                 self.__authorisation[canonical_url(op_url)] = dict(
-                    config_parser[section].items())
+                    config_parser[section].items()
+                )
 
     def get_authorisation(self, op_url):
         """Return authorisation section in configuration for OP given by URL"""
@@ -121,7 +128,7 @@ class Config():
                 logging.getLogger(__name__).debug("Read config from %s", files_read)
                 return Config(config_parser)
         raise InternalException(
-            "No configuration file found at given or default locations: "\
+            "No configuration file found at given or default locations: "
             f"{list_of_config_files}"
         )
 
@@ -141,15 +148,14 @@ class Config():
             files += [Path(filename)]
         files += [
             Path("motley_cue.conf").absolute(),
-            Path("~/.config/motley_cue/motley_cue.conf").expanduser()
+            Path("~/.config/motley_cue/motley_cue.conf").expanduser(),
         ]
         files += [Path("/etc/motley_cue/motley_cue.conf")]
         return files
 
 
 def canonical_url(url):
-    """Strip URL of protocol info and ending slashes
-    """
+    """Strip URL of protocol info and ending slashes"""
     url = url.lower()
     if url.startswith("http://"):
         url = url[7:]
@@ -180,14 +186,14 @@ def to_list(list_str):
     Raise an InternalException if the string is not a valid list, with square brackets.
     """
     # remove all whitespace
-    stripped_list_str = list_str.replace("\n", "")\
-        .replace(" ", "").replace("\t", "")
+    stripped_list_str = list_str.replace("\n", "").replace(" ", "").replace("\t", "")
     # strip list of square brackets
     if stripped_list_str.startswith("[") and stripped_list_str.endswith("]"):
         stripped_list_str = stripped_list_str[1:-1].strip(",")
     else:
         raise InternalException(
-            f"Could not parse string as list, must be contained in square brackets: {list_str}")
+            f"Could not parse string as list, must be contained in square brackets: {list_str}"
+        )
     # check empty list
     if stripped_list_str == "":
         return []
@@ -195,8 +201,8 @@ def to_list(list_str):
 
 
 class OPAuthZ:
-    """Class describing the authorisation configuration for an OP.
-    """
+    """Class describing the authorisation configuration for an OP."""
+
     # pylint: disable=too-many-instance-attributes
     # Eight is reasonable in this case.
     def __init__(self, op_authz: dict):
@@ -206,10 +212,11 @@ class OPAuthZ:
         Args:
             op_authz (dict): ConfigParser section for authorisation
         """
-        self.op_url = canonical_url(op_authz.get("op_url",""))
-        self.authorise_all = to_bool(op_authz.get("authorise_all","False"))
+        self.op_url = canonical_url(op_authz.get("op_url", ""))
+        self.authorise_all = to_bool(op_authz.get("authorise_all", "False"))
         self.authorise_admins_for_all_ops = to_bool(
-            op_authz.get("authorise_admins_for_all_ops","False"))
+            op_authz.get("authorise_admins_for_all_ops", "False")
+        )
         self.authorised_users = to_list(op_authz.get("authorised_users", "[]"))
         self.authorised_admins = to_list(op_authz.get("authorised_admins", "[]"))
         self.authorised_vos = to_list(op_authz.get("authorised_vos", "[]"))
@@ -251,7 +258,9 @@ class OPAuthZ:
             )
 
         if len(self.authorised_users) > 0:
-            user_has_sub = lambda user_infos: user_infos.subject in self.authorised_users
+            user_has_sub = (
+                lambda user_infos: user_infos.subject in self.authorised_users
+            )
             req.add_requirement(IsTrue(user_has_sub))
 
         return req
@@ -261,7 +270,9 @@ class OPAuthZ:
         for API admins.
         """
         if len(self.authorised_admins) > 0:
-            user_has_sub = lambda user_infos: user_infos.subject in self.authorised_admins
+            user_has_sub = (
+                lambda user_infos: user_infos.subject in self.authorised_admins
+            )
             return IsTrue(user_has_sub)
 
         return Unsatisfiable()

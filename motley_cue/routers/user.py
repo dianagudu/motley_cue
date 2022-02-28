@@ -25,8 +25,8 @@ async def read_root():
         "endpoints": {
             f"{api.prefix}/get_status": "Get information about your local account.",
             f"{api.prefix}/deploy": "Provision local account.",
-            f"{api.prefix}/suspend": "Suspend local account."
-        }
+            f"{api.prefix}/suspend": "Suspend local account.",
+        },
     }
 
 
@@ -35,13 +35,13 @@ async def read_root():
     dependencies=[Depends(mapper.user_security)],
     response_model=FeudalResponse,
     response_model_exclude_unset=True,
-    responses={**responses, 200: {"model": FeudalResponse}}
+    responses={**responses, 200: {"model": FeudalResponse}},
 )
 @mapper.authorised_user_required
 async def get_status(
-        request: Request,
-        token: str = Header(..., alias="Authorization", description="OIDC Access Token")
-    ):  # pylint: disable=unused-argument
+    request: Request,
+    token: str = Header(..., alias="Authorization", description="OIDC Access Token"),
+):  # pylint: disable=unused-argument
     """Get information about your local account:
 
     * **state**: one of the supported states, such as deployed, not_deployed, suspended.
@@ -57,13 +57,13 @@ async def get_status(
     dependencies=[Depends(mapper.user_security)],
     response_model=FeudalResponse,
     response_model_exclude_unset=True,
-    responses={**responses, 200: {"model": FeudalResponse}}
+    responses={**responses, 200: {"model": FeudalResponse}},
 )
 @mapper.authorised_user_required
 async def deploy(
-        request: Request,
-        token: str = Header(..., alias="Authorization", description="OIDC Access Token")
-    ):  # pylint: disable=unused-argument
+    request: Request,
+    token: str = Header(..., alias="Authorization", description="OIDC Access Token"),
+):  # pylint: disable=unused-argument
     """Provision a local account.
 
     Requires an authorised user.
@@ -76,13 +76,13 @@ async def deploy(
     dependencies=[Depends(mapper.user_security)],
     response_model=FeudalResponse,
     response_model_exclude_unset=True,
-    responses={**responses, 200: {"model": FeudalResponse}}
+    responses={**responses, 200: {"model": FeudalResponse}},
 )
 @mapper.authorised_user_required
 async def suspend(
-        request: Request,
-        token: str = Header(..., alias="Authorization", description="OIDC Access Token")
-    ):  # pylint: disable=unused-argument
+    request: Request,
+    token: str = Header(..., alias="Authorization", description="OIDC Access Token"),
+):  # pylint: disable=unused-argument
     """Suspends a local account.
 
     Requires an authorised user.

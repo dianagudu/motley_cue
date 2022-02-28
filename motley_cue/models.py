@@ -9,37 +9,49 @@ from .mapper.authorisation import AuthorisationType
 
 @dataclass
 class Info:
-    """Data model for responses on the /info endpoint.
-    """
-    login_info: dict = Field(..., example={
-        "description": "Local SSH Test Service",
-        "login_help": "Login via `mccli ssh {login_host}`.",
-        "ssh_host": "localhost"
-    })
-    supported_OPs: list = Field(..., example=[  # pylint: disable=invalid-name
-        "https://aai.egi.eu/oidc",
-        "https://login.helmholtz.de/oauth2"
-    ])
+    """Data model for responses on the /info endpoint."""
+
+    login_info: dict = Field(
+        ...,
+        example={
+            "description": "Local SSH Test Service",
+            "login_help": "Login via `mccli ssh {login_host}`.",
+            "ssh_host": "localhost",
+        },
+    )
+    supported_OPs: list = Field(  # pylint: disable=invalid-name
+        ...,
+        example=[
+            "https://aai.egi.eu/oidc",
+            "https://login.helmholtz.de/oauth2",
+        ],
+    )
 
 
 @dataclass
 class InfoAuthorisation:
-    """Data model for responses on the /info/authorisation endpoint.
-    """
-    OP: str = Field (..., example="https://wlcg.cloud.cnaf.infn.it/")  # pylint: disable=invalid-name
+    """Data model for responses on the /info/authorisation endpoint."""
+
+    OP: str = Field(  # pylint: disable=invalid-name
+        ..., example="https://wlcg.cloud.cnaf.infn.it/"
+    )
     authorisation_type: str = Field(
-        ..., example=AuthorisationType.VO_BASED.description()["authorisation_type"])
-    authorisation_info: str = Field (
-        ..., example=AuthorisationType.VO_BASED.description()["authorisation_info"])
-    supported_VOs: Optional[list] = Field ([], example=["/wlcg"])  # pylint: disable=invalid-name
+        ..., example=AuthorisationType.VO_BASED.description()["authorisation_type"]
+    )
+    authorisation_info: str = Field(
+        ..., example=AuthorisationType.VO_BASED.description()["authorisation_info"]
+    )
+    supported_VOs: Optional[list] = Field(  # pylint: disable=invalid-name
+        [], example=["/wlcg"]
+    )
 
 
 @dataclass
 class VerifyUser:
-    """Data model for responses on the /verify_user endpoint.
-    """
-    state: str = Field (..., example="deployed")
-    verified: bool = Field (..., example=True)
+    """Data model for responses on the /verify_user endpoint."""
+
+    state: str = Field(..., example="deployed")
+    verified: bool = Field(..., example=True)
 
 
 @dataclass
@@ -47,28 +59,32 @@ class FeudalResponse:
     """Data model for any responses coming from FeudalAdapter,
     on any /user/* and /admin/* endpoints.
     """
-    state: str = Field (..., example="deployed")
-    message: str = Field (..., example="User was created and was added to groups wlcg.")
-    credentials: Optional[dict] = Field ({}, example={
-        "commandline": "ssh wlcg001@localhost",
-        "description": "Local SSH Test Service",
-        "login_help": "Login via `mccli ssh {login_host}`.",
-        "ssh_host": "localhost",
-        "ssh_user": "wlcg001"
-    })
+
+    state: str = Field(..., example="deployed")
+    message: str = Field(..., example="User was created and was added to groups wlcg.")
+    credentials: Optional[dict] = Field(
+        {},
+        example={
+            "commandline": "ssh wlcg001@localhost",
+            "description": "Local SSH Test Service",
+            "login_help": "Login via `mccli ssh {login_host}`.",
+            "ssh_host": "localhost",
+            "ssh_user": "wlcg001",
+        },
+    )
 
 
 @dataclass
 class ClientError:
-    """Data model for responses on errors.
-    """
+    """Data model for responses on errors."""
+
     detail: str
 
 
 @dataclass
 class FlaatError:
-    """Data model for responses on errors coming from FLAAT
-    """
+    """Data model for responses on errors coming from FLAAT"""
+
     error: str
     error_description: str
     error_details: Optional[str]
