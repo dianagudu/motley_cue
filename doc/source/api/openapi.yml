@@ -2,7 +2,7 @@ openapi: 3.0.2
 info:
   title: motley_cue
   description: A service for mapping OIDC identities to local identities
-  version: 0.1.4.dev33
+  version: 0.1.6
 paths:
   /user:
     get:
@@ -56,24 +56,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FeudalResponse'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ClientError'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientError'
+                title: Response 401 Get Status User Get Status Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientError'
+                title: Response 403 Get Status User Get Status Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                title: Response 404 Get Status User Get Status Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
         '422':
           description: Validation Error
           content:
@@ -108,24 +117,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FeudalResponse'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ClientError'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientError'
+                title: Response 401 Deploy User Deploy Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientError'
+                title: Response 403 Deploy User Deploy Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                title: Response 404 Deploy User Deploy Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
         '422':
           description: Validation Error
           content:
@@ -160,24 +178,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FeudalResponse'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ClientError'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientError'
+                title: Response 401 Suspend User Suspend Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientError'
+                title: Response 403 Suspend User Suspend Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                title: Response 404 Suspend User Suspend Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
         '422':
           description: Validation Error
           content:
@@ -252,24 +279,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FeudalResponse'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ClientError'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientError'
+                title: Response 401 Suspend Admin Suspend Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientError'
+                title: Response 403 Suspend Admin Suspend Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                title: Response 404 Suspend Admin Suspend Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
         '422':
           description: Validation Error
           content:
@@ -325,24 +361,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FeudalResponse'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ClientError'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientError'
+                title: Response 401 Resume Admin Resume Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientError'
+                title: Response 403 Resume Admin Resume Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                title: Response 404 Resume Admin Resume Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
         '422':
           description: Validation Error
           content:
@@ -415,24 +460,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InfoAuthorisation'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ClientError'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientError'
+                title: Response 401 Info Authorisation Info Authorisation Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientError'
+                title: Response 403 Info Authorisation Info Authorisation Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                title: Response 404 Info Authorisation Info Authorisation Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
         '422':
           description: Validation Error
           content:
@@ -476,24 +530,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VerifyUser'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ClientError'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientError'
+                title: Response 401 Verify User Verify User Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientError'
+                title: Response 403 Verify User Verify User Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                title: Response 404 Verify User Verify User Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
         '422':
           description: Validation Error
           content:
@@ -538,6 +601,23 @@ components:
             login_help: Login via `mccli ssh {login_host}`.
             ssh_host: localhost
             ssh_user: wlcg001
+    FlaatError:
+      title: FlaatError
+      required:
+        - error
+        - error_description
+        - error_details
+      type: object
+      properties:
+        error:
+          title: Error
+          type: string
+        error_description:
+          title: Error Description
+          type: string
+        error_details:
+          title: Error Details
+          type: string
     HTTPValidationError:
       title: HTTPValidationError
       type: object
