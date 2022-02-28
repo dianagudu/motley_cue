@@ -1,3 +1,6 @@
+"""
+This module contains the definition of motley_cue's user API.
+"""
 from fastapi import APIRouter, Request, Depends, Header
 
 from ..dependencies import mapper
@@ -38,7 +41,7 @@ async def read_root():
 async def get_status(
         request: Request,
         token: str = Header(..., alias="Authorization", description="OIDC Access Token")
-    ):
+    ):  # pylint: disable=unused-argument
     """Get information about your local account:
 
     * **state**: one of the supported states, such as deployed, not_deployed, suspended.
@@ -60,7 +63,7 @@ async def get_status(
 async def deploy(
         request: Request,
         token: str = Header(..., alias="Authorization", description="OIDC Access Token")
-    ):
+    ):  # pylint: disable=unused-argument
     """Provision a local account.
 
     Requires an authorised user.
@@ -79,7 +82,7 @@ async def deploy(
 async def suspend(
         request: Request,
         token: str = Header(..., alias="Authorization", description="OIDC Access Token")
-    ):
+    ):  # pylint: disable=unused-argument
     """Suspends a local account.
 
     Requires an authorised user.

@@ -1,3 +1,6 @@
+"""
+This module contains the definition of motley_cue's REST API.
+"""
 from fastapi import FastAPI, Depends, Request, Query, Header
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
@@ -39,16 +42,21 @@ async def read_root():
         "usage": "All endpoints are available via a bearer token.",
         "endpoints": {
             "/info": "Service-specific information.",
-            "/info/authorisation": "Authorisation information for specific OP; requires valid access token from a supported OP.",
-            "/user": "User API; requires valid access token of an authorised user.",
-            "/admin": "Admin API; requires valid access token of an authorised user with admin role.",
-            "/verify_user": "Verifies if a given token belongs to a given local account via 'username'."
+            "/info/authorisation":
+                "Authorisation information for specific OP; "\
+                "requires valid access token from a supported OP.",
+            "/user":
+                "User API; requires valid access token of an authorised user.",
+            "/admin":
+                "Admin API; requires valid access token of an authorised user with admin role.",
+            "/verify_user":
+                "Verifies if a given token belongs to a given local account via 'username'."
         }
     }
 
 
 @api.get("/info", response_model=Info)
-async def info(request: Request):
+async def info():
     """Retrieve service-specific information:
 
     * login info
@@ -68,7 +76,7 @@ async def info(request: Request):
 async def info_authorisation(
         request: Request,
         token: str = Header(..., alias="Authorization", description="OIDC Access Token")
-    ):
+    ):  # pylint: disable=unused-argument
     """Retrieve authorisation information for specific OP.
 
     Requires:
@@ -90,7 +98,7 @@ async def verify_user(
         request: Request,
         username: str = Query(..., description="username to compare to local username", ),
         token: str = Header(..., alias="Authorization", description="OIDC Access Token")
-    ):
+    ):  # pylint: disable=unused-argument
     """Verify that the authenticated user has a local account with the given **username**.
 
     Requires the user to be authorised on the service.

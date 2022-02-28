@@ -30,7 +30,7 @@ class Mapper:
             try:
                 log_handler = logging.handlers.RotatingFileHandler(
                     self.__config.log_file, maxBytes=100**6, backupCount=2)
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 # anything goes wrong, fallback to stderr
                 log_handler = logging.StreamHandler()
         log_format = "[%(asctime)s] [%(name)s] %(levelname)s - %(message)s"
@@ -46,59 +46,99 @@ class Mapper:
 
     @property
     def authorisation(self):
+        """Authorisation object"""
         return self.__authorisation
 
     @property
     def config(self):
+        """Config object"""
         return self.__config
 
     @property
     def user_security(self):
+        """User security for FastAPI"""
         return self.__user_security
 
     @property
     def admin_security(self):
+        """Admin security for FastAPI"""
         return self.__admin_security
 
     def info(self):
-        # here we return service name, description, supported OPs
+        """Return information about the local service:
+        * supported OPs
+        * login information
+        """
         return {
             "login_info": self.__lum.login_info(),
             "supported_OPs": self.__authorisation.trusted_op_list,
         }
 
     def info_authorisation(self, request):
+        """Return authorisation information for issuer of token.
+        OIDC Access Token should be found in request headers.
+        """
         return self.__authorisation.info(request)
 
     def authenticated_user_required(self, func):
+        """Decorator that only allows users from supported OPs.
+        OIDC Access Token should be found in request headers.
+        """
         return self.__authorisation.authenticated_user_required(func)
 
     def authorised_user_required(self, func):
+        """Decorator that only allows users from supported OPs that meet the
+        configured authorisation requirements.
+        OIDC Access Token should be found in request headers.
+        """
         return self.__authorisation.authorised_user_required(func)
 
     def authorised_admin_required(self, func):
+        """Decorator that only allows admins from supported OPs that meet the
+        configured authorisation requirements.
+        OIDC Access Token should be found in request headers.
+        """
         return self.__authorisation.authorised_admin_required(func)
 
     def deploy(self, request: Request):
+        """Deploy a local account for user identified by token.
+        OIDC Access Token should be found in request headers.
+        """
         user_infos = self.__authorisation.get_user_infos_from_request(request)
         if user_infos is None:
             raise Unauthorised(message="No user infos")
         return self.__lum.deploy(user_infos.user_info)
 
     def get_status(self, request: Request):
+        """Get the status of a local account corresponding to the user identified by token.
+        OIDC Access Token should be found in request headers.
+        """
         userinfo = self.__authorisation.get_uid_from_request(request)
         return self.__lum.get_status(userinfo)
 
     def suspend(self, request: Request):
+        """Suspend a local account corresponding to the user identified by token.
+        OIDC Access Token should be found in request headers.
+        """
         userinfo = self.__authorisation.get_uid_from_request(request)
         return self.__lum.suspend(userinfo)
 
     def admin_suspend(self, sub: str, iss: str):
+        """Suspend a local account corresponding to the user identified by
+        OIDC sub and iss claims.
+        """
         return self.__lum.admin_suspend(sub, iss)
 
     def admin_resume(self, sub: str, iss: str):
+        """Resume a suspended local account corresponding to the user identified by
+        OIDC sub and iss claims.
+        """
         return self.__lum.admin_resume(sub, iss)
 
     def verify_user(self, request: Request, username: str):
+        """Verify that the local account corresponding to the user identified by token
+        has the given username.
+        OIDC Access Token should be found in request headers.
+        """
         userinfo = self.__authorisation.get_uid_from_request(request)
         return self.__lum.verify_user(userinfo, username)

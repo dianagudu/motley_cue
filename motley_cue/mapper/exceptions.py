@@ -1,8 +1,14 @@
+"""exceptions definitions for motley_cue
+"""
 from pydantic import ValidationError
 from fastapi import Request
 from fastapi.exceptions import HTTPException, RequestValidationError
 from starlette.responses import JSONResponse
-from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_500_INTERNAL_SERVER_ERROR
+from starlette.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_401_UNAUTHORIZED,
+    HTTP_500_INTERNAL_SERVER_ERROR
+)
 
 
 class Unauthorised(HTTPException):
@@ -62,6 +68,8 @@ async def validation_exception_handler(request: Request, exc: ValidationError):
     :param request: request object that caused the RequestValidationError
     :param exc: RequestValidationError containing validation errors
     """
+    _ = request
+    _ = exc
     return JSONResponse(
         status_code=HTTP_500_INTERNAL_SERVER_ERROR,
         content={"detail": "Could not validate response model."}
@@ -74,4 +82,5 @@ async def request_validation_exception_handler(request: Request, exc: RequestVal
     :param request: request object that caused the RequestValidationError
     :param exc: RequestValidationError containing validation errors
     """
+    _ = request
     return MissingParameter(exc)

@@ -2,7 +2,16 @@ from typing import Callable, List, Dict, Optional
 from fastapi import Request
 from starlette.datastructures import Headers
 
-from ldf_adapter.results import Deployed, NotDeployed, Result, Status, Failure, Rejection, Question, Questionnaire
+from ldf_adapter.results import (
+    Deployed,
+    NotDeployed,
+    Result,
+    Status,
+    Failure,
+    Rejection,
+    Question,
+    Questionnaire
+)
 from flaat import BaseFlaat
 from flaat.user_infos import UserInfos
 from flaat.access_tokens import AccessTokenInfo

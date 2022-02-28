@@ -1,34 +1,52 @@
-from typing import Optional
-from pydantic import BaseModel, Field
+"""Definitions of API response models
+"""
+from typing import Optional, Union
+from pydantic.dataclasses import dataclass
+from pydantic import Field
 
-from .mapper.utils import AuthorisationType
+from .mapper.authorisation import AuthorisationType
 
 
-class Info(BaseModel):
+@dataclass
+class Info:
+    """Data model for responses on the /info endpoint.
+    """
     login_info: dict = Field(..., example={
         "description": "Local SSH Test Service",
         "login_help": "Login via `mccli ssh {login_host}`.",
         "ssh_host": "localhost"
     })
-    supported_OPs: list = Field(..., example=[
+    supported_OPs: list = Field(..., example=[  # pylint: disable=invalid-name
         "https://aai.egi.eu/oidc",
         "https://login.helmholtz.de/oauth2"
     ])
 
 
-class InfoAuthorisation(BaseModel):
-    OP: str = Field (..., example="https://wlcg.cloud.cnaf.infn.it/")
-    authorisation_type: str = Field(..., example=AuthorisationType.vo_based.description()["authorisation_type"])
-    authorisation_info: str = Field (..., example=AuthorisationType.vo_based.description()["authorisation_info"])
-    supported_VOs: Optional[list] = Field ([], example=["/wlcg"])
+@dataclass
+class InfoAuthorisation:
+    """Data model for responses on the /info/authorisation endpoint.
+    """
+    OP: str = Field (..., example="https://wlcg.cloud.cnaf.infn.it/")  # pylint: disable=invalid-name
+    authorisation_type: str = Field(
+        ..., example=AuthorisationType.VO_BASED.description()["authorisation_type"])
+    authorisation_info: str = Field (
+        ..., example=AuthorisationType.VO_BASED.description()["authorisation_info"])
+    supported_VOs: Optional[list] = Field ([], example=["/wlcg"])  # pylint: disable=invalid-name
 
 
-class VerifyUser(BaseModel):
+@dataclass
+class VerifyUser:
+    """Data model for responses on the /verify_user endpoint.
+    """
     state: str = Field (..., example="deployed")
     verified: bool = Field (..., example=True)
 
 
-class FeudalResponse(BaseModel):
+@dataclass
+class FeudalResponse:
+    """Data model for any responses coming from FeudalAdapter,
+    on any /user/* and /admin/* endpoints.
+    """
     state: str = Field (..., example="deployed")
     message: str = Field (..., example="User was created and was added to groups wlcg.")
     credentials: Optional[dict] = Field ({}, example={
@@ -40,12 +58,24 @@ class FeudalResponse(BaseModel):
     })
 
 
-class ClientError(BaseModel):
+@dataclass
+class ClientError:
+    """Data model for responses on errors.
+    """
     detail: str
 
 
+@dataclass
+class FlaatError:
+    """Data model for responses on errors coming from FLAAT
+    """
+    error: str
+    error_description: str
+    error_details: Optional[str]
+
+
 responses = {
-    400: {"model": ClientError},
-    401: {"model": ClientError},
-    403: {"model": ClientError},
+    401: {"model": Union[ClientError, FlaatError]},
+    403: {"model": Union[ClientError, FlaatError]},
+    404: {"model": Union[ClientError, FlaatError]},
 }

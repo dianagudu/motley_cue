@@ -1,3 +1,5 @@
+"""Module for loading and describing motley_cue configuration.
+"""
 from __future__ import annotations
 from configparser import ConfigParser
 from typing import List, Optional
@@ -11,11 +13,23 @@ from .exceptions import InternalException
 
 
 class Config():
+    """Class for motley_cue configuration.
+    """
     def __init__(self, config_parser):
+        """Create a configuration object from a ConfigParser.
+
+        Args:
+            config_parser (ConfigParser): ConfigParser object
+
+        Raises:
+            InternalException: if configuration does not contain mandatory section [mapper]
+        """
         try:
             config_mapper = config_parser['mapper']
-        except:
-            raise InternalException("No [mapper] configuration found in configuration file!")
+        except Exception as ex:
+            raise InternalException(
+                "No [mapper] configuration found in configuration file!"
+            ) from ex
         # log level
         self.__log_level = config_mapper.get(
             'log_level', logging.WARNING)
@@ -41,26 +55,32 @@ class Config():
                     config_parser[section].items())
 
     def get_authorisation(self, op_url):
+        """Return authorisation section in configuration for OP given by URL"""
         return self.__authorisation[op_url]
 
     @property
     def trusted_ops(self):
+        """Return list of trusted OPs"""
         return self.__trusted_ops
 
     @property
     def authorisation(self):
+        """Return all authorisation sections in configuration"""
         return self.__authorisation
 
     @property
     def log_file(self):
+        """Return log file name"""
         return self.__log_file
 
     @property
     def log_level(self):
+        """return log level"""
         return self.__log_level
 
     @property
     def docs_url(self):
+        """return url to be used as location for swagger docs"""
         return self.__docs_url
 
     @property
@@ -76,38 +96,44 @@ class Config():
         """
         if self.__log_level == "CRITICAL":
             return 0
-        elif self.__log_level in ["ERROR", "WARNING", "WARN"]:
+        if self.__log_level in ["ERROR", "WARNING", "WARN"]:
             return 1
-        elif self.__log_level == "INFO":
+        if self.__log_level == "INFO":
             return 2
-        elif self.__log_level == "DEBUG":
+        if self.__log_level == "DEBUG":
             return 3
-        else:
-            return 1
+        return 1
 
     @staticmethod
     def from_files(list_of_config_files: List):
+        """Load motley_cue configuration from given list of files.
+        Processing is stopped, once a give file is found.
+
+        If no configuration is found in given list, default locations are checked.
+        If none of the files exist, raise an InternalException.
+        """
         list_of_config_files.extend(Config._reload_motley_cue_configs())
         config_parser = ConfigParser()
         for filename in list_of_config_files:
-            f = Path(filename)
-            if f.exists():
-                files_read = config_parser.read(f)
-                logging.getLogger(__name__).debug(F"Read config from {files_read}")
+            fpath = Path(filename)
+            if fpath.exists():
+                files_read = config_parser.read(fpath)
+                logging.getLogger(__name__).debug("Read config from %s", files_read)
                 return Config(config_parser)
-        raise InternalException(f"No configuration file found at given or default locations: {list_of_config_files}")
+        raise InternalException(
+            "No configuration file found at given or default locations: "\
+            f"{list_of_config_files}"
+        )
 
     @staticmethod
     def _reload_motley_cue_configs():
-        """Reload configuration from disk.
+        """Return a list of default configuration paths.
 
         Config locations, by priority:
         $MOTLEY_CUE_CONFIG
         ./motley_cue.conf
         ~/.config/motley_cue/motley_cue.conf
         /etc/motley_cue/motley_cue.conf
-
-        processing is stopped, once a give file is found
         """
         files = []
         filename = os.environ.get("MOTLEY_CUE_CONFIG")
@@ -138,17 +164,20 @@ def canonical_url(url):
 
 def to_bool(bool_str):
     """Convert a string to bool.
+    Raise an InternalException if the string cannot be converted.
     """
     if bool_str.lower() == "true":
         return True
-    elif bool_str.lower() == "false":
+    if bool_str.lower() == "false":
         return False
-    else:
-        raise InternalException(f"Error reading config file: unrecognised boolean value {bool_str}.")
+    raise InternalException(
+        f"Error reading config file: unrecognised boolean value {bool_str}."
+    )
 
 
 def to_list(list_str):
     """Convert a string to a list.
+    Raise an InternalException if the string is not a valid list, with square brackets.
     """
     # remove all whitespace
     stripped_list_str = list_str.replace("\n", "")\
@@ -157,7 +186,8 @@ def to_list(list_str):
     if stripped_list_str.startswith("[") and stripped_list_str.endswith("]"):
         stripped_list_str = stripped_list_str[1:-1].strip(",")
     else:
-        raise InternalException(f"Could not parse string as list, must be contained in square brackets: {list_str}")
+        raise InternalException(
+            f"Could not parse string as list, must be contained in square brackets: {list_str}")
     # check empty list
     if stripped_list_str == "":
         return []
@@ -165,10 +195,21 @@ def to_list(list_str):
 
 
 class OPAuthZ:
+    """Class describing the authorisation configuration for an OP.
+    """
+    # pylint: disable=too-many-instance-attributes
+    # Eight is reasonable in this case.
     def __init__(self, op_authz: dict):
+        """Initialises all fields from given dict or with default values,
+        and converts them to the appropriate type when necessary.
+
+        Args:
+            op_authz (dict): ConfigParser section for authorisation
+        """
         self.op_url = canonical_url(op_authz.get("op_url",""))
         self.authorise_all = to_bool(op_authz.get("authorise_all","False"))
-        self.authorise_admins_for_all_ops = to_bool(op_authz.get("authorise_admins_for_all_ops","False"))
+        self.authorise_admins_for_all_ops = to_bool(
+            op_authz.get("authorise_admins_for_all_ops","False"))
         self.authorised_users = to_list(op_authz.get("authorised_users", "[]"))
         self.authorised_admins = to_list(op_authz.get("authorised_admins", "[]"))
         self.authorised_vos = to_list(op_authz.get("authorised_vos", "[]"))
@@ -177,12 +218,24 @@ class OPAuthZ:
 
     @classmethod
     def load(cls, authorisation, user_infos) -> Optional[OPAuthZ]:
+        """Creates an OPAuthZ object for OP given in user_infos.
+
+        Args:
+            authorisation: configuration dict containing all authorisation sections.
+            user_infos: (flaat) UserInfo object
+
+        Returns:
+            Optional[OPAuthZ]: OPAuthZ object
+        """
         op_authz = authorisation.get(canonical_url(user_infos.issuer), None)
         if op_authz is None:
             return None
         return cls(op_authz)
 
     def get_user_requirement(self) -> Requirement:
+        """Creates a (flaat) Requirement object from this authorisation configuration,
+        for API users.
+        """
         req = OneOf()
         if self.authorise_all:
             user_has_same_issuer = (
@@ -204,6 +257,9 @@ class OPAuthZ:
         return req
 
     def get_admin_requirement(self) -> Requirement:
+        """Creates a (flaat) Requirement object from this authorisation configuration,
+        for API admins.
+        """
         if len(self.authorised_admins) > 0:
             user_has_sub = lambda user_infos: user_infos.subject in self.authorised_admins
             return IsTrue(user_has_sub)
