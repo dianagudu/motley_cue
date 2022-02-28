@@ -1,4 +1,5 @@
 .. include:: ../../README.rst
+  :start-after: from-this-marker-in-docs
   :end-before: inclusion-marker-do-not-remove
 
 .. toctree::
