@@ -1,7 +1,7 @@
 from io import StringIO
 from configparser import ConfigParser
 
-from .test_env import MC_SUB, MC_ISS, MC_VO, MC_VO_CLAIM
+from .utils import MOCK_SUB, MOCK_ISS, MOCK_VO, MOCK_VO_CLAIM
 
 
 CONFIG_BASE = """
@@ -33,50 +33,50 @@ CONFIG_NOT_SUPPORTED = load_config(f"""
 CONFIG_SUPPORTED_NOT_AUTHORISED = load_config(f"""
 {CONFIG_BASE}
 [authorisation.OP]
-op_url = {MC_ISS}
+op_url = {MOCK_ISS}
 """)
 
 CONFIG_AUTHORISE_ALL = load_config(f"""
 {CONFIG_BASE}
 [authorisation.OP]
-op_url = {MC_ISS}
+op_url = {MOCK_ISS}
 authorise_all = True
 """)
 
 CONFIG_INDIVIDUAL = load_config(f"""
 {CONFIG_BASE}
 [authorisation.OP]
-op_url = {MC_ISS}
+op_url = {MOCK_ISS}
 authorised_users = [
-        {MC_SUB}
+        {MOCK_SUB}
     ]
 """)
 
 CONFIG_VO_BASED = load_config(f"""
 {CONFIG_BASE}
 [authorisation.OP]
-op_url = {MC_ISS}
+op_url = {MOCK_ISS}
 authorised_vos = [
-        {MC_VO}
+        {MOCK_VO}
     ]
-vo_claim = {MC_VO_CLAIM}
+vo_claim = {MOCK_VO_CLAIM}
 """)
 
 CONFIG_ADMIN = load_config(f"""
 {CONFIG_BASE}
 [authorisation.OP]
-op_url = {MC_ISS}
+op_url = {MOCK_ISS}
 authorised_admins = [
-        {MC_SUB}
+        {MOCK_SUB}
     ]
 """)
 
 CONFIG_ADMIN_FOR_ALL = load_config(f"""
 {CONFIG_BASE}
 [authorisation.OP]
-op_url = {MC_ISS}
+op_url = {MOCK_ISS}
 authorised_admins = [
-        {MC_SUB}
+        {MOCK_SUB}
     ]
 authorise_admins_for_all_ops = True
 """)

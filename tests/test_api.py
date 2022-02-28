@@ -2,9 +2,8 @@ import pytest
 import sys
 from pydantic import ValidationError
 
-from .utils import PUBLIC_ENDPOINTS, PROTECTED_ENDPOINTS, QUERY_ENDPOINTS, Info
-from .utils import MC_HEADERS, build_query_string
-from .test_env import MC_ISS
+from .utils import PUBLIC_ENDPOINTS, PROTECTED_ENDPOINTS, QUERY_ENDPOINTS, Info, build_query_string
+from .utils import MOCK_HEADERS, MOCK_ISS
 from .configs import CONFIGS_AUTHENTICATED_USERS, CONFIG_NOT_SUPPORTED
 from .configs import CONFIG_DOC_ENABLED, CONFIG_CUSTOM_DOC, CONFIG_INVALID_CUSTOM_DOC
 
@@ -24,7 +23,7 @@ def test_public_endpoints_no_patch(test_api, endpoint):
 
 
 @pytest.mark.parametrize("config_file,supported_ops", [
-    *[(cf, [MC_ISS.rstrip("/")]) for cf in CONFIGS_AUTHENTICATED_USERS.values()],
+    *[(cf, [MOCK_ISS.rstrip("/")]) for cf in CONFIGS_AUTHENTICATED_USERS.values()],
     (CONFIG_NOT_SUPPORTED, [])
 ], ids=[*CONFIGS_AUTHENTICATED_USERS.keys(), "NOT_SUPPORTED"])
 @pytest.mark.parametrize("method_to_patch,callback", [("", Info.callback_valid)])
@@ -49,7 +48,7 @@ def test_protected_endpoints_missing_token(test_api, endpoint):
     [(e, e.mapper_method, e.callback_valid) for e in QUERY_ENDPOINTS],
     ids=[x.url for x in QUERY_ENDPOINTS])
 def test_query_endpoints_missing_params(test_api, endpoint):
-    response = test_api.get(endpoint.url, headers=MC_HEADERS)
+    response = test_api.get(endpoint.url, headers=MOCK_HEADERS)
     assert response.status_code == 400
 
 
@@ -62,7 +61,7 @@ def test_protected_endpoints_with_token(test_api, endpoint):
     params = {x: "" for x in endpoint.params}
     response = test_api.get(
         "{}?{}".format(endpoint.url, build_query_string(params)),
-        headers=MC_HEADERS
+        headers=MOCK_HEADERS
     )
     assert response.status_code == 200
 
@@ -76,7 +75,7 @@ def test_invalid_response_models(test_api, endpoint):
     params = {x: "" for x in endpoint.params}
     response = test_api.get(
         "{}?{}".format(endpoint.url, build_query_string(params)),
-        headers=MC_HEADERS
+        headers=MOCK_HEADERS
     )
     assert response.status_code == 500
 

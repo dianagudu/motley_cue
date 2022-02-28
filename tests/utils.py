@@ -1,13 +1,16 @@
-from typing import Callable, List, Dict
+from typing import Callable, List, Dict, Optional
 from fastapi import Request
 from starlette.datastructures import Headers
 
 from ldf_adapter.results import Deployed, NotDeployed, Result, Status, Failure, Rejection, Question, Questionnaire
-
-from .test_env import MC_TOKEN
+from flaat import BaseFlaat
+from flaat.user_infos import UserInfos
+from flaat.access_tokens import AccessTokenInfo
 
 
 class Endpoint():
+    """Class for describing motley_cue API endpoints.
+    """
     def __init__(
             self, url: str, valid_response: Dict,
             children: List = [], params: List = [],
@@ -78,6 +81,8 @@ Root = Endpoint(
 
 
 def getListOfEndpoints(endpoint: Endpoint, condition: Callable[[Endpoint], bool]) -> List[Endpoint]:
+    """Returns a list of endpoints that satisfy a given condition,
+    from the subtree starting at the given endpoint"""
     endpoints = []
     if condition(endpoint):
         endpoints += [endpoint]
@@ -93,10 +98,14 @@ QUERY_ENDPOINTS = getListOfEndpoints(Root, condition=lambda x: len(x.params)>0)
 
 
 def build_query_string(params: Dict = {}) -> str:
+    """Builds a query string for an HTTP request with given query parameters"""
     return "&".join(["=".join(x) for x in params.items()])
 
 
-def build_request(token: str = "", params: Dict = {}) -> Request:
+def build_request(token: str = "") -> Request:
+    """Builds a FastAPI Request with Authorization headers containing
+    given token as Bearer token. 
+    """
     if token == "":
         headers = {}
     else:
@@ -105,33 +114,57 @@ def build_request(token: str = "", params: Dict = {}) -> Request:
         "type": "http",
         "headers": headers,
         "path": "/"
-        # "query_string": bytes(build_query_string(params), "utf-8"),
     })
 
 
-MC_HEADERS = {"Authorization": f"Bearer {MC_TOKEN}"}
-MC_REQUEST = build_request(MC_TOKEN)
-MC_BAD_REQUEST = build_request("badtoken")
+MOCK_TOKEN = "mock.access.token"
+MOCK_ISS = "https://mock.issuer/oidc"
+MOCK_SUB = "some-unique-mock-uid"
+MOCK_VO = "some-vo"
+MOCK_VO_CLAIM = "eduperson_entitlement"
+MOCK_HEADERS = {"Authorization": f"Bearer {MOCK_TOKEN}"}
+MOCK_REQUEST = build_request(MOCK_TOKEN)
+MOCK_USER_INFO = {
+    "sub": MOCK_SUB,
+    "iss": MOCK_ISS,
+    MOCK_VO_CLAIM: [MOCK_VO]
+}
+MOCK_TOKEN_INFO = AccessTokenInfo(header={}, body={
+        "sub": MOCK_SUB,
+        "iss": MOCK_ISS,
+        "wlcg.groups": ["another_group"]
+    }, signature="")
+
+
+MOCK_BAD_TOKEN = "badtoken"
+MOCK_BAD_REQUEST = build_request(MOCK_BAD_TOKEN)
 
 
 class MockUser:
+    """Mock class for User in feudalAdapter
+    """
     def __init__(self, data) -> None:
         pass
 
 
 def mock_failure() -> Callable[..., Result]:
+    """mocks a function that raises a (feudal) Failure exception"""
     return lambda *x: (_ for _ in ()).throw(Failure(message=""))
 
 
 def mock_rejection() -> Callable[..., Result]:
+    """mocks a function that raises a (feudal) Rejection exception"""
     return lambda *x: (_ for _ in ()).throw(Rejection(message=""))
 
 
 def mock_exception() -> Callable[..., Result]:
+    """mocks a function that raises an exception"""
     return lambda *x: (_ for _ in ()).throw(Exception())
 
 
 def mock_status_result(state: str, username: str = "") -> Callable[..., Result]:
+    """mocks a function that returns a (feudal) Status result
+    with given state and username"""
     if username == "":
         message = "No message"
     else:
@@ -140,9 +173,25 @@ def mock_status_result(state: str, username: str = "") -> Callable[..., Result]:
 
 
 def mock_deployed_result(username: str = "") -> Callable[..., Result]:
+    """mocks a function that returns a (feudal) Deployed result with given username"""
     credentials = {"ssh_user": username}
     message = "User was created and was added to groups."
     return lambda *x: Deployed(credentials=credentials, message=message)
 
 def mock_not_deployed_result() -> Callable[..., Result]:
+    """mocks a function that returns a (feudal) NotDeployed result"""
     return lambda *x: NotDeployed(message="")
+
+
+class MockBaseFlaat(BaseFlaat):
+    """Mock Flaat base class.
+    """
+    def get_user_infos_from_access_token(
+        self, access_token: str, issuer_hint: str = ""
+    ) -> Optional[UserInfos]:
+        """Mock function that returns a mock UserInfos object for a
+        mock token. Otherwise behave as usual.
+        """
+        if access_token == MOCK_TOKEN and MOCK_ISS in self.trusted_op_list:
+            return UserInfos(access_token_info=MOCK_TOKEN_INFO, user_info=MOCK_USER_INFO, introspection_info=None)
+        super().get_user_infos_from_access_token(access_token, issuer_hint)

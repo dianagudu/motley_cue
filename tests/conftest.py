@@ -4,12 +4,15 @@ import pytest
 from starlette.testclient import TestClient
 import sys
 
-from .utils import MockUser
+from .utils import MockUser, MockBaseFlaat
 
 
 @pytest.fixture()
 def test_api(config_file, method_to_patch: str, callback: Callable[..., Dict], monkeypatch):
     with monkeypatch.context() as mp:
+        # mock the flaat UserInfos class
+        import flaat
+        mp.setattr(flaat, "BaseFlaat", MockBaseFlaat)
         # patch the config to return minimal config instead of reading through files
         from motley_cue.mapper import config
         mp.setattr(config.Config, "from_files", lambda x: config.Config(config_file))
@@ -34,10 +37,13 @@ def test_api(config_file, method_to_patch: str, callback: Callable[..., Dict], m
 
 
 @pytest.fixture()
-def test_authorisation(config_file: ConfigParser):
-    from motley_cue.mapper import authorisation, config
-    authz = authorisation.Authorisation(config.Config(config_file))
-    yield authz
+def test_authorisation(config_file: ConfigParser, monkeypatch):
+    with monkeypatch.context() as mp:
+        import flaat
+        mp.setattr(flaat, "BaseFlaat", MockBaseFlaat)
+        from motley_cue.mapper import authorisation, config
+        authz = authorisation.Authorisation(config.Config(config_file))
+        yield authz
 
 
 @pytest.fixture()

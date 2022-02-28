@@ -2,7 +2,7 @@ import pytest
 
 from .utils import mock_deployed_result, mock_exception, mock_not_deployed_result, mock_status_result
 from .utils import mock_failure, mock_rejection, mock_exception
-from .test_env import MC_ISS, MC_SUB
+from .utils import MOCK_ISS, MOCK_SUB
 
 
 def test_lum_login_info(test_local_user_manager):
@@ -78,14 +78,14 @@ def test_suspend_fail(test_local_user_manager_patched, test_internal_server_erro
         ], mock_not_deployed_result()
     ])
 def test_admin_suspend_success(test_local_user_manager_patched):
-    response = test_local_user_manager_patched.admin_suspend(sub=MC_SUB, iss=MC_ISS)
+    response = test_local_user_manager_patched.admin_suspend(sub=MOCK_SUB, iss=MOCK_ISS)
     assert set(response.keys()) == set(["state", "message"])
 
 
 @pytest.mark.parametrize("mocker", [mock_exception()])
 def test_admin_suspend_fail(test_local_user_manager_patched, test_internal_server_error):
     with pytest.raises(test_internal_server_error):
-        test_local_user_manager_patched.admin_suspend(sub=MC_SUB, iss=MC_ISS)
+        test_local_user_manager_patched.admin_suspend(sub=MOCK_SUB, iss=MOCK_ISS)
 
 
 @pytest.mark.parametrize("mocker", [
@@ -96,14 +96,14 @@ def test_admin_suspend_fail(test_local_user_manager_patched, test_internal_serve
         ], mock_not_deployed_result()
     ])
 def test_admin_resume_success(test_local_user_manager_patched):
-    response = test_local_user_manager_patched.admin_resume(sub=MC_SUB, iss=MC_ISS)
+    response = test_local_user_manager_patched.admin_resume(sub=MOCK_SUB, iss=MOCK_ISS)
     assert set(response.keys()) == set(["state", "message"])
 
 
 @pytest.mark.parametrize("mocker", [mock_exception()])
 def test_admin_resume_fail(test_local_user_manager_patched, test_internal_server_error):
     with pytest.raises(test_internal_server_error):
-        test_local_user_manager_patched.admin_resume(sub=MC_SUB, iss=MC_ISS)
+        test_local_user_manager_patched.admin_resume(sub=MOCK_SUB, iss=MOCK_ISS)
 
 
 @pytest.mark.parametrize("mocker,username,verified", [
