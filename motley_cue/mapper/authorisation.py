@@ -228,7 +228,8 @@ class Authorisation(Flaat):
             wlcg_groups = user_infos.access_token_info.body.get("wlcg.groups", None)
             if wlcg_groups is not None:
                 if "groups" in user_infos.user_info:
-                    user_infos.user_info["groups"] += wlcg_groups
+                    user_infos.user_info["groups"] += [
+                        g for g in wlcg_groups if g not in user_infos.user_info["groups"]]
                 else:
                     user_infos.user_info["groups"] = wlcg_groups
         return user_infos
