@@ -72,14 +72,16 @@ tox:
 # Dockers
 .PHONY: dockerised_some_packages
 dockerised_some_packages: dockerised_deb_debian_buster\
-	dockerised_rpm_centos8\
+	dockerised_rpm_rocky8.5\
 
 .PHONY: dockerised_most_packages
 dockerised_most_packages: dockerised_deb_debian_buster\
 	dockerised_deb_debian_bullseye\
 	dockerised_deb_debian_bookworm\
 	dockerised_rpm_centos7\
-	dockerised_rpm_centos8\
+	dockerised_rpm_centos_stream\
+	dockerised_rpm_rocky8.5\
+	dockerised_rpm_rocky8\
 	dockerised_rpm_opensuse_tumbleweed\
 
 .PHONY: dockerised_all_packages
@@ -89,14 +91,18 @@ dockerised_all_packages: dockerised_deb_debian_buster\
 	dockerised_deb_ubuntu_bionic\
 	dockerised_deb_ubuntu_focal\
 	dockerised_rpm_centos7\
-	dockerised_rpm_centos8\
+	dockerised_rpm_centos_stream\
+	dockerised_rpm_rocky8.5\
+	dockerised_rpm_rocky8\
 	dockerised_rpm_opensuse15.2\
 	dockerised_rpm_opensuse15.3\
 	dockerised_rpm_opensuse_tumbleweed
 
 .PHONY: docker_images
-docker_images: docker_centos8\
+docker_images: docker_rocky8.5\
+	docker_rocky8\
 	docker_centos7\
+	docker_centos_stream\
 	docker_debian_bullseye\
 	docker_debian_buster\
 	docker_debian_bookworm\
@@ -166,13 +172,27 @@ docker_centos7:
 	"RUN yum -y groups mark convert\n"\
 	"RUN yum -y groupinstall \"Development tools\"\n" | \
 	docker build --tag centos7 -f - .  >> docker.log
-.PHONY: docker_centos8
-docker_centos8:
-	@echo -e "\ncentos8"
-	@echo -e "FROM centos:8\n"\
+.PHONY: docker_centos_stream
+docker_centos_stream:
+	@echo -e "\ncentos_stream"
+	@echo -e "FROM tgagor/centos-stream\n"\
 	"RUN yum install -y make rpm-build\n" \
 	"RUN dnf -y group install \"Development Tools\"\n" | \
-	docker build --tag centos8 -f -  .  >> docker.log
+	docker build --tag centos_stream -f -  .  >> docker.log
+.PHONY: docker_rocky8.5
+docker_rocky8.5:
+	@echo -e "\nrocky8.5"
+	@echo -e "FROM rockylinux:8.5\n"\
+	"RUN yum install -y make rpm-build\n" \
+	"RUN dnf -y group install \"Development Tools\"\n" | \
+	docker build --tag rocky8.5 -f -  .  >> docker.log
+.PHONY: docker_rocky8
+docker_rocky8:
+	@echo -e "\nrocky8"
+	@echo -e "FROM rockylinux:8\n"\
+	"RUN yum install -y make rpm-build\n" \
+	"RUN dnf -y group install \"Development Tools\"\n" | \
+	docker build --tag rocky8 -f -  .  >> docker.log
 .PHONY: docker_opensuse15.2
 docker_opensuse15.2:
 	@echo -e "\nopensuse-15.2"
@@ -208,8 +228,10 @@ docker_clean:
 	docker image rm	opensuse_tumbleweed || true
 	docker image rm opensuse15.2 || true
 	docker image rm	opensuse15.3 || true
-	docker image rm centos8 || true
+	docker image rm rocky8.5 || true
+	docker image rm rocky8 || true
 	docker image rm	centos7 || true
+	docker image rm	centos_stream || true
 	docker image rm ubuntu_bionic || true
 	docker image rm	ubuntu_focal || true
 	docker image rm debian_buster || true
@@ -252,11 +274,23 @@ dockerised_rpm_centos7: docker_centos7
 	@docker run --tty --rm -v ${DOCKER_BASE}:/home/build centos7 \
 		/home/build/${PACKAGE}/build.sh ${PACKAGE} centos7 ${PKG_NAME} > $@.log
 
-.PHONY: dockerised_rpm_centos8
-dockerised_rpm_centos8: docker_centos8
+.PHONY: dockerised_rpm_centos_stream
+dockerised_rpm_centos_stream: docker_centos_stream
 	@echo "Writing build log to $@.log"
-	@docker run --tty --rm -v ${DOCKER_BASE}:/home/build centos8 \
-		/home/build/${PACKAGE}/build.sh ${PACKAGE} centos8 ${PKG_NAME} > $@.log
+	@docker run --tty --rm -v ${DOCKER_BASE}:/home/build centos_stream \
+		/home/build/${PACKAGE}/build.sh ${PACKAGE} centos_stream ${PKG_NAME} > $@.log
+
+.PHONY: dockerised_rpm_rocky8.5
+dockerised_rpm_rocky8.5: docker_rocky8.5
+	@echo "Writing build log to $@.log"
+	@docker run --tty --rm -v ${DOCKER_BASE}:/home/build rocky8.5 \
+		/home/build/${PACKAGE}/build.sh ${PACKAGE} rocky8.5 ${PKG_NAME} > $@.log
+
+.PHONY: dockerised_rpm_rocky8
+dockerised_rpm_rocky8: docker_rocky8
+	@echo "Writing build log to $@.log"
+	@docker run --tty --rm -v ${DOCKER_BASE}:/home/build rocky8 \
+		/home/build/${PACKAGE}/build.sh ${PACKAGE} rocky8 ${PKG_NAME} > $@.log
 
 .PHONY: dockerised_rpm_opensuse15.2
 dockerised_rpm_opensuse15.2: docker_opensuse15.2
@@ -286,7 +320,9 @@ publish-to-repo:
 		@echo "%_gpg_name ACDFB08FDC962044D87FF00B512839863D487A87";\
 		};
 	@scp ../results/centos7/* build@repo.data.kit.edu:/var/www/centos/centos7
-	@scp ../results/centos8/* build@repo.data.kit.edu:/var/www/centos/centos8
+	@scp ../results/centos_stream/* build@repo.data.kit.edu:/var/www/centos/centos_stream
+	@scp ../results/rocky8.5/* build@repo.data.kit.edu:/var/www/rocky/rocky8.5
+	@scp ../results/rocky8/* build@repo.data.kit.edu:/var/www/rocky/rocky8
 	@scp ../results/debian_buster/* build@repo.data.kit.edu:/var/www/debian/buster
 	@scp ../results/debian_bullseye/* build@repo.data.kit.edu:/var/www/debian/bullseye
 	@scp ../results/debian_bookworm/* build@repo.data.kit.edu:/var/www/debian/bookworm
@@ -300,13 +336,13 @@ publish-to-repo:
 # Debian Packaging
 
 .PHONY: preparedeb
-preparedeb: clean
+preparedeb: distclean
 	@quilt pop -a || true
 	@debian/rules clean
 	( cd ..; tar czf ${PKG_NAME}_${VERSION}.orig.tar.gz --exclude-vcs --exclude=debian --exclude=.pc ${PKG_NAME_UNDERSCORES})
 
 .PHONY: debsource
-debsource: distclean preparedeb
+debsource: preparedeb
 	dpkg-source -b .
 
 .PHONY: deb

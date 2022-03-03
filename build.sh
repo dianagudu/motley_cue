@@ -65,7 +65,7 @@ ubuntu_focal_install_dependencies() {
     apt-get -y install dh-virtualenv
 }
 
-centos8_install_dependencies() {
+rocky8_install_dependencies() {
     yum -y install python3 python3-devel python3-pip python3-setuptools \
         python3-virtualenv python3-pip python3-policycoreutils
     pip3 install -U pip
@@ -125,8 +125,8 @@ case "$DIST" in
         rpm_build_package
         rpm_copy_output
     ;;
-    centos8)
-        centos8_install_dependencies
+    centos_stream|rocky8*)
+        rocky8_install_dependencies
         rpm_build_package
         rpm_copy_output
     ;;
