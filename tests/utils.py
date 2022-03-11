@@ -146,9 +146,10 @@ MOCK_HEADERS = {"Authorization": f"Bearer {MOCK_TOKEN}"}
 MOCK_REQUEST = build_request(MOCK_TOKEN)
 MOCK_USER_INFO = {"sub": MOCK_SUB, "iss": MOCK_ISS, MOCK_VO_CLAIM: [MOCK_VO]}
 MOCK_TOKEN_INFO = AccessTokenInfo(
-    header={},
-    body={"sub": MOCK_SUB, "iss": MOCK_ISS, "wlcg.groups": ["another_group"]},
-    signature="",
+    complete_decode={
+        "payload": {"sub": MOCK_SUB, "iss": MOCK_ISS, "wlcg.groups": ["another_group"]},
+    },
+    verification=None
 )
 
 

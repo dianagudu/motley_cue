@@ -58,7 +58,7 @@ async def read_root():
     }
 
 
-@api.get("/info", response_model=Info)
+@api.get("/info", response_model=Info, response_model_exclude_unset=True)
 async def info():
     """Retrieve service-specific information:
 

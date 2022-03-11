@@ -1,10 +1,10 @@
 """Definitions of API response models
 """
-from typing import Optional, Union
+from typing import Optional, Union, List
 from pydantic.dataclasses import dataclass
 from pydantic import Field
 
-from .mapper.authorisation import AuthorisationType
+from .mapper.authorisation import AuthorisationType, AuthorisedUserRequirement
 
 
 @dataclass
@@ -44,6 +44,7 @@ class InfoAuthorisation:
     supported_VOs: Optional[list] = Field(  # pylint: disable=invalid-name
         [], example=["/wlcg"]
     )
+    audience: Optional[Union[str, List[str]]] = Field("", example="ssh_localhost")
 
 
 @dataclass

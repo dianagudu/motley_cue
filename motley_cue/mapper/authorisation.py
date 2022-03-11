@@ -88,12 +88,15 @@ class AuthorisationType(Enum):
         self.__mode = mode
         self.__info = info
 
-    def description(self, vo_match="one"):
+    def description(self, vo_match="one", audience=""):
         """Return a description of the authorisation as a dict"""
-        return {
+        desc_dict = {
             "authorisation_type": self.__mode,
             "authorisation_info": self.__info.format(vo_match),
         }
+        if audience is not None and audience != "" and audience != []:
+            desc_dict["audience"] = audience
+        return desc_dict
 
 
 class Authorisation(Flaat):
@@ -145,23 +148,33 @@ class Authorisation(Flaat):
             }
         # if all users from this OP are authorised
         if op_authz.authorise_all:
-            return {"OP": op_authz.op_url, **AuthorisationType.ALL_USERS.description()}
+            return {
+                "OP": op_authz.op_url,
+                **AuthorisationType.ALL_USERS.description(audience=op_authz.audience),
+            }
         # if authorised VOs are specified
         if len(op_authz.authorised_vos) > 0:
             return {
                 "OP": op_authz.op_url,
-                **AuthorisationType.VO_BASED.description(vo_match=op_authz.vo_match),
+                **AuthorisationType.VO_BASED.description(
+                    vo_match=op_authz.vo_match, audience=op_authz.audience
+                ),
                 "supported_VOs": op_authz.authorised_vos,
             }
         # if individual users are specified
         if len(op_authz.authorised_users) > 0:
             return {
                 "OP": op_authz.op_url,
-                **AuthorisationType.INDIVIDUAL_USERS.description(),
+                **AuthorisationType.INDIVIDUAL_USERS.description(
+                    audience=op_authz.audience
+                ),
             }
 
         # OP is supported but no authorisation is configured
-        return {"OP": op_authz.op_url, **AuthorisationType.NOT_CONFIGURED.description()}
+        return {
+            "OP": op_authz.op_url,
+            **AuthorisationType.NOT_CONFIGURED.description(audience=op_authz.audience),
+        }
 
     def authenticated_user_required(self, func):
         """Decorator that only allows users from supported OPs.
@@ -212,12 +225,7 @@ class Authorisation(Flaat):
         self, access_token, issuer_hint=""
     ) -> Optional[UserInfos]:
         """Get a (flaat) UserInfos object from given OIDC Access Token."""
-        try:
-            user_infos = super().get_user_infos_from_access_token(
-                access_token, issuer_hint
-            )
-        except Exception:  # pylint: disable=broad-except
-            return None
+        user_infos = super().get_user_infos_from_access_token(access_token, issuer_hint)
         if (
             user_infos is not None
             and user_infos.user_info is not None
@@ -229,7 +237,10 @@ class Authorisation(Flaat):
             if wlcg_groups is not None:
                 if "groups" in user_infos.user_info:
                     user_infos.user_info["groups"] += [
-                        g for g in wlcg_groups if g not in user_infos.user_info["groups"]]
+                        g
+                        for g in wlcg_groups
+                        if g not in user_infos.user_info["groups"]
+                    ]
                 else:
                     user_infos.user_info["groups"] = wlcg_groups
         return user_infos

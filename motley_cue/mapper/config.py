@@ -10,9 +10,11 @@ from pathlib import Path
 from flaat.requirements import (
     IsTrue,
     OneOf,
+    AllOf,
     Requirement,
     Unsatisfiable,
     get_vo_requirement,
+    get_audience_requirement,
 )
 
 from .exceptions import InternalException
@@ -204,7 +206,7 @@ class OPAuthZ:
     """Class describing the authorisation configuration for an OP."""
 
     # pylint: disable=too-many-instance-attributes
-    # Eight is reasonable in this case.
+    # nine is reasonable in this case.
     def __init__(self, op_authz: dict):
         """Initialises all fields from given dict or with default values,
         and converts them to the appropriate type when necessary.
@@ -222,6 +224,7 @@ class OPAuthZ:
         self.authorised_vos = to_list(op_authz.get("authorised_vos", "[]"))
         self.vo_claim = op_authz.get("vo_claim", "")
         self.vo_match = op_authz.get("vo_match", "")
+        self.audience = op_authz.get("audience", "")
 
     @classmethod
     def load(cls, authorisation, user_infos) -> Optional[OPAuthZ]:
@@ -263,7 +266,11 @@ class OPAuthZ:
             )
             req.add_requirement(IsTrue(user_has_sub))
 
-        return req
+        all_req = AllOf()
+        all_req.add_requirement(req)
+        all_req.add_requirement(get_audience_requirement(self.audience))
+
+        return all_req
 
     def get_admin_requirement(self) -> Requirement:
         """Creates a (flaat) Requirement object from this authorisation configuration,
