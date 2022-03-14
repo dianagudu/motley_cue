@@ -4,7 +4,7 @@ from typing import Optional, Union, List
 from pydantic.dataclasses import dataclass
 from pydantic import Field
 
-from .mapper.authorisation import AuthorisationType, AuthorisedUserRequirement
+from .mapper.authorisation import AuthorisationType
 
 
 @dataclass
