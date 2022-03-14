@@ -1,3 +1,21 @@
+.. image:: https://github.com/dianagudu/motley_cue/actions/workflows/publish-docs.yml/badge.svg
+    :target: https://dianagudu.github.io/motley_cue
+    :alt: Docs
+.. image:: https://github.com/dianagudu/motley_cue/actions/workflows/ci.yml/badge.svg
+    :target: https://github.com/dianagudu/motley_cue/actions/workflows/ci.yml
+    :alt: CI
+.. image:: https://github.com/dianagudu/motley_cue/actions/workflows/ci.yml/coverage.svg
+    :target: https://github.com/dianagudu/motley_cue/actions/workflows/ci.yml
+    :alt: Coverage
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+    :alt: Code style: black
+.. image:: https://img.shields.io/badge/License-MIT-yellow.svg
+    :target: https://opensource.org/licenses/MIT
+    :alt: License: MIT
+
+.. from-this-marker-in-docs
+
 motley cue
 ============
 
