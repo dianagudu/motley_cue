@@ -21,13 +21,9 @@ jobs:
           python -m pip install tox tox-gh-actions
       - run: tox
         name: Linting and testing with tox
-      - if: ${{ matrix.python-version == '3.10' }}
-        name: Upload Coverage Badge
-        uses: popsiclestick/gist-sync-action@v1.2.0
-        id: sync
+      # Main doesn't have a PR for comments so skip that branch
+      # We don't want multiple comments about code coverage, just just run it once on 3.10
+      - if: ${{ github.ref != "refs/heads/main" && matrix.python-version == "3.10" }}
+        uses: romeovs/lcov-reporter-action@v0.2.16
         with:
-          auth: ${{ secrets.GIST_SECRET }}
-          gist_url: https://gist.github.com/dianagudu/7e4e0d8d88702b439a0daf4a9cb3e7c0
-          gist_title: motley_cue coverage badge
-          gist_description: motley_cue coverage badge
-          github_file: coverage.svg
+          lcov-file: ./coverage.lcov

@@ -4,7 +4,7 @@
 .. image:: https://github.com/dianagudu/motley_cue/actions/workflows/ci.yml/badge.svg
     :target: https://github.com/dianagudu/motley_cue/actions/workflows/ci.yml
     :alt: CI
-.. image:: https://github.com/dianagudu/motley_cue/actions/workflows/ci.yml/coverage.svg
+.. image:: https://gist.githubusercontent.com/dianagudu/7e4e0d8d88702b439a0daf4a9cb3e7c0/raw/motley_cue_coverage.svg
     :target: https://github.com/dianagudu/motley_cue/actions/workflows/ci.yml
     :alt: Coverage
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg

@@ -58,3 +58,16 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./doc/build
+
+      - name: Run coverage
+        run: tox -e coverage
+
+      - name: Upload Coverage Badge
+        uses: popsiclestick/gist-sync-action@v1.2.0
+        id: sync
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gist_url: https://gist.github.com/dianagudu/7e4e0d8d88702b439a0daf4a9cb3e7c0
+          gist_title: motley_cue_coverage.svg
+          gist_description: motley_cue coverage badge
+          github_file: coverage.svg
