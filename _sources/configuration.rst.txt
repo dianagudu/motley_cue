@@ -82,6 +82,10 @@ Below, a configuration block for one OP with default values.
     ## specified through OIDC 'sub', relative to the section's OP ('iss')
     authorised_users = []
 
+    ## audience claim specific to this service (OPTIONAL); it can be a string or a list of strings
+    ## if empty or not specified, audience checking will not be used for authorisation
+    # audience = ssh_localhost
+
     ## list of authorised admins specified by OIDC 'sub'
     authorised_admins = []
 
@@ -90,6 +94,12 @@ Below, a configuration block for one OP with default values.
 - A VO must be specified as a string or an entitlement according to the AARC guideline `AARC-G002 <https://aarc-community.org/guidelines/aarc-g002>`_ (or `AARC-G069 <https://aarc-community.org/guidelines/aarc-g069>`_, once it is published)
 - An individual user must be specified by its unique identifier at the OP (the ``sub`` claim)
 
+
+Furthermore, you can also configure an **audience** for the service in order to restrict access to tokens that have been released for this specific audience (i.e., they contain the configured audience in the ``aud`` claim). The audience can be configured individually per-OP.
+
+.. warning::
+
+  Most OPs do not support requesting a specific audience for access tokens, in which case this setting is ignored. So far, only IAM allows requesting the audience.
 
 .. _account creation:
 

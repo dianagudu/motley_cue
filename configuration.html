@@ -189,6 +189,10 @@
 <span class="c1">## specified through OIDC &#39;sub&#39;, relative to the section&#39;s OP (&#39;iss&#39;)</span><span class="w"></span>
 <span class="na">authorised_users</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[]</span><span class="w"></span>
 
+<span class="c1">## audience claim specific to this service (OPTIONAL); it can be a string or a list of strings</span><span class="w"></span>
+<span class="c1">## if empty or not specified, audience checking will not be used for authorisation</span><span class="w"></span>
+<span class="c1"># audience = ssh_localhost</span><span class="w"></span>
+
 <span class="c1">## list of authorised admins specified by OIDC &#39;sub&#39;</span><span class="w"></span>
 <span class="na">authorised_admins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[]</span><span class="w"></span>
 </pre></div>
@@ -199,6 +203,11 @@
 <li><p>A VO must be specified as a string or an entitlement according to the AARC guideline <a class="reference external" href="https://aarc-community.org/guidelines/aarc-g002">AARC-G002</a> (or <a class="reference external" href="https://aarc-community.org/guidelines/aarc-g069">AARC-G069</a>, once it is published)</p></li>
 <li><p>An individual user must be specified by its unique identifier at the OP (the <code class="docutils literal notranslate"><span class="pre">sub</span></code> claim)</p></li>
 </ul>
+<p>Furthermore, you can also configure an <strong>audience</strong> for the service in order to restrict access to tokens that have been released for this specific audience (i.e., they contain the configured audience in the <code class="docutils literal notranslate"><span class="pre">aud</span></code> claim). The audience can be configured individually per-OP.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Most OPs do not support requesting a specific audience for access tokens, in which case this setting is ignored. So far, only IAM allows requesting the audience.</p>
+</div>
 </section>
 <section id="account-creation-configuration">
 <span id="account-creation"></span><h2>Account creation configuration<a class="headerlink" href="#account-creation-configuration" title="Permalink to this headline">¶</a></h2>
