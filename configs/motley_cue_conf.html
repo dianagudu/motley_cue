@@ -135,10 +135,6 @@
 <span class="c1">## log_file -- default: /dev/stderr</span><span class="w"></span>
 <span class="c1"># log_file = /var/log/motley_cue/mapper.log</span><span class="w"></span>
 <span class="c1">##</span><span class="w"></span>
-<span class="c1">## audience claim specific to this service</span><span class="w"></span>
-<span class="c1">## NOT SUPPORTED</span><span class="w"></span>
-<span class="c1"># audience = &lt;ssh_host&gt;</span><span class="w"></span>
-<span class="c1">##</span><span class="w"></span>
 <span class="c1">## enable swagger documentation -- default: False</span><span class="w"></span>
 <span class="c1"># enable_docs = False</span><span class="w"></span>
 <span class="c1">## location of swagger docs -- default: /docs</span><span class="w"></span>
@@ -171,6 +167,11 @@
 <span class="c1">## specified through OIDC &#39;sub&#39;, relative to the section&#39;s OP (&#39;iss&#39;)</span><span class="w"></span>
 <span class="c1">## defaults to empy list if not specified</span><span class="w"></span>
 <span class="na">authorised_users</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[]</span><span class="w"></span>
+<span class="c1">##</span><span class="w"></span>
+<span class="c1">## audience claim specific to this service (OPTIONAL); it can be a string or a list of strings</span><span class="w"></span>
+<span class="c1">## if empty or not specified, audience checking will not be used for authorisation</span><span class="w"></span>
+<span class="c1">## !! be aware that many OPs do not support this feature, in which case it will be ignored for authorisation</span><span class="w"></span>
+<span class="c1"># audience = ssh_localhost</span><span class="w"></span>
 <span class="c1">##</span><span class="w"></span>
 <span class="c1">## You can find out your &#39;sub&#39; and VOs you are a member of by using flaat:</span><span class="w"></span>
 <span class="c1">##      $ pip install flaat</span><span class="w"></span>
@@ -248,6 +249,8 @@
 <span class="c1">#         &quot;/wlcg&quot;</span><span class="w"></span>
 <span class="c1">#     ]</span><span class="w"></span>
 <span class="c1"># vo_claim = wlcg.groups</span><span class="w"></span>
+<span class="c1">## you can set different audience values per OP, e.g.</span><span class="w"></span>
+<span class="c1"># audience = ssh_localhost_wlcg</span><span class="w"></span>
 
 <span class="c1">## ADMIN AUTHORISATION</span><span class="w"></span>
 <span class="c1">## no admin users allowed from this OP</span><span class="w"></span>

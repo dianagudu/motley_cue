@@ -328,6 +328,111 @@
 <span class="na">Description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Local SSH Test Service</span><span class="w"></span>
 <span class="na">login_help</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Login via `mccli ssh {login_host}`.</span><span class="w"></span>
 <span class="na">ssh_host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">localhost</span><span class="w"></span>
+
+<span class="k">[backend.bwidm]</span><span class="w"></span>
+<span class="c1"># Configuration for the bwidm backend</span><span class="w"></span>
+
+<span class="c1">### url</span><span class="w"></span>
+<span class="c1"># The base URL of the bwidm API</span><span class="w"></span>
+<span class="na">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://bwidm-test.scc.kit.edu/rest</span><span class="w"></span>
+
+<span class="c1">### org_id</span><span class="w"></span>
+<span class="c1"># The ID for bwidm. This is used for prefixing user- and group names</span><span class="w"></span>
+<span class="na">org_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">fdl</span><span class="w"></span>
+
+<span class="c1">### log_outgoing_http_requests -- default: false</span><span class="w"></span>
+<span class="c1">#log_outgoing_http_requests = false</span><span class="w"></span>
+
+<span class="k">[backend.bwidm.auth]</span><span class="w"></span>
+<span class="c1"># HTTP basic auth to connect to BWIDM API</span><span class="w"></span>
+<span class="na">http_user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">foo</span><span class="w"></span>
+<span class="na">http_pass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">bar</span><span class="w"></span>
+
+<span class="k">[backend.bwidm.service]</span><span class="w"></span>
+<span class="c1"># The name of the service the user should be added to on BWIDM:</span><span class="w"></span>
+<span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">sshtest</span><span class="w"></span>
+
+<span class="k">[backend.bwidm.login_info]</span><span class="w"></span>
+<span class="c1"># Static information displayed to the user when deployed to a service.</span><span class="w"></span>
+<span class="c1"># Each key and value field will be shown to the user in the &quot;Credentials&quot;</span><span class="w"></span>
+<span class="c1"># screen.</span><span class="w"></span>
+<span class="c1"># ssh_host and ssh_user are usually filled by the backend</span><span class="w"></span>
+<span class="c1">#</span><span class="w"></span>
+<span class="na">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">SSH Test Service</span><span class="w"></span>
+<span class="na">ssh_host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">hdf-login.lsdf.kit.edu</span><span class="w"></span>
+<span class="na">ssh_host_alternative</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">hdf-ssh.data.kit.edu</span><span class="w"></span>
+
+<span class="k">[backend.ldap]</span><span class="w"></span>
+<span class="c1"># Configuration for the ldap backend</span><span class="w"></span>
+
+<span class="c1"># The ldap backend can function in 3 different modes:</span><span class="w"></span>
+<span class="c1"># - read_only (default): there is read only access to the LDAP, therefore the local accounts</span><span class="w"></span>
+<span class="c1">#       need to already be created in the LDAP and mapped to the federated accounts;</span><span class="w"></span>
+<span class="c1">#       read the docs for more on how to map local &lt;-&gt; federated accounts.</span><span class="w"></span>
+<span class="c1"># - pre_created: the local accounts already exist in the LDAP, but they are not mapped;</span><span class="w"></span>
+<span class="c1">#       the feudal adapter should have write access to the LDAP to modify entries in</span><span class="w"></span>
+<span class="c1">#       order to add the mapping to the federated OIDC account.</span><span class="w"></span>
+<span class="c1"># - full_access: the feudal adapter has full access to the LDAP and can add/delete/update</span><span class="w"></span>
+<span class="c1">#       entries contianing local accounts and mappings.</span><span class="w"></span>
+<span class="na">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">read_only</span><span class="w"></span>
+
+<span class="c1"># host where ldap server is running, default: localhost</span><span class="w"></span>
+<span class="na">host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ldap_server</span><span class="w"></span>
+
+<span class="c1"># port where server is listening, default: 1389 or 636 if TLS is enabled</span><span class="w"></span>
+<span class="na">port</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1389</span><span class="w"></span>
+
+<span class="c1"># OPTIONAL: admin credentials to authenticate to the ldap</span><span class="w"></span>
+<span class="c1"># NEEDED for modifying the LDAP</span><span class="w"></span>
+<span class="c1"># when not provided, anonymous bind is used</span><span class="w"></span>
+<span class="c1"># admin user should be fully qualified</span><span class="w"></span>
+<span class="c1"># admin_user = cn=admin,dc=cesga,dc=es</span><span class="w"></span>
+<span class="c1"># admin_password = adminpassword</span><span class="w"></span>
+
+<span class="c1"># set to true if tls is enabled; default: False</span><span class="w"></span>
+<span class="c1"># not supported yet</span><span class="w"></span>
+<span class="na">tls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">False</span><span class="w"></span>
+
+<span class="c1"># ldap base for user namespace; default: ou=users,dc=example</span><span class="w"></span>
+<span class="c1"># can include any number of ou / o / dc entries separated by commas</span><span class="w"></span>
+<span class="na">user_base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ou=usershpc,ou=users,dc=cesga,dc=es</span><span class="w"></span>
+
+<span class="c1"># user entry attributes containing uids for mapping a user; defaults: gecos &amp; uid</span><span class="w"></span>
+<span class="c1"># users have to be have (at least) the following objectClass: inetOrgPerson, posixAccount</span><span class="w"></span>
+<span class="na">attribute_oidc_uid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">labeledURI</span><span class="w"></span>
+<span class="na">attribute_local_uid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">uid</span><span class="w"></span>
+
+<span class="c1"># ldap base for group namespace; default: ou=groups,dc=example</span><span class="w"></span>
+<span class="c1"># can include any number of ou / o / dc entries separated by commas</span><span class="w"></span>
+<span class="na">group_base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ou=groupshpc,ou=groups,dc=cesga,dc=es</span><span class="w"></span>
+
+
+<span class="c1">#### Options only needed for full_access mode when accounts need to be created</span><span class="w"></span>
+
+<span class="c1">## shell  --  default: /bin/sh</span><span class="w"></span>
+<span class="c1">## The unix shell to use</span><span class="w"></span>
+<span class="c1"># shell = /bin/bash</span><span class="w"></span>
+
+<span class="c1">## base directory for home directories -- default /home</span><span class="w"></span>
+<span class="c1"># home_base = /home/curso/</span><span class="w"></span>
+
+<span class="c1">## UID range -- default 1000 -&gt; 60000</span><span class="w"></span>
+<span class="c1"># uid_min = 1000</span><span class="w"></span>
+<span class="c1"># uid_max = 60000</span><span class="w"></span>
+
+<span class="c1">## GID range -- default 1000 -&gt; 60000</span><span class="w"></span>
+<span class="c1"># gid_min = 1000</span><span class="w"></span>
+<span class="c1"># gid_max = 60000</span><span class="w"></span>
+
+<span class="k">[backend.ldap.login_info]</span><span class="w"></span>
+<span class="c1"># Static information displayed to the user when deployed to a service.</span><span class="w"></span>
+<span class="c1"># Each key and value field will be shown to the user in the &quot;Credentials&quot;</span><span class="w"></span>
+<span class="c1"># screen.</span><span class="w"></span>
+<span class="c1"># ssh_host and ssh_user are usually filled by the backend</span><span class="w"></span>
+<span class="c1">#</span><span class="w"></span>
+<span class="na">Description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Local SSH Test Service</span><span class="w"></span>
+<span class="na">login_help</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Login via `mccli ssh {login_host}`.</span><span class="w"></span>
+<span class="na">ssh_host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">localhost</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
