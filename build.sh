@@ -66,15 +66,19 @@ ubuntu_focal_install_dependencies() {
 }
 
 rocky8_install_dependencies() {
-    yum -y install python3 python3-devel python3-pip python3-setuptools \
-        python3-virtualenv python3-pip python3-policycoreutils
+    yum -y install python39 python39-devel python3-policycoreutils
     pip3 install -U pip
+    pip install virtualenv
 }
 centos7_install_dependencies() {
-    yum -y install python3 python3-devel python3-pip python3-setuptools \
-        python3-pip policycoreutils-python
-    pip3 install -U pip
-    pip3 install virtualenv
+    yum -y install centos-release-scl-rh centos-release-scl
+    yum -y install rh-python38 rh-python38-python-devel
+    yum -y install policycoreutils policycoreutils-python
+    echo -e "source /opt/rh/rh-python38/enable\n"\
+         "export X_SCLS=\"\`scl enable rh-python38 'echo $X_SCLS'\`\""\
+          >> /etc/profile.d/python38.sh
+    source /opt/rh/rh-python38/enable
+    pip install virtualenv
 }
 opensuse15_install_dependencies() {
     zypper -n install libcurl-devel pam-devel zypper audit-devel git \
@@ -89,7 +93,7 @@ opensuse15_install_dependencies() {
 }
 centos7_patch_rpm() {
     # Force RPM's python-bytecompile script to use python3
-    sed "s@^default_python@default_python=/usr/bin/python3\n#default_python@" -i /usr/lib/rpm/brp-python-bytecompile
+    sed "s@^default_python@default_python=python3\n#default_python@" -i /usr/lib/rpm/brp-python-bytecompile
     echo "typing-extensions" >> requirements.txt
 }
 rpm_build_package() {

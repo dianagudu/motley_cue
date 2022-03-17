@@ -18,24 +18,30 @@ Group: System/Libraries
 %endif
 
 %if 0%{?centos} == 7
-BuildRequires: python3-setuptools >= 39, python36 >= 3.6, python3-pip >= 9.0, python36-devel >= 3.6
-BuildRequires: policycoreutils-python
+BuildRequires: centos-release-scl-rh, centos-release-scl
+BuildRequires: rh-python38 >= 2.0, rh-python38-python-devel >= 3.8
+BuildRequires: policycoreutils, policycoreutils-python
 %endif
 %if 0%{?centos} == 8
-BuildRequires: python3-setuptools >= 39, python36 >= 3.6, python3-pip >= 9.0, python36-devel >= 3.6
-BuildRequires: python3-policycoreutils >= 2.9, python3-virtualenv >= 15.1
+# valid for centos stream and rocky linux
+BuildRequires: python39 >= 3.9, python39-devel >= 3.9
+BuildRequires: python3-policycoreutils >= 2.9
 %endif
 %if 0%{?suse_version}
-BuildRequires: python3 >= 3.6 python3-policycoreutils >= 2.9
+BuildRequires: python3 >= 3.7 python3-policycoreutils >= 2.9
 #, python3-virtualenv >= 15.1
 %endif
 
 BuildRoot:	%{_tmppath}/%{name}
-%if 0%{?centos}
-Requires: python36 >= 3.6
+%if 0%{?centos} == 7
+Requires: rh-python38 >= 2.0
+%endif
+%if 0%{?centos} == 8
+# valid for centos stream and rocky linux
+Requires: python39 >= 3.9
 %endif
 %if 0%{?suse_version}
-Requires: python3 >= 3.6
+Requires: python3 >= 3.7
 %endif
 Requires: nginx >= 1.16.1
 
@@ -60,9 +66,6 @@ the creation, deletion, and information of a user-account.
 %build
 
 %install
-%if 0%{?centos} == 7
-export PYTHONPATH=/usr/local/lib/python3.6/site-packages
-%endif
 make install DESTDIR=%{buildroot}
 ./rpm/fix-venv-paths.sh %{buildroot} %{name}
 ./rpm/compile-semodules.sh %{installroot}%{se_dir}
