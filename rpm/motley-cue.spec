@@ -28,8 +28,9 @@ BuildRequires: python39 >= 3.9, python39-devel >= 3.9
 BuildRequires: python3-policycoreutils >= 2.9
 %endif
 %if 0%{?suse_version}
-BuildRequires: python3 >= 3.7 python3-policycoreutils >= 2.9
-#, python3-virtualenv >= 15.1
+BuildRequires: python39 >= 3.9, python39-devel >= 3.9
+BuildRequires: python39-pip, python39-setuptools
+BuildRequires: python3-policycoreutils >= 3.0
 %endif
 
 BuildRoot:	%{_tmppath}/%{name}
@@ -41,7 +42,7 @@ Requires: rh-python38 >= 2.0
 Requires: python39 >= 3.9
 %endif
 %if 0%{?suse_version}
-Requires: python3 >= 3.7
+Requires: python39 >= 3.9
 %endif
 Requires: nginx >= 1.16.1
 

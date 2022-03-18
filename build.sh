@@ -64,6 +64,12 @@ ubuntu_focal_install_dependencies() {
     apt-get update
     apt-get -y install dh-virtualenv
 }
+ubuntu_bionic_install_dependencies() {
+    apt-get update
+    apt-get -y install python3.8 python3.8-dev python3.8-venv python3-pip libffi-dev
+    update-alternatives --install /usr/bin/python3 python /usr/bin/python3.8 1
+    python3 -m pip install -U pip
+}
 
 rocky8_install_dependencies() {
     yum -y install python39 python39-devel python3-policycoreutils
@@ -82,11 +88,10 @@ centos7_install_dependencies() {
 }
 opensuse15_install_dependencies() {
     zypper -n install libcurl-devel pam-devel zypper audit-devel git \
-        python3 python3-devel python3-pip python3-setuptools
-    zypper -n install python3-pip
+        python39 python39-devel python39-pip python39-setuptools
     zypper -n install policycoreutils
-    zypper -n install policycoreutils-python
-    pip3 install -U pip
+    zypper -n install python3-policycoreutils
+    pip3.9 install -U pip
     pip3 install virtualenv || {
         /usr/local/bin/pip3 install virtualenv
     }
@@ -112,7 +117,7 @@ rpm_copy_output() {
 common_prepare_dirs
 
 case "$DIST" in
-    debian_buster|debian_bullseye|ubuntu_bionic|debian_bookworm)
+    debian_buster|debian_bullseye|debian_bookworm)
         debian_install_dependencies
         debian_build_package
         debian_copy_output
@@ -120,6 +125,11 @@ case "$DIST" in
     ubuntu_focal)   
         ubuntu_focal_install_dependencies
         debian_install_dependencies
+        debian_build_package
+        debian_copy_output
+    ;;
+    ubuntu_bionic)
+        ubuntu_bionic_install_dependencies
         debian_build_package
         debian_copy_output
     ;;

@@ -1,4 +1,4 @@
-motley-cue (0.2.0-1) UNRELEASED; urgency=medium
+motley-cue (0.2.1-1) UNRELEASED; urgency=medium
 
   [ Marcus Hardt ]
   * Initial go for packageing
@@ -28,5 +28,6 @@ motley-cue (0.2.0-1) UNRELEASED; urgency=medium
   * Add support for flaat 1.0.0
   * Add support for LDAP backend (feudalAdapter 0.4.0)
   * Add audience-based authorisation
+  * Add support for additional_groups in feudal conf
 
- -- Diana Gudu <diana.gudu@kit.edu>  Mon, 14 Mar 2022 17:07:19 +0100
+ -- Diana Gudu <diana.gudu@kit.edu>  Thu, 17 Mar 2022 17:01:14 +0100
