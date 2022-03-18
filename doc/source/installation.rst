@@ -8,22 +8,40 @@ The recommended way to install ``motley_cue`` is via your Linux package manager.
 
 Supported Linux distributions:
 
-- Debian: stable and testing
-- Ubuntu: 18.04, 20.04, 21.04
-- CentOS: 7 and 8
-- openSUSE: Tumbleweed, Leap 15.2, Leap 15.3
+- Debian: 10, 11, 12
+- Ubuntu: 18.04, 20.04
+- CentOS: 7, Stream 8
+- Rocky Linux: 8, 8.5
+- openSUSE: Tumbleweed, Leap 15.3
 
-The packages are available at http://repo.data.kit.edu/
+Since v.0.2.0, the following distributions are no longer supported due to having reached EOL:
 
-Example install on Debian-based systems:
+- CentOS 8
+- openSUSE Leap 15.2
+
+The packages are available at http://repo.data.kit.edu/. Follow the instructions there to support the repository on your system.
+
+Then install ``motley_cue`` with your favourite package manager:
 
 .. code-block:: bash
 
-   curl repo.data.kit.edu/key.pgp | apt-key add -
-   apt-get install motley-cue
+   apt install motley-cue     # on debian-based systems
+   yum install motley-cue     # on centos/rocky linux
+   zypper install motley-cue  # on opensuse
 
 
 This will ensure that all the dependencies are installed as well, and ``motley_cue`` is up and running as a systemd service.
+
+.. warning::
+
+   On Centos 7, you'll need to install two additional repositories for ``motley_cue``'s dependencies:
+
+   - Extra Packages for Enterprise Linux (EPEL): for ``nginx``
+   - Software Collections (SCL): for ``rh-python38``
+
+   .. code-block:: bash
+
+      yum install epel-release centos-release-scl
 
 
 Installation from pypi
