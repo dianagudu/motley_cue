@@ -118,18 +118,36 @@
 <p>The recommended way to install <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> is via your Linux package manager.</p>
 <p>Supported Linux distributions:</p>
 <ul class="simple">
-<li><p>Debian: stable and testing</p></li>
-<li><p>Ubuntu: 18.04, 20.04, 21.04</p></li>
-<li><p>CentOS: 7 and 8</p></li>
-<li><p>openSUSE: Tumbleweed, Leap 15.2, Leap 15.3</p></li>
+<li><p>Debian: 10, 11, 12</p></li>
+<li><p>Ubuntu: 18.04, 20.04</p></li>
+<li><p>CentOS: 7, Stream 8</p></li>
+<li><p>Rocky Linux: 8, 8.5</p></li>
+<li><p>openSUSE: Tumbleweed, Leap 15.3</p></li>
 </ul>
-<p>The packages are available at <a class="reference external" href="http://repo.data.kit.edu/">http://repo.data.kit.edu/</a></p>
-<p>Example install on Debian-based systems:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl repo.data.kit.edu/key.pgp <span class="p">|</span> apt-key add -
-apt-get install motley-cue
+<p>Since v.0.2.0, the following distributions are no longer supported due to having reached EOL:</p>
+<ul class="simple">
+<li><p>CentOS 8</p></li>
+<li><p>openSUSE Leap 15.2</p></li>
+</ul>
+<p>The packages are available at <a class="reference external" href="http://repo.data.kit.edu/">http://repo.data.kit.edu/</a>. Follow the instructions there to support the repository on your system.</p>
+<p>Then install <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> with your favourite package manager:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt install motley-cue     <span class="c1"># on debian-based systems</span>
+yum install motley-cue     <span class="c1"># on centos/rocky linux</span>
+zypper install motley-cue  <span class="c1"># on opensuse</span>
 </pre></div>
 </div>
 <p>This will ensure that all the dependencies are installed as well, and <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> is up and running as a systemd service.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>On Centos 7, you’ll need to install two additional repositories for <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code>’s dependencies:</p>
+<ul class="simple">
+<li><p>Extra Packages for Enterprise Linux (EPEL): for <code class="docutils literal notranslate"><span class="pre">nginx</span></code></p></li>
+<li><p>Software Collections (SCL): for <code class="docutils literal notranslate"><span class="pre">rh-python38</span></code></p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>yum install epel-release centos-release-scl
+</pre></div>
+</div>
+</div>
 <section id="installation-from-pypi">
 <h2>Installation from pypi<a class="headerlink" href="#installation-from-pypi" title="Permalink to this headline">¶</a></h2>
 <p>It is also possible to install <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> with <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
