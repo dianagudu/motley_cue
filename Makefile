@@ -304,7 +304,7 @@ publish-to-repo:
 		@echo "%_gpg_name ACDFB08FDC962044D87FF00B512839863D487A87";\
 		};
 	@scp ../results/centos7/* build@repo.data.kit.edu:/var/www/centos/centos7
-	@scp ../results/centos_stream/* build@repo.data.kit.edu:/var/www/centos/centos_stream
+	@scp ../results/centos_stream/* build@repo.data.kit.edu:/var/www/centos/centos-stream
 	@scp ../results/rocky8.5/* build@repo.data.kit.edu:/var/www/rocky/rocky8.5
 	@scp ../results/rocky8/* build@repo.data.kit.edu:/var/www/rocky/rocky8
 	@scp ../results/debian_buster/* build@repo.data.kit.edu:/var/www/debian/buster
