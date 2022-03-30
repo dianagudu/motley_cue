@@ -11,6 +11,7 @@ from .config import Config
 from .authorisation import Authorisation
 from .local_user_management import LocalUserManager
 from .exceptions import Unauthorised
+from .token_manager import TokenManager
 
 
 class Mapper:
@@ -45,6 +46,7 @@ class Mapper:
         self.__admin_security = HTTPBearer(description="OIDC Access Token")
         self.__authorisation = Authorisation(self.__config)
         self.__lum = LocalUserManager()
+        self.__token_manager = TokenManager.from_config(self.__config.otp)
 
     @property
     def authorisation(self):
@@ -102,6 +104,15 @@ class Mapper:
         """
         return self.__authorisation.authorised_admin_required(func)
 
+    def inject_token(self, func):
+        """Decorator that replaces the given token (OTP) with its corresponding AT.
+        Only if OTPs are supported, and if given token is found in OTP db.
+        Otherwise pass token through as is, and it will be treated like an AT.
+        """
+        if not self.__token_manager:
+            return func
+        return self.__token_manager.inject_token(func)
+
     def deploy(self, request: Request):
         """Deploy a local account for user identified by token.
         OIDC Access Token should be found in request headers.
@@ -124,6 +135,16 @@ class Mapper:
         """
         userinfo = self.__authorisation.get_uid_from_request(request)
         return self.__lum.suspend(userinfo)
+
+    def generate_otp(self, request: Request):
+        """Generates and stores a one-time password from token.
+        Returns whether operation was successful.
+        """
+        if not self.__token_manager:
+            return {"supported": False}
+        return self.__token_manager.generate_otp(
+            self.__authorisation._get_access_token_from_request(request)
+        )
 
     def admin_suspend(self, sub: str, iss: str):
         """Suspend a local account corresponding to the user identified by

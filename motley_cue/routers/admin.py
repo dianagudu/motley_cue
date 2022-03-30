@@ -40,7 +40,7 @@ async def read_root():
 @mapper.authorised_admin_required
 async def suspend(
     request: Request,
-    token: str = Header(..., alias="Authorization", description="OIDC Access Token"),
+    header: str = Header(..., alias="Authorization", description="OIDC Access Token"),
     sub: str = Query(
         ...,
         description="sub claim of the user to be suspended",
@@ -71,7 +71,7 @@ async def suspend(
 @mapper.authorised_admin_required
 async def resume(
     request: Request,
-    token: str = Header(..., alias="Authorization", description="OIDC Access Token"),
+    header: str = Header(..., alias="Authorization", description="OIDC Access Token"),
     sub: str = Query(
         ...,
         description="sub claim of the user to be suspended",

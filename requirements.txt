@@ -3,3 +3,4 @@ flaat>=1.0.0
 fastapi
 uvicorn[standard]
 gunicorn
+sqlcipher3-binary
