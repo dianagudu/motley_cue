@@ -2,7 +2,7 @@ from typing import Callable, Optional
 import hashlib
 import logging
 from functools import wraps
-import sqlite3
+import pathlib
 from sqlcipher3 import dbapi2 as sqlcipher
 import shelve
 
@@ -15,6 +15,12 @@ class TokenDB:
     """Generic database for mapping of short-lived / one-time-use tokens to access tokens
     All methods must be implemented: pop, store, get, insert, delete.
     """
+
+    backend = "generic"
+
+    def rename_location(self, location) -> str:
+        p = pathlib.Path(location)
+        return str(p.parent.joinpath(f"{self.backend}_{p.name}"))
 
     def pop(self, otp: str) -> Optional[str]:
         """Implement one-time logic by removing mapping after get."""
@@ -43,9 +49,11 @@ class TokenDB:
 class SQLiteTokenDB(TokenDB):
     """SQLite-based DB for mapping one-time tokens to access tokens"""
 
+    backend = "sqlite"
+
     def __init__(self, location: str, password: str) -> None:
         # new db connection for location (does not need to exist)
-        self.connection = sqlcipher.connect(location)
+        self.connection = sqlcipher.connect(self.rename_location(location))
         self.connection.execute(f'pragma key="{password}"')
         with self.connection:  # con.commit() is called automatically afterwards on success
             # create table
@@ -117,8 +125,12 @@ class SQLiteTokenDB(TokenDB):
 
 
 class ShelveTokenDB(TokenDB):
+    """Shelve-based DB for mapping one-time tokens to access tokens"""
+
+    backend = "shelve"
+
     def __init__(self, location: str) -> None:
-        self.__location = location
+        self.__location = self.rename_location(location)
 
     def _open_db(self) -> shelve.Shelf:
         return shelve.open(self.__location, flag="c")
