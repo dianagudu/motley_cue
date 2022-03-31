@@ -3,12 +3,53 @@ import hashlib
 import logging
 from functools import wraps
 import pathlib
-from sqlcipher3 import dbapi2 as sqlcipher
+import sqlite3
 import shelve
+import sqlitedict
+import json
+from cryptography.fernet import Fernet
 
 from .config import OTPConfig
+from .exceptions import InternalException
 
 logger = logging.getLogger(__name__)
+
+
+class Encryption:
+    def __init__(self, keyfile: str) -> None:
+        self.keyfile = keyfile
+        self.save_key()
+        self.key = self.load_key()
+
+    def load_key(self) -> bytes:
+        key = open(self.keyfile, "rb").read()
+        return key
+
+    def save_key(self) -> None:
+        try:
+            key = Fernet.generate_key()
+            open(self.keyfile, "xb").write(key)
+            logger.debug(
+                "Created secret key for encryption and saved it to %s.", self.keyfile
+            )
+        except FileExistsError:
+            logger.debug("Key already exists in %s, nothing to do here.", self.keyfile)
+        except Exception as e:
+            logger.error(
+                "Something went wrong when trying to create secret key in %s",
+                self.keyfile,
+            )
+            raise InternalException(
+                message=f"Could not create secret key in {self.keyfile}"
+            ) from e
+
+    def encrypt(self, secret: str) -> str:
+        fer = Fernet(self.key)
+        return fer.encrypt(secret.encode()).decode()
+
+    def decrypt(self, secret: str) -> str:
+        fer = Fernet(self.key)
+        return fer.decrypt(secret.encode()).decode()
 
 
 class TokenDB:
@@ -37,7 +78,7 @@ class TokenDB:
         """Retrieve access token mapped to given one-time token from db."""
         return None
 
-    def delete(self, otp: str) -> bool:
+    def remove(self, otp: str) -> bool:
         """Remove mapping for given one-time token from db."""
         return False
 
@@ -51,10 +92,10 @@ class SQLiteTokenDB(TokenDB):
 
     backend = "sqlite"
 
-    def __init__(self, location: str, password: str) -> None:
+    def __init__(self, location: str, keyfile: str) -> None:
+        self.encryption = Encryption(keyfile)
         # new db connection for location (does not need to exist)
-        self.connection = sqlcipher.connect(self.rename_location(location))
-        self.connection.execute(f'pragma key="{password}"')
+        self.connection = sqlite3.connect(self.rename_location(location))
         with self.connection:  # con.commit() is called automatically afterwards on success
             # create table
             self.connection.execute(
@@ -73,7 +114,7 @@ class SQLiteTokenDB(TokenDB):
                 return None
             if len(result) > 1:
                 logger.warning("Multiple entries found in token db for OTP: %s", otp)
-            token = result[0][0]
+            token = self.encryption.decrypt(result[0][0])
             self.connection.execute(sql_del, [otp])
         return token
 
@@ -86,7 +127,7 @@ class SQLiteTokenDB(TokenDB):
             result = self.connection.execute(sql_get, [otp]).fetchall()
             # if already in db
             if len(result) > 0:
-                stored_token = result[0][0]
+                stored_token = self.encryption.decrypt(result[0][0])
                 # for the same token
                 if stored_token == token:
                     logger.debug("OTP already exists for token %s", token)
@@ -98,7 +139,12 @@ class SQLiteTokenDB(TokenDB):
                     )
                     return False
             # when not found in db, insert new mapping
-            self.connection.execute(sql_insert, (otp, token))
+            # only encrypt access token
+            logger.debug("Storing OTP [%s] for token [%s]", otp, token)
+            self.connection.execute(
+                sql_insert,
+                (otp, self.encryption.encrypt(token)),
+            )
         return True
 
     def get(self, otp: str) -> Optional[str]:
@@ -109,9 +155,9 @@ class SQLiteTokenDB(TokenDB):
             return None
         if len(result) > 1:
             logger.warning("Multiple entries found in token db for OTP: %s", otp)
-        return result[0][0]
+        return self.encryption.decrypt(result[0][0])
 
-    def delete(self, otp: str) -> bool:
+    def remove(self, otp: str) -> bool:
         sql_del = "delete from tokenmap where otp=?"
         with self.connection:
             self.connection.execute(sql_del, [otp])
@@ -120,7 +166,7 @@ class SQLiteTokenDB(TokenDB):
     def insert(self, otp: str, token: str) -> bool:
         sql_insert = "insert into tokenmap(otp, at) values (?,?)"
         with self.connection:
-            self.connection.execute(sql_insert, (otp, token))
+            self.connection.execute(sql_insert, (otp, self.encryption.encrypt(token)))
         return True
 
 
@@ -177,7 +223,7 @@ class ShelveTokenDB(TokenDB):
         self._close_db(db)
         return token
 
-    def delete(self, otp: str) -> bool:
+    def remove(self, otp: str) -> bool:
         db = self._open_db()
         del db[otp]
         self._close_db(db)
@@ -187,6 +233,75 @@ class ShelveTokenDB(TokenDB):
         db = self._open_db()
         db[otp] = token
         self._close_db(db)
+        return True
+
+
+class SQLiteDictTokenDB(TokenDB):
+    """SQLiteDict-based DB for mapping one-time tokens to access tokens"""
+
+    backend = "sqlitedict"
+
+    def __init__(self, location: str, keyfile: str) -> None:
+        self.encryption = Encryption(keyfile)
+        # new db connection for location (does not need to exist)
+        self.db = sqlitedict.SqliteDict(
+            self.rename_location(location),
+            tablename="tokenmap",
+            flag="c",
+            encode=self.encrypted_encode,
+            decode=self.encrypted_decode,
+        )
+
+    def encrypted_encode(self, obj):
+        return self.encryption.encrypt(json.dumps(obj))
+
+    def encrypted_decode(self, obj):
+        return json.loads(self.encryption.decrypt(obj))
+
+    def pop(self, otp: str) -> Optional[str]:
+        token = None
+        if otp in self.db:
+            token = str(self.db[otp])
+            del self.db[otp]
+        self.db.commit()
+        return token
+
+    def store(self, otp: str, token: str) -> bool:
+        stored_token = None
+        success = False
+        if otp in self.db:
+            stored_token = str(self.db[otp])
+        if not stored_token:
+            logger.debug("Storing OTP [%s] for token [%s]", otp, token)
+            self.db[otp] = token
+            success = True
+        elif stored_token == token:
+            logger.debug("OTP already exists for token %s", token)
+            success = True
+        else:
+            logger.debug(
+                "Collision error: OTP for token %s collides with OTP for another token",
+                token,
+            )
+            success = False
+        self.db.commit()
+        return success
+
+    def get(self, otp: str) -> Optional[str]:
+        token = None
+        if otp in self.db:
+            token = str(self.db[otp])
+        self.db.commit()
+        return token
+
+    def remove(self, otp: str) -> bool:
+        del self.db[otp]
+        self.db.commit()
+        return True
+
+    def insert(self, otp: str, token: str) -> bool:
+        self.db[otp] = token
+        self.db.commit()
         return True
 
 
@@ -208,9 +323,11 @@ class TokenManager:
     def __init__(self, otp_config: OTPConfig) -> None:
         """Any DB-related initialisations"""
         if otp_config.backend == "sqlite":
-            self.__db = SQLiteTokenDB(otp_config.db_location, otp_config.password)
+            self.__db = SQLiteTokenDB(otp_config.db_location, otp_config.keyfile)
         elif otp_config.backend == "shelve":
             self.__db = ShelveTokenDB(otp_config.db_location)
+        elif otp_config.backend == "sqlitedict":
+            self.__db = SQLiteDictTokenDB(otp_config.db_location, otp_config.keyfile)
 
     @classmethod
     def from_config(cls, otp_config: OTPConfig):

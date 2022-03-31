@@ -310,4 +310,4 @@ class OTPConfig:
         self.use_otp = to_bool(otp_config.get("use_otp", "False"))
         self.backend = otp_config.get("backend", "sqlite").lower()
         self.db_location = otp_config.get("db_location", "/run/motley_cue/tokenmap.db")
-        self.password = otp_config.get("password", "")
+        self.keyfile = otp_config.get("keyfile", "/run/motley_cue/motley_cue.key")

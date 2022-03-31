@@ -4,3 +4,5 @@ fastapi
 uvicorn[standard]
 gunicorn
 sqlcipher3-binary
+sqlitedict
+cryptography
