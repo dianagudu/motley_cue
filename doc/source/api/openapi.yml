@@ -2,7 +2,7 @@ openapi: 3.0.2
 info:
   title: motley_cue
   description: A service for mapping OIDC identities to local identities
-  version: 0.1.6
+  version: 0.3.0
 paths:
   /user:
     get:
@@ -202,6 +202,68 @@ paths:
             application/json:
               schema:
                 title: Response 404 Suspend User Suspend Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+        - HTTPBearer: []
+  /user/generate_otp:
+    get:
+      tags:
+        - user
+      summary: Generate Otp
+      description: 'Generates and stores a new one-time password, using token as shared
+        secret.
+
+
+        Requires an authorised user.'
+      operationId: generate_otp_user_generate_otp_get
+      parameters:
+        - description: OIDC Access Token
+          required: true
+          schema:
+            title: Authorization
+            type: string
+            description: OIDC Access Token
+          name: Authorization
+          in: header
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OTPResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                title: Response 401 Generate Otp User Generate Otp Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                title: Response 403 Generate Otp User Generate Otp Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                title: Response 404 Generate Otp User Generate Otp Get
                 anyOf:
                   - $ref: '#/components/schemas/ClientError'
                   - $ref: '#/components/schemas/FlaatError'
@@ -515,12 +577,12 @@ paths:
             description: username to compare to local username
           name: username
           in: query
-        - description: OIDC Access Token
+        - description: OIDC Access Token or valid one-time token
           required: true
           schema:
             title: Authorization
             type: string
-            description: OIDC Access Token
+            description: OIDC Access Token or valid one-time token
           name: Authorization
           in: header
       responses:
@@ -675,6 +737,30 @@ components:
           default: []
           example:
             - /wlcg
+        audience:
+          title: Audience
+          anyOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          default: ''
+          example: ssh_localhost
+    OTPResponse:
+      title: OTPResponse
+      required:
+        - supported
+      type: object
+      properties:
+        supported:
+          title: Supported
+          type: boolean
+          example: true
+        successful:
+          title: Successful
+          type: boolean
+          default: false
+          example: true
     ValidationError:
       title: ValidationError
       required:

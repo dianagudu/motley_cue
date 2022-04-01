@@ -120,6 +120,37 @@ Pay close attention to the following configurations:
 Additional configurations
 -------------------------
 
+.. rubric:: One-time tokens
+
+To enable SSH support for large access tokens (longer than 1k), you can enable the use of one-time tokens in the ``[mapper.otp]`` section in ``motley_cue.conf``.
+
+Calling the ``/user/generate_otp`` endpoint will generate a shorter, one-time token and store it in a local, encrypted database. This token can then be used as an SSH password instead of the access token, and the ``/verify_user`` will be able to verify the username with this one-time token by retrieving the corresponding access token from the database.
+
+You can also configure the location of the token database, the backend used, as well as the location of the encryption key.
+
+.. code-block:: ini
+
+  ############
+  [mapper.otp]
+  ############
+  ## use one-time passwords (OTP) instead of tokens as ssh password -- default: False
+  ## this can be used when access tokens are too long to be used as passwords (>1k)
+  use_otp = True
+  ##
+  ## backend for storing the OTP-AT mapping -- default: sqlite
+  ## supported backends: sqlite, sqlitedict, shelve
+  # backend = sqlite
+  ##
+  ## location for storing token database -- default: /run/motley_cue/tokenmap.db
+  # db_location = /run/motley_cue/tokenmap.db
+  ## path to file containing key for encrypting token db -- default: /run/motley_cue/motley_cue.key
+  ## key must be a URL-safe base64-encoded 32-byte key, and it will be created if it doesn't exist
+  ## encryption not supported when using the "shelve" backend
+  # keyfile = /run/motley_cue/motley_cue.key
+
+
+.. rubric:: Swagger docs
+
 By default, the Swagger documentation for the REST API is disabled. You can enable it in ``motley_cue.conf``, and change its location:
 
 .. code-block:: ini

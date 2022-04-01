@@ -104,7 +104,11 @@ async def verify_user(
         ...,
         description="username to compare to local username",
     ),
-    header: str = Header(..., alias="Authorization", description="OIDC Access Token"),
+    header: str = Header(
+        ...,
+        alias="Authorization",
+        description="OIDC Access Token or valid one-time token",
+    ),
 ):  # pylint: disable=unused-argument
     """Verify that the authenticated user has a local account with the given **username**.
 
