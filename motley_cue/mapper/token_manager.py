@@ -1,3 +1,4 @@
+import os
 from typing import Callable, Optional
 import hashlib
 import logging
@@ -16,40 +17,60 @@ logger = logging.getLogger(__name__)
 
 
 class Encryption:
+    """Class for encrypting/decrypting strings using symmetric keys."""
+
     def __init__(self, keyfile: str) -> None:
-        self.keyfile = keyfile
-        self.save_key()
-        self.key = self.load_key()
+        """Initialise Encryption by creating new key and saving it to keyfile
+        if it does not exist, and loading the key from keyfile.
+        """
+        Encryption.create_key(keyfile)
+        self.fernet = Encryption.load_fernet(keyfile)
 
-    def load_key(self) -> bytes:
-        key = open(self.keyfile, "rb").read()
-        return key
+    @staticmethod
+    def load_fernet(keyfile: str) -> Fernet:
+        """Loads a secret key from keyfile and returns a Fernet object."""
+        try:
+            key = open(keyfile, "rb").read()
+            return Fernet(key)
+        except Exception as e:
+            logger.error(
+                "Something went wrong when trying to load secret key in %s",
+                keyfile,
+            )
+            raise InternalException(
+                message=f"Could not create secret key in {keyfile}"
+            ) from e
 
-    def save_key(self) -> None:
+    @staticmethod
+    def create_key(keyfile: str) -> None:
+        """Creates a fresh Fernet (secret) key and saves it to keyfile,
+        only if key does not already exist. Sets appropriate permissions on keyfile.
+        """
         try:
             key = Fernet.generate_key()
-            open(self.keyfile, "xb").write(key)
+            open(keyfile, "xb").write(key)
+            os.chmod(keyfile, 0o600)
             logger.debug(
-                "Created secret key for encryption and saved it to %s.", self.keyfile
+                "Created secret key for encryption and saved it to %s.", keyfile
             )
         except FileExistsError:
-            logger.debug("Key already exists in %s, nothing to do here.", self.keyfile)
+            logger.debug("Key already exists in %s, nothing to do here.", keyfile)
         except Exception as e:
             logger.error(
                 "Something went wrong when trying to create secret key in %s",
-                self.keyfile,
+                keyfile,
             )
             raise InternalException(
-                message=f"Could not create secret key in {self.keyfile}"
+                message=f"Could not create secret key in {keyfile}"
             ) from e
 
     def encrypt(self, secret: str) -> str:
-        fer = Fernet(self.key)
-        return fer.encrypt(secret.encode()).decode()
+        """Encrypt secret using Fernet key"""
+        return self.fernet.encrypt(secret.encode()).decode()
 
     def decrypt(self, secret: str) -> str:
-        fer = Fernet(self.key)
-        return fer.decrypt(secret.encode()).decode()
+        """Decrypt secret using Fernet key"""
+        return self.fernet.decrypt(secret.encode()).decode()
 
 
 class TokenDB:
@@ -60,6 +81,7 @@ class TokenDB:
     backend = "generic"
 
     def rename_location(self, location) -> str:
+        """Add prefix to filename where database is stored, to differentiate between backends."""
         p = pathlib.Path(location)
         return str(p.parent.joinpath(f"{self.backend}_{p.name}"))
 
@@ -123,13 +145,10 @@ class SQLiteTokenDB(TokenDB):
         sql_get = "select at from tokenmap where otp=?"
         sql_insert = "insert into tokenmap(otp, at) values (?,?)"
         with self.connection:
-            # look for otp in db
             result = self.connection.execute(sql_get, [otp]).fetchall()
-            # if already in db
-            if len(result) > 0:
+            if len(result) > 0:  # if already in db
                 stored_token = self.encryption.decrypt(result[0][0])
-                # for the same token
-                if stored_token == token:
+                if stored_token == token:  # for the same token
                     logger.debug("OTP already exists for token %s", token)
                     return True
                 else:  # for another token => collision
@@ -138,8 +157,7 @@ class SQLiteTokenDB(TokenDB):
                         token,
                     )
                     return False
-            # when not found in db, insert new mapping
-            # only encrypt access token
+            # when not found in db, insert new mapping; only encrypt access token
             logger.debug("Storing OTP [%s] for token [%s]", otp, token)
             self.connection.execute(
                 sql_insert,
@@ -171,7 +189,9 @@ class SQLiteTokenDB(TokenDB):
 
 
 class ShelveTokenDB(TokenDB):
-    """Shelve-based DB for mapping one-time tokens to access tokens"""
+    """Shelve-based DB for mapping one-time tokens to access tokens.
+    Not encrypted or thread safe.
+    """
 
     backend = "shelve"
 
@@ -243,7 +263,6 @@ class SQLiteDictTokenDB(TokenDB):
 
     def __init__(self, location: str, keyfile: str) -> None:
         self.encryption = Encryption(keyfile)
-        # new db connection for location (does not need to exist)
         self.db = sqlitedict.SqliteDict(
             self.rename_location(location),
             tablename="tokenmap",
@@ -311,13 +330,11 @@ class TokenManager:
     - useful for long tokens (>1k)
     - maps ATs to OTPs (shorter, short-lived tokens)
     - generates OTP by hashing the AT
-    - stores mapping OTP <-> AT in a secure db (or in memory??)
+    - stores mapping OTP <-> AT in a secure db
         - this is done on /user/generate_otp
     - use OTP as ssh password
         - on /verify_user, OTP is translated to AT and then we go forward with authorisation & usual verification
-    - security:
-        - either one-time use (remove mapping once it is used)
-        - or expiration after a certain time
+    - security: one-time use (remove mapping once it is used)
     """
 
     def __init__(self, otp_config: OTPConfig) -> None:
