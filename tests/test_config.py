@@ -5,6 +5,8 @@ from .configs import (
     CONFIG_DOC_ENABLED,
     CONFIG_INVALID,
     CONFIG_NOT_SUPPORTED,
+    CONFIG_OTP_NOT_SUPPORTED,
+    CONFIG_OTP_SUPPORTED,
 )
 
 
@@ -87,3 +89,19 @@ def test_invalid_config(test_config):
 )
 def test_docs_url(test_config, config_parser, docs_url):
     assert test_config.Config(config_parser).docs_url == docs_url
+
+
+@pytest.mark.parametrize(
+    "config_parser,use_otp",
+    [
+        (CONFIG_NOT_SUPPORTED, False),
+        (CONFIG_OTP_NOT_SUPPORTED, False),
+        (CONFIG_OTP_SUPPORTED, True),
+    ],
+)
+def test_otp(test_config, config_parser, use_otp):
+    otp_config = test_config.Config(config_parser).otp
+    assert otp_config.use_otp == use_otp
+    assert otp_config.backend == "sqlite"
+    assert otp_config.db_location == "/run/motley_cue/tokenmap.db"
+    assert otp_config.keyfile == "/run/motley_cue/motley_cue.key"

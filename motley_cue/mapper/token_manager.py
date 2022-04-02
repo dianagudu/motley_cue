@@ -86,27 +86,36 @@ class TokenDB:
         return str(p.parent.joinpath(f"{self.backend}_{p.name}"))
 
     def pop(self, otp: str) -> Optional[str]:
-        """Implement one-time logic by removing mapping after get."""
+        """Implement one-time logic by removing mapping after get.
+        Return None when otp not in db.
+        """
         return None
 
     def store(self, otp: str, token: str) -> bool:
         """Do collision checking before inserting mapping to DB.
         Return True on successful insert. If mapping already existed,
         insert is also considered successful.
+        Return False on collision.
         """
         return False
 
     def get(self, otp: str) -> Optional[str]:
-        """Retrieve access token mapped to given one-time token from db."""
+        """Retrieve access token mapped to given one-time token from db.
+        Return None when otp not in db.
+        """
         return None
 
-    def remove(self, otp: str) -> bool:
-        """Remove mapping for given one-time token from db."""
-        return False
+    def remove(self, otp: str) -> None:
+        """Remove mapping for given one-time token from db.
+        Undefined behaviour when otp not in db.
+        """
+        pass
 
-    def insert(self, otp: str, token: str) -> bool:
-        """Insert mapping between given one-time token and access token to db."""
-        return False
+    def insert(self, otp: str, token: str) -> None:
+        """Insert mapping between given one-time token and access token to db.
+        Undefined behaviour when otp already in db.
+        """
+        pass
 
 
 class SQLiteTokenDB(TokenDB):
@@ -175,17 +184,15 @@ class SQLiteTokenDB(TokenDB):
             logger.warning("Multiple entries found in token db for OTP: %s", otp)
         return self.encryption.decrypt(result[0][0])
 
-    def remove(self, otp: str) -> bool:
+    def remove(self, otp: str) -> None:
         sql_del = "delete from tokenmap where otp=?"
         with self.connection:
             self.connection.execute(sql_del, [otp])
-        return True
 
-    def insert(self, otp: str, token: str) -> bool:
+    def insert(self, otp: str, token: str) -> None:
         sql_insert = "insert into tokenmap(otp, at) values (?,?)"
         with self.connection:
             self.connection.execute(sql_insert, (otp, self.encryption.encrypt(token)))
-        return True
 
 
 class ShelveTokenDB(TokenDB):
@@ -243,17 +250,15 @@ class ShelveTokenDB(TokenDB):
         self._close_db(db)
         return token
 
-    def remove(self, otp: str) -> bool:
+    def remove(self, otp: str) -> None:
         db = self._open_db()
         del db[otp]
         self._close_db(db)
-        return True
 
-    def insert(self, otp: str, token: str) -> bool:
+    def insert(self, otp: str, token: str) -> None:
         db = self._open_db()
         db[otp] = token
         self._close_db(db)
-        return True
 
 
 class SQLiteDictTokenDB(TokenDB):
@@ -313,15 +318,13 @@ class SQLiteDictTokenDB(TokenDB):
         self.db.commit()
         return token
 
-    def remove(self, otp: str) -> bool:
+    def remove(self, otp: str) -> None:
         del self.db[otp]
         self.db.commit()
-        return True
 
-    def insert(self, otp: str, token: str) -> bool:
+    def insert(self, otp: str, token: str) -> None:
         self.db[otp] = token
         self.db.commit()
-        return True
 
 
 class TokenManager:
@@ -345,6 +348,12 @@ class TokenManager:
             self.__db = ShelveTokenDB(otp_config.db_location)
         elif otp_config.backend == "sqlitedict":
             self.__db = SQLiteDictTokenDB(otp_config.db_location, otp_config.keyfile)
+        else:
+            self.__db = TokenDB()
+
+    @property
+    def db(self):
+        return self.__db
 
     @classmethod
     def from_config(cls, otp_config: OTPConfig):
@@ -359,7 +368,7 @@ class TokenManager:
     def get_token(self, otp: str) -> Optional[str]:
         """Retrieve the token associated to this OTP from token DB."""
         try:
-            return self.__db.pop(otp)
+            return self.db.pop(otp)
         except Exception as e:
             logger.debug("Failed to get or remove token mapping for otp %s: %s", otp, e)
             return None
@@ -368,7 +377,7 @@ class TokenManager:
         """Generate and store a new OTP for given token."""
         try:
             otp = self._new_otp(token)
-            success = self.__db.store(otp, token)
+            success = self.db.store(otp, token)
         except Exception as e:
             logger.debug(
                 "Failed to create or store an otp for token [%s]: %s",
@@ -411,7 +420,6 @@ class TokenManager:
                     new_headers = kwargs["request"].headers.mutablecopy()
                     new_headers["authorization"] = f"Bearer {token}"
                     kwargs["request"]._headers = new_headers
-
             return kwargs
 
         @wraps(func)

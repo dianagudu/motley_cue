@@ -3,8 +3,9 @@ from typing import Callable, Dict
 import pytest
 from starlette.testclient import TestClient
 import sys
+import os
 
-from .utils import MockUser, MockBaseFlaat
+from .utils import MockTokenManager, MockUser, MockBaseFlaat
 
 
 @pytest.fixture()
@@ -85,32 +86,83 @@ def test_local_user_manager_patched(
 def test_unauthorised():
     from motley_cue.mapper.exceptions import Unauthorised
 
-    return Unauthorised
+    yield Unauthorised
 
 
 @pytest.fixture()
 def test_bad_request():
     from motley_cue.mapper.exceptions import BadRequest
 
-    return BadRequest
+    yield BadRequest
 
 
 @pytest.fixture()
 def test_internal_server_error():
     from motley_cue.mapper.exceptions import InternalServerError
 
-    return InternalServerError
+    yield InternalServerError
 
 
 @pytest.fixture()
 def test_internal_exception():
     from motley_cue.mapper.exceptions import InternalException
 
-    return InternalException
+    yield InternalException
 
 
 @pytest.fixture()
 def test_config():
     from motley_cue.mapper import config
 
-    return config
+    yield config
+
+
+@pytest.fixture()
+def test_encryption():
+    from motley_cue.mapper import token_manager
+
+    yield token_manager.Encryption
+
+
+@pytest.fixture()
+def test_token_manager(monkeypatch):
+    with monkeypatch.context() as mp:
+        from motley_cue.mapper.token_manager import TokenManager
+        from motley_cue.mapper.config import OTPConfig
+
+        mp.setattr(TokenManager, "__init__", MockTokenManager.__init__)
+        mp.setattr(TokenManager, "_new_otp", MockTokenManager._new_otp)
+        mp.setattr(TokenManager, "db", MockTokenManager.db)
+
+        yield TokenManager(OTPConfig({"use_otp": "True"}))
+
+
+@pytest.fixture()
+def test_token_manager_original_new_otp(monkeypatch):
+    with monkeypatch.context() as mp:
+        from motley_cue.mapper.token_manager import TokenManager
+        from motley_cue.mapper.config import OTPConfig
+
+        mp.setattr(TokenManager, "__init__", MockTokenManager.__init__)
+        mp.setattr(TokenManager, "db", MockTokenManager.db)
+
+        yield TokenManager(OTPConfig({"use_otp": "True"}))
+
+
+@pytest.fixture()
+def test_token_db(backend):
+    from motley_cue.mapper import token_manager
+
+    keyfile = "tmp_keyfile"
+    db_location = "tmp.db"
+
+    if backend == "sqlite":
+        yield token_manager.SQLiteTokenDB(db_location, keyfile)
+        os.remove(keyfile)
+    elif backend == "sqlitedict":
+        yield token_manager.SQLiteDictTokenDB(db_location, keyfile)
+        os.remove(keyfile)
+    else:  # backend == "shelve":
+        yield token_manager.ShelveTokenDB(db_location)
+
+    os.remove(f"{backend}_{db_location}")

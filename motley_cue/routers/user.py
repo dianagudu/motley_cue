@@ -26,6 +26,7 @@ async def read_root():
             f"{api.prefix}/get_status": "Get information about your local account.",
             f"{api.prefix}/deploy": "Provision local account.",
             f"{api.prefix}/suspend": "Suspend local account.",
+            f"{api.prefix}/generate_otp": "Generates a one-time token for given access token.",
         },
     }
 
