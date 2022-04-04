@@ -139,7 +139,7 @@ case "$DIST" in
         rpm_build_package
         rpm_copy_output
     ;;
-    centos_stream|rocky8*)
+    centos_stream|rocky8*|centos8)
         rocky8_install_dependencies
         rpm_build_package
         rpm_copy_output
