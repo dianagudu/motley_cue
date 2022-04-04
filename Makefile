@@ -178,9 +178,11 @@ docker_centos8:
 	@echo -e "FROM centos:8\n"\
 	"RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*\n"\
 	"RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*\n"\
+	"RUN yum install -y wget epel-release\n"\
 	"RUN yum -y install make rpm-build\n"\
-	"RUN yum -y groups mark convert\n"\
-	"RUN yum -y groupinstall \"Development tools\"\n" | \
+	"RUN yum -y groupinstall \"Development tools\"\n"\
+	"RUN dnf -y install https://rpms.remirepo.net/enterprise/remi-release-8.rpm\n"\
+	"RUN dnf config-manager --set-enabled powertools\n" | \
 	docker build --tag centos8 -f - .  >> docker.log
 .PHONY: docker_centos_stream
 docker_centos_stream:
