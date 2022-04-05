@@ -5,7 +5,6 @@ import logging
 from functools import wraps
 import pathlib
 import sqlite3
-import shelve
 import sqlitedict
 import json
 from cryptography.fernet import Fernet
@@ -195,72 +194,6 @@ class SQLiteTokenDB(TokenDB):
             self.connection.execute(sql_insert, (otp, self.encryption.encrypt(token)))
 
 
-class ShelveTokenDB(TokenDB):
-    """Shelve-based DB for mapping one-time tokens to access tokens.
-    Not encrypted or thread safe.
-    """
-
-    backend = "shelve"
-
-    def __init__(self, location: str) -> None:
-        self.__location = self.rename_location(location)
-
-    def _open_db(self) -> shelve.Shelf:
-        return shelve.open(self.__location, flag="c")
-
-    def _close_db(self, db: shelve.Shelf):
-        db.close()
-
-    def pop(self, otp: str) -> Optional[str]:
-        token = None
-        db = self._open_db()
-        if otp in db:
-            token = str(db[otp])
-            del db[otp]
-        self._close_db(db)
-        return token
-
-    def store(self, otp: str, token: str) -> bool:
-        stored_token = None
-        success = False
-        db = self._open_db()
-        if otp in db:
-            stored_token = str(db[otp])
-        if not stored_token:
-            logger.debug("Storing OTP [%s] for token [%s]", otp, token)
-            db[otp] = token
-            success = True
-        elif stored_token == token:
-            logger.debug("OTP already exists for token %s", token)
-            success = True
-        else:
-            logger.debug(
-                "Collision error: OTP for token %s collides with OTP for another token",
-                token,
-            )
-            success = False
-        self._close_db(db)
-        return success
-
-    def get(self, otp: str) -> Optional[str]:
-        token = None
-        db = self._open_db()
-        if otp in db:
-            token = str(db[otp])
-        self._close_db(db)
-        return token
-
-    def remove(self, otp: str) -> None:
-        db = self._open_db()
-        del db[otp]
-        self._close_db(db)
-
-    def insert(self, otp: str, token: str) -> None:
-        db = self._open_db()
-        db[otp] = token
-        self._close_db(db)
-
-
 class SQLiteDictTokenDB(TokenDB):
     """SQLiteDict-based DB for mapping one-time tokens to access tokens"""
 
@@ -344,8 +277,6 @@ class TokenManager:
         """Any DB-related initialisations"""
         if otp_config.backend == "sqlite":
             self.__db = SQLiteTokenDB(otp_config.db_location, otp_config.keyfile)
-        elif otp_config.backend == "shelve":
-            self.__db = ShelveTokenDB(otp_config.db_location)
         elif otp_config.backend == "sqlitedict":
             self.__db = SQLiteDictTokenDB(otp_config.db_location, otp_config.keyfile)
         else:

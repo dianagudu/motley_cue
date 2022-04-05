@@ -142,7 +142,7 @@ async def test_token_manager_inject_token_keep_at(test_token_manager):
     assert result["header_token"] == MOCK_TOKEN
 
 
-@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict", "shelve"])
+@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict"])
 def test_token_db_empty(test_token_db):
     mock_otp = "mock_otp"
 
@@ -150,7 +150,7 @@ def test_token_db_empty(test_token_db):
     assert test_token_db.pop(mock_otp) == None
 
 
-@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict", "shelve"])
+@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict"])
 def test_token_db_insert(test_token_db):
     mock_otp = "mock_otp"
     mock_at = "mock_at"
@@ -160,7 +160,7 @@ def test_token_db_insert(test_token_db):
     assert test_token_db.get(mock_otp) == mock_at
 
 
-@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict", "shelve"])
+@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict"])
 def test_token_db_remove(test_token_db):
     mock_otp = "mock_otp"
     mock_at = "mock_at"
@@ -170,7 +170,7 @@ def test_token_db_remove(test_token_db):
     assert test_token_db.get(mock_otp) == None
 
 
-@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict", "shelve"])
+@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict"])
 def test_token_db_pop(test_token_db):
     mock_otp = "mock_otp"
     mock_at = "mock_at"
@@ -180,7 +180,7 @@ def test_token_db_pop(test_token_db):
     assert test_token_db.get(mock_otp) == None
 
 
-@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict", "shelve"])
+@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict"])
 def test_token_db_store(test_token_db):
     mock_otp = "mock_otp"
     mock_at = "mock_at"
@@ -189,7 +189,7 @@ def test_token_db_store(test_token_db):
     assert test_token_db.get(mock_otp) == mock_at
 
 
-@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict", "shelve"])
+@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict"])
 def test_token_db_store_twice(test_token_db):
     mock_otp = "mock_otp"
     mock_at = "mock_at"
@@ -200,7 +200,7 @@ def test_token_db_store_twice(test_token_db):
     assert test_token_db.get(mock_otp) == mock_at
 
 
-@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict", "shelve"])
+@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict"])
 def test_token_db_store_collision(test_token_db):
     mock_otp = "mock_otp"
     mock_at = "mock_at"

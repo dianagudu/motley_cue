@@ -158,11 +158,8 @@ def test_token_db(backend):
 
     if backend == "sqlite":
         yield token_manager.SQLiteTokenDB(db_location, keyfile)
-        os.remove(keyfile)
-    elif backend == "sqlitedict":
+    else:  # if backend == "sqlitedict":
         yield token_manager.SQLiteDictTokenDB(db_location, keyfile)
-        os.remove(keyfile)
-    else:  # backend == "shelve":
-        yield token_manager.ShelveTokenDB(db_location)
 
+    os.remove(keyfile)
     os.remove(f"{backend}_{db_location}")
