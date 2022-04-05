@@ -91,6 +91,7 @@ dockerised_all_packages: dockerised_deb_debian_buster\
 	dockerised_deb_ubuntu_bionic\
 	dockerised_deb_ubuntu_focal\
 	dockerised_rpm_centos7\
+	dockerised_rpm_centos8\
 	dockerised_rpm_centos_stream\
 	dockerised_rpm_rocky8.5\
 	dockerised_rpm_rocky8\
@@ -101,6 +102,7 @@ dockerised_all_packages: dockerised_deb_debian_buster\
 docker_images: docker_rocky8.5\
 	docker_rocky8\
 	docker_centos7\
+	docker_centos8\
 	docker_centos_stream\
 	docker_debian_bullseye\
 	docker_debian_buster\
@@ -170,6 +172,18 @@ docker_centos7:
 	"RUN yum -y groups mark convert\n"\
 	"RUN yum -y groupinstall \"Development tools\"\n" | \
 	docker build --tag centos7 -f - .  >> docker.log
+.PHONY: docker_centos8
+docker_centos8:
+	@echo -e "\ncentos8"
+	@echo -e "FROM centos:8\n"\
+	"RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*\n"\
+	"RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*\n"\
+	"RUN yum install -y wget epel-release\n"\
+	"RUN yum -y install make rpm-build\n"\
+	"RUN yum -y groupinstall \"Development tools\"\n"\
+	"RUN dnf -y install https://rpms.remirepo.net/enterprise/remi-release-8.rpm\n"\
+	"RUN dnf config-manager --set-enabled powertools\n" | \
+	docker build --tag centos8 -f - .  >> docker.log
 .PHONY: docker_centos_stream
 docker_centos_stream:
 	@echo -e "\ncentos_stream"
@@ -221,6 +235,7 @@ docker_clean:
 	docker image rm rocky8.5 || true
 	docker image rm rocky8 || true
 	docker image rm	centos7 || true
+	docker image rm	centos8 || true
 	docker image rm	centos_stream || true
 	docker image rm ubuntu_bionic || true
 	docker image rm	ubuntu_focal || true
@@ -264,6 +279,12 @@ dockerised_rpm_centos7: docker_centos7
 	@docker run --tty --rm -v ${DOCKER_BASE}:/home/build centos7 \
 		/home/build/${PACKAGE}/build.sh ${PACKAGE} centos7 ${PKG_NAME} > $@.log
 
+.PHONY: dockerised_rpm_centos8
+dockerised_rpm_centos8: docker_centos8
+	@echo "Writing build log to $@.log"
+	@docker run --tty --rm -v ${DOCKER_BASE}:/home/build centos8 \
+		/home/build/${PACKAGE}/build.sh ${PACKAGE} centos8 ${PKG_NAME} > $@.log
+
 .PHONY: dockerised_rpm_centos_stream
 dockerised_rpm_centos_stream: docker_centos_stream
 	@echo "Writing build log to $@.log"
@@ -304,6 +325,7 @@ publish-to-repo:
 		@echo "%_gpg_name ACDFB08FDC962044D87FF00B512839863D487A87";\
 		};
 	@scp ../results/centos7/* build@repo.data.kit.edu:/var/www/centos/centos7
+	@scp ../results/centos8/* build@repo.data.kit.edu:/var/www/centos/centos8
 	@scp ../results/centos_stream/* build@repo.data.kit.edu:/var/www/centos/centos-stream
 	@scp ../results/rocky8.5/* build@repo.data.kit.edu:/var/www/rocky/rocky8.5
 	@scp ../results/rocky8/* build@repo.data.kit.edu:/var/www/rocky/rocky8
