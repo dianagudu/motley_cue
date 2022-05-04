@@ -80,7 +80,7 @@ def test_token_manager_generate_otp(test_token_manager):
 
 
 def test_token_manager_generate_otp_fail(test_token_manager, monkeypatch):
-    monkeypatch.setattr(test_token_manager.db, "store", mock_exception)
+    monkeypatch.setattr(test_token_manager.database, "store", mock_exception)
     assert test_token_manager.generate_otp(MOCK_TOKEN) == {
         "supported": True,
         "successful": False,
@@ -88,7 +88,7 @@ def test_token_manager_generate_otp_fail(test_token_manager, monkeypatch):
 
 
 def test_token_manager_get_token_fail(test_token_manager, monkeypatch):
-    monkeypatch.setattr(test_token_manager.db, "pop", mock_exception)
+    monkeypatch.setattr(test_token_manager.database, "pop", mock_exception)
     test_token_manager.generate_otp(MOCK_TOKEN)
     assert test_token_manager.get_token(MOCK_OTP) == None
 

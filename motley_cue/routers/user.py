@@ -100,9 +100,9 @@ async def suspend(
 )
 @mapper.authorised_user_required
 async def generate_otp(
-    request: Request,  # pylint: disable=unused-argument
+    request: Request,
     header: str = Header(..., alias="Authorization", description="OIDC Access Token"),
-):
+):  # pylint: disable=unused-argument
     """Generates and stores a new one-time password, using token as shared secret.
 
     Requires an authorised user.

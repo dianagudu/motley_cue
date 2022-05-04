@@ -132,7 +132,7 @@ def test_token_manager(monkeypatch):
 
         mp.setattr(TokenManager, "__init__", MockTokenManager.__init__)
         mp.setattr(TokenManager, "_new_otp", MockTokenManager._new_otp)
-        mp.setattr(TokenManager, "db", MockTokenManager.db)
+        mp.setattr(TokenManager, "database", MockTokenManager.database)
 
         yield TokenManager(OTPConfig({"use_otp": "True"}))
 
@@ -144,7 +144,7 @@ def test_token_manager_original_new_otp(monkeypatch):
         from motley_cue.mapper.config import OTPConfig
 
         mp.setattr(TokenManager, "__init__", MockTokenManager.__init__)
-        mp.setattr(TokenManager, "db", MockTokenManager.db)
+        mp.setattr(TokenManager, "database", MockTokenManager.database)
 
         yield TokenManager(OTPConfig({"use_otp": "True"}))
 

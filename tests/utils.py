@@ -107,9 +107,7 @@ Root = Endpoint(
 )
 
 
-def getListOfEndpoints(
-    endpoint: Endpoint, condition: Callable[[Endpoint], bool]
-) -> List[Endpoint]:
+def getListOfEndpoints(endpoint: Endpoint, condition: Callable[[Endpoint], bool]) -> List[Endpoint]:
     """Returns a list of endpoints that satisfy a given condition,
     from the subtree starting at the given endpoint"""
     endpoints = []
@@ -267,9 +265,10 @@ class MockTokenManager:
         self.__db = MockTokenDB()
 
     @property
-    def db(self):
+    def database(self):
         return self.__db
 
-    def _new_otp(self, token: str) -> str:
+    @staticmethod
+    def _new_otp(token: str) -> str:
         _ = token
         return MOCK_OTP

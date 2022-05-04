@@ -1,12 +1,16 @@
+"""
+Module for managing one-time tokens and the (long) Access Tokens they are derived from.
+"""
+from abc import abstractmethod
 import os
 from typing import Callable, Optional
 import hashlib
 import logging
 from functools import wraps
 import pathlib
+import json
 import sqlite3
 import sqlitedict
-import json
 from cryptography.fernet import Fernet
 
 from .config import OTPConfig
@@ -29,16 +33,14 @@ class Encryption:
     def load_fernet(keyfile: str) -> Fernet:
         """Loads a secret key from keyfile and returns a Fernet object."""
         try:
-            key = open(keyfile, "rb").read()
+            key = open(keyfile, "rb").read()  # pylint: disable=consider-using-with
             return Fernet(key)
-        except Exception as e:
+        except Exception as ex:
             logger.error(
                 "Something went wrong when trying to load secret key in %s",
                 keyfile,
             )
-            raise InternalException(
-                message=f"Could not create secret key in {keyfile}"
-            ) from e
+            raise InternalException(message=f"Could not create secret key in {keyfile}") from ex
 
     @staticmethod
     def create_key(keyfile: str) -> None:
@@ -47,21 +49,17 @@ class Encryption:
         """
         try:
             key = Fernet.generate_key()
-            open(keyfile, "xb").write(key)
+            open(keyfile, "xb").write(key)  # pylint: disable=consider-using-with
             os.chmod(keyfile, 0o600)
-            logger.debug(
-                "Created secret key for encryption and saved it to %s.", keyfile
-            )
+            logger.debug("Created secret key for encryption and saved it to %s.", keyfile)
         except FileExistsError:
             logger.debug("Key already exists in %s, nothing to do here.", keyfile)
-        except Exception as e:
+        except Exception as ex:
             logger.error(
                 "Something went wrong when trying to create secret key in %s",
                 keyfile,
             )
-            raise InternalException(
-                message=f"Could not create secret key in {keyfile}"
-            ) from e
+            raise InternalException(message=f"Could not create secret key in {keyfile}") from ex
 
     def encrypt(self, secret: str) -> str:
         """Encrypt secret using Fernet key"""
@@ -81,40 +79,40 @@ class TokenDB:
 
     def rename_location(self, location) -> str:
         """Add prefix to filename where database is stored, to differentiate between backends."""
-        p = pathlib.Path(location)
-        return str(p.parent.joinpath(f"{self.backend}_{p.name}"))
+        new_location = pathlib.Path(location)
+        return str(new_location.parent.joinpath(f"{self.backend}_{new_location.name}"))
 
+    @abstractmethod
     def pop(self, otp: str) -> Optional[str]:
         """Implement one-time logic by removing mapping after get.
         Return None when otp not in db.
         """
-        return None
 
+    @abstractmethod
     def store(self, otp: str, token: str) -> bool:
         """Do collision checking before inserting mapping to DB.
         Return True on successful insert. If mapping already existed,
         insert is also considered successful.
         Return False on collision.
         """
-        return False
 
+    @abstractmethod
     def get(self, otp: str) -> Optional[str]:
         """Retrieve access token mapped to given one-time token from db.
         Return None when otp not in db.
         """
-        return None
 
+    @abstractmethod
     def remove(self, otp: str) -> None:
         """Remove mapping for given one-time token from db.
         Undefined behaviour when otp not in db.
         """
-        pass
 
+    @abstractmethod
     def insert(self, otp: str, token: str) -> None:
         """Insert mapping between given one-time token and access token to db.
         Undefined behaviour when otp already in db.
         """
-        pass
 
 
 class SQLiteTokenDB(TokenDB):
@@ -159,12 +157,12 @@ class SQLiteTokenDB(TokenDB):
                 if stored_token == token:  # for the same token
                     logger.debug("OTP already exists for token %s", token)
                     return True
-                else:  # for another token => collision
-                    logger.debug(
-                        "Collision error: OTP for token %s collides with OTP for another token",
-                        token,
-                    )
-                    return False
+                # else:  # for another token => collision
+                logger.debug(
+                    "Collision error: OTP for token %s collides with OTP for another token",
+                    token,
+                )
+                return False
             # when not found in db, insert new mapping; only encrypt access token
             logger.debug("Storing OTP [%s] for token [%s]", otp, token)
             self.connection.execute(
@@ -201,36 +199,36 @@ class SQLiteDictTokenDB(TokenDB):
 
     def __init__(self, location: str, keyfile: str) -> None:
         self.encryption = Encryption(keyfile)
-        self.db = sqlitedict.SqliteDict(
+        self.database = sqlitedict.SqliteDict(
             self.rename_location(location),
             tablename="tokenmap",
             flag="c",
-            encode=self.encrypted_encode,
-            decode=self.encrypted_decode,
+            encode=self._encrypted_encode,
+            decode=self._encrypted_decode,
         )
 
-    def encrypted_encode(self, obj):
+    def _encrypted_encode(self, obj):
         return self.encryption.encrypt(json.dumps(obj))
 
-    def encrypted_decode(self, obj):
+    def _encrypted_decode(self, obj):
         return json.loads(self.encryption.decrypt(obj))
 
     def pop(self, otp: str) -> Optional[str]:
         token = None
-        if otp in self.db:
-            token = str(self.db[otp])
-            del self.db[otp]
-        self.db.commit()
+        if otp in self.database:
+            token = str(self.database[otp])
+            del self.database[otp]
+        self.database.commit()
         return token
 
     def store(self, otp: str, token: str) -> bool:
         stored_token = None
         success = False
-        if otp in self.db:
-            stored_token = str(self.db[otp])
+        if otp in self.database:
+            stored_token = str(self.database[otp])
         if not stored_token:
             logger.debug("Storing OTP [%s] for token [%s]", otp, token)
-            self.db[otp] = token
+            self.database[otp] = token
             success = True
         elif stored_token == token:
             logger.debug("OTP already exists for token %s", token)
@@ -241,23 +239,23 @@ class SQLiteDictTokenDB(TokenDB):
                 token,
             )
             success = False
-        self.db.commit()
+        self.database.commit()
         return success
 
     def get(self, otp: str) -> Optional[str]:
         token = None
-        if otp in self.db:
-            token = str(self.db[otp])
-        self.db.commit()
+        if otp in self.database:
+            token = str(self.database[otp])
+        self.database.commit()
         return token
 
     def remove(self, otp: str) -> None:
-        del self.db[otp]
-        self.db.commit()
+        del self.database[otp]
+        self.database.commit()
 
     def insert(self, otp: str, token: str) -> None:
-        self.db[otp] = token
-        self.db.commit()
+        self.database[otp] = token
+        self.database.commit()
 
 
 class TokenManager:
@@ -269,7 +267,8 @@ class TokenManager:
     - stores mapping OTP <-> AT in a secure db
         - this is done on /user/generate_otp
     - use OTP as ssh password
-        - on /verify_user, OTP is translated to AT and then we go forward with authorisation & usual verification
+        - on /verify_user, OTP is translated to AT and then
+          we go forward with authorisation & usual verification
     - security: one-time use (remove mapping once it is used)
     """
 
@@ -280,40 +279,43 @@ class TokenManager:
         elif otp_config.backend == "sqlitedict":
             self.__db = SQLiteDictTokenDB(otp_config.db_location, otp_config.keyfile)
         else:
-            self.__db = TokenDB()
+            raise InternalException(f"Unknown backend for token manager: {otp_config.backend}")
 
     @property
-    def db(self):
+    def database(self):
+        """Return TokenDB object"""
         return self.__db
 
     @classmethod
     def from_config(cls, otp_config: OTPConfig):
+        """Load TokenManager from given config object"""
         if otp_config.use_otp:
             return cls(otp_config)
         return None
 
-    def _new_otp(self, token: str) -> str:
+    @staticmethod
+    def _new_otp(token: str) -> str:
         """Create a new OTP by hashing given token."""
         return hashlib.sha512(bytearray(token, "ascii")).hexdigest()
 
     def get_token(self, otp: str) -> Optional[str]:
         """Retrieve the token associated to this OTP from token DB."""
         try:
-            return self.db.pop(otp)
-        except Exception as e:
-            logger.debug("Failed to get or remove token mapping for otp %s: %s", otp, e)
+            return self.database.pop(otp)
+        except Exception as ex:  # pylint: disable=broad-except
+            logger.debug("Failed to get or remove token mapping for otp %s: %s", otp, ex)
             return None
 
     def generate_otp(self, token: str) -> dict:
         """Generate and store a new OTP for given token."""
         try:
-            otp = self._new_otp(token)
-            success = self.db.store(otp, token)
-        except Exception as e:
+            otp = TokenManager._new_otp(token)
+            success = self.database.store(otp, token)
+        except Exception as ex:  # pylint: disable=broad-except
             logger.debug(
                 "Failed to create or store an otp for token [%s]: %s",
                 token,
-                e,
+                ex,
             )
             success = False
         return {"supported": True, "successful": success}
@@ -350,7 +352,8 @@ class TokenManager:
                 if authz_header and authz_header.startswith("Bearer "):
                     new_headers = kwargs["request"].headers.mutablecopy()
                     new_headers["authorization"] = f"Bearer {token}"
-                    kwargs["request"]._headers = new_headers
+                    kwargs["request"]._headers = new_headers  # pylint: disable=protected-access
+                    kwargs["request"].scope.update(headers=new_headers.raw)
             return kwargs
 
         @wraps(func)
@@ -358,13 +361,13 @@ class TokenManager:
             otp = _get_token_from_kwargs(kwargs)
             if otp:
                 logger.debug("Found token in kwargs: %s", otp)
-                at = self.get_token(otp)
-                if at:
+                access_token = self.get_token(otp)
+                if access_token:
                     logger.debug("OTP %s found in token DB", otp)
-                    kwargs = _replace_token_in_kwargs(kwargs, at)
+                    kwargs = _replace_token_in_kwargs(kwargs, access_token)
                     logger.debug(
                         "Injected Access Token %s corresponding to given OTP %s",
-                        at,
+                        access_token,
                         otp,
                     )
             return await func(*args, **kwargs)
