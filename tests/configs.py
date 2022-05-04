@@ -121,6 +121,31 @@ docs_url = docs
 )
 
 
+CONFIG_OTP_NOT_SUPPORTED = load_config(
+    f"""
+{CONFIG_BASE}
+[mapper.otp]
+use_otp = False
+[authorisation.OP]
+op_url = {MOCK_ISS}
+authorise_all = True
+"""
+)
+
+CONFIG_OTP_SUPPORTED = load_config(
+    f"""
+{CONFIG_BASE}
+[mapper.otp]
+use_otp = True
+backend = sqlite
+db_location = /run/motley_cue/tokenmap.db
+keyfile = /run/motley_cue/motley_cue.key
+[authorisation.OP]
+op_url = {MOCK_ISS}
+authorise_all = True
+"""
+)
+
 CONFIGS = {
     "NOT_SUPPORTED": CONFIG_NOT_SUPPORTED,
     "SUPPORTED_NOT_AUTHORISED": CONFIG_SUPPORTED_NOT_AUTHORISED,

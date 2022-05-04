@@ -78,7 +78,7 @@ async def info():
 @mapper.authenticated_user_required
 async def info_authorisation(
     request: Request,
-    token: str = Header(..., alias="Authorization", description="OIDC Access Token"),
+    header: str = Header(..., alias="Authorization", description="OIDC Access Token"),
 ):  # pylint: disable=unused-argument
     """Retrieve authorisation information for specific OP.
 
@@ -96,6 +96,7 @@ async def info_authorisation(
     response_model=VerifyUser,
     responses={**responses, 200: {"model": VerifyUser}},
 )
+@mapper.inject_token
 @mapper.authorised_user_required
 async def verify_user(
     request: Request,
@@ -103,7 +104,11 @@ async def verify_user(
         ...,
         description="username to compare to local username",
     ),
-    token: str = Header(..., alias="Authorization", description="OIDC Access Token"),
+    header: str = Header(
+        ...,
+        alias="Authorization",
+        description="OIDC Access Token or valid one-time token",
+    ),
 ):  # pylint: disable=unused-argument
     """Verify that the authenticated user has a local account with the given **username**.
 

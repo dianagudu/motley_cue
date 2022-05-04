@@ -6,6 +6,7 @@ from typing import List, Optional
 import logging
 import os
 from pathlib import Path
+from dataclasses import dataclass
 
 from flaat.requirements import (
     IsTrue,
@@ -32,21 +33,26 @@ class Config:
         Raises:
             InternalException: if configuration does not contain mandatory section [mapper]
         """
-        try:
+        if config_parser.has_section("mapper"):
             config_mapper = config_parser["mapper"]
-        except Exception as ex:
+        else:
             raise InternalException(
                 "No [mapper] configuration found in configuration file!"
-            ) from ex
+            )
         # log level
         self.__log_level = config_mapper.get("log_level", logging.WARNING)
         # log file
         self.__log_file = config_mapper.get("log_file", None)
         # swagger docs
-        if config_mapper.get("enable_docs", False):
+        if to_bool(config_mapper.get("enable_docs", "False")):
             self.__docs_url = config_mapper.get("docs_url", "/docs")
         else:
             self.__docs_url = None
+        # use OTPs as a replacement for long (>1k) access tokens
+        otp_dict = {}
+        if config_parser.has_section("mapper.otp"):
+            otp_dict = dict(config_parser["mapper.otp"])
+        self.__otp = OTPConfig(otp_dict)
         # trusted OPs
         authz_sections = [
             section
@@ -91,6 +97,11 @@ class Config:
     def docs_url(self):
         """return url to be used as location for swagger docs"""
         return self.__docs_url
+
+    @property
+    def otp(self):
+        """Return whether OTPs are enabled"""
+        return self.__otp
 
     @property
     def verbosity(self):
@@ -283,3 +294,20 @@ class OPAuthZ:
             return IsTrue(user_has_sub)
 
         return Unsatisfiable()
+
+
+@dataclass
+class OTPConfig:
+    """Class describing the OTP configuration"""
+
+    def __init__(self, otp_config: dict) -> None:
+        """Initialises all fields from given dict or with default values,
+        and converts them to the appropriate type when necessary.
+
+        Args:
+            otp_config (dict): ConfigParser section for OTP
+        """
+        self.use_otp = to_bool(otp_config.get("use_otp", "False"))
+        self.backend = otp_config.get("backend", "sqlite").lower()
+        self.db_location = otp_config.get("db_location", "/run/motley_cue/tokenmap.db")
+        self.keyfile = otp_config.get("keyfile", "/run/motley_cue/motley_cue.key")

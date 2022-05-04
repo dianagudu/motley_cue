@@ -4,7 +4,7 @@ This module contains the definition of motley_cue's user API.
 from fastapi import APIRouter, Request, Depends, Header
 
 from ..dependencies import mapper
-from ..models import FeudalResponse, responses
+from ..models import FeudalResponse, OTPResponse, responses
 
 
 api = APIRouter(prefix="/user")
@@ -26,6 +26,7 @@ async def read_root():
             f"{api.prefix}/get_status": "Get information about your local account.",
             f"{api.prefix}/deploy": "Provision local account.",
             f"{api.prefix}/suspend": "Suspend local account.",
+            f"{api.prefix}/generate_otp": "Generates a one-time token for given access token.",
         },
     }
 
@@ -40,7 +41,7 @@ async def read_root():
 @mapper.authorised_user_required
 async def get_status(
     request: Request,
-    token: str = Header(..., alias="Authorization", description="OIDC Access Token"),
+    header: str = Header(..., alias="Authorization", description="OIDC Access Token"),
 ):  # pylint: disable=unused-argument
     """Get information about your local account:
 
@@ -62,7 +63,7 @@ async def get_status(
 @mapper.authorised_user_required
 async def deploy(
     request: Request,
-    token: str = Header(..., alias="Authorization", description="OIDC Access Token"),
+    header: str = Header(..., alias="Authorization", description="OIDC Access Token"),
 ):  # pylint: disable=unused-argument
     """Provision a local account.
 
@@ -81,10 +82,29 @@ async def deploy(
 @mapper.authorised_user_required
 async def suspend(
     request: Request,
-    token: str = Header(..., alias="Authorization", description="OIDC Access Token"),
+    header: str = Header(..., alias="Authorization", description="OIDC Access Token"),
 ):  # pylint: disable=unused-argument
     """Suspends a local account.
 
     Requires an authorised user.
     """
     return mapper.suspend(request)
+
+
+@api.get(
+    "/generate_otp",
+    dependencies=[Depends(mapper.user_security)],
+    response_model=OTPResponse,
+    response_model_exclude_unset=True,
+    responses={**responses, 200: {"model": OTPResponse}},
+)
+@mapper.authorised_user_required
+async def generate_otp(
+    request: Request,  # pylint: disable=unused-argument
+    header: str = Header(..., alias="Authorization", description="OIDC Access Token"),
+):
+    """Generates and stores a new one-time password, using token as shared secret.
+
+    Requires an authorised user.
+    """
+    return mapper.generate_otp(request)

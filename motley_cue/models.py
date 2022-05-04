@@ -76,6 +76,19 @@ class FeudalResponse:
 
 
 @dataclass
+class OTPResponse:
+    """Data model for any responses coming from TokenManager,
+    on /user/generate_otp.
+    Information on whether OTPs are supported, in which case also
+    whether the OTP generation and storage succeeded.
+    """
+
+    supported: bool = Field(..., example=True)
+    successful: bool = Field(False, example=True)
+    # message: Optional[str] = Field("", example="OTPs not supported.")
+
+
+@dataclass
 class ClientError:
     """Data model for responses on errors."""
 

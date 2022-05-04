@@ -73,6 +73,11 @@ User = Endpoint(
             ("/user/deploy", {"state": "", "message": "", "credentials": {}}, "deploy"),
             ("/user/get_status", {"state": "", "message": ""}, "get_status"),
             ("/user/suspend", {"state": "", "message": ""}, "suspend"),
+            (
+                "/user/generate_otp",
+                {"supported": False, "successful": False},
+                "generate_otp",
+            ),
         ]
     ],
 )
@@ -149,12 +154,15 @@ MOCK_TOKEN_INFO = AccessTokenInfo(
     complete_decode={
         "payload": {"sub": MOCK_SUB, "iss": MOCK_ISS, "wlcg.groups": ["another_group"]},
     },
-    verification=None
+    verification=None,
 )
-
 
 MOCK_BAD_TOKEN = "badtoken"
 MOCK_BAD_REQUEST = build_request(MOCK_BAD_TOKEN)
+
+MOCK_OTP = "mock.one.time.token"
+MOCK_OTP_REQUEST = build_request(MOCK_OTP)
+MOCK_OTP_HEADERS = {"Authorization": f"Bearer {MOCK_OTP}"}
 
 
 class MockUser:
@@ -217,3 +225,51 @@ class MockBaseFlaat(BaseFlaat):
                 introspection_info=None,
             )
         super().get_user_infos_from_access_token(access_token, issuer_hint)
+
+
+class MockTokenDB:
+    def __init__(self) -> None:
+        self.__db = {}
+
+    def pop(self, otp: str) -> Optional[str]:
+        token = None
+        if otp in self.__db:
+            token = self.__db[otp]
+            del self.__db[otp]
+        return token
+
+    def store(self, otp: str, token: str) -> bool:
+        stored_token = None
+        success = False
+        if otp in self.__db:
+            stored_token = self.__db[otp]
+        if not stored_token:
+            self.__db[otp] = token
+            success = True
+        elif stored_token == token:
+            success = True
+        else:
+            success = False
+        return success
+
+    def get(self, otp: str) -> Optional[str]:
+        return self.__db.get(otp, None)
+
+    def remove(self, otp: str) -> None:
+        del self.__db[otp]
+
+    def insert(self, otp: str, token: str) -> None:
+        self.__db[otp] = token
+
+
+class MockTokenManager:
+    def __init__(self, otp_config) -> None:
+        self.__db = MockTokenDB()
+
+    @property
+    def db(self):
+        return self.__db
+
+    def _new_otp(self, token: str) -> str:
+        _ = token
+        return MOCK_OTP
