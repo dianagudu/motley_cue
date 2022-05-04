@@ -160,6 +160,8 @@
 <span class="n">graceful_timeout_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;GRACEFUL_TIMEOUT&quot;</span><span class="p">,</span> <span class="s2">&quot;120&quot;</span><span class="p">)</span>
 <span class="n">timeout_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;TIMEOUT&quot;</span><span class="p">,</span> <span class="s2">&quot;120&quot;</span><span class="p">)</span>
 <span class="n">keepalive_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;KEEP_ALIVE&quot;</span><span class="p">,</span> <span class="s2">&quot;5&quot;</span><span class="p">)</span>
+<span class="n">max_requests_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MAX_REQUESTS&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
+<span class="n">max_requests_jitter_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MAX_REQUESTS_JITTER&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
 
 <span class="c1"># Gunicorn config variables</span>
 <span class="n">loglevel</span> <span class="o">=</span> <span class="n">use_loglevel</span>
@@ -171,7 +173,8 @@
 <span class="n">graceful_timeout</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">graceful_timeout_str</span><span class="p">)</span>
 <span class="n">timeout</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">timeout_str</span><span class="p">)</span>
 <span class="n">keepalive</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">keepalive_str</span><span class="p">)</span>
-
+<span class="n">max_requests</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_requests_str</span><span class="p">)</span>
+<span class="n">max_requests_jitter</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_requests_jitter_str</span><span class="p">)</span>
 
 <span class="c1"># For debugging and testing</span>
 <span class="n">log_data</span> <span class="o">=</span> <span class="p">{</span>
@@ -183,6 +186,8 @@
     <span class="s2">&quot;keepalive&quot;</span><span class="p">:</span> <span class="n">keepalive</span><span class="p">,</span>
     <span class="s2">&quot;errorlog&quot;</span><span class="p">:</span> <span class="n">errorlog</span><span class="p">,</span>
     <span class="s2">&quot;accesslog&quot;</span><span class="p">:</span> <span class="n">accesslog</span><span class="p">,</span>
+    <span class="s2">&quot;max_requests&quot;</span><span class="p">:</span> <span class="n">max_requests</span><span class="p">,</span>
+    <span class="s2">&quot;max_requests_jitter&quot;</span><span class="p">:</span> <span class="n">max_requests_jitter</span><span class="p">,</span>
     <span class="c1"># Additional, non-gunicorn variables</span>
     <span class="s2">&quot;workers_per_core&quot;</span><span class="p">:</span> <span class="n">workers_per_core</span><span class="p">,</span>
     <span class="s2">&quot;use_max_workers&quot;</span><span class="p">:</span> <span class="n">use_max_workers</span><span class="p">,</span>

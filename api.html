@@ -208,6 +208,31 @@
 </dd></dl>
 
 <dl class="http get">
+<dt class="sig sig-object http" id="get--user-generate_otp">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/generate_otp</span></span><a class="headerlink" href="#get--user-generate_otp" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Generate Otp</strong></p>
+<p>Generates and stores a new one-time password, using token as shared secret.</p>
+<p>Requires an authorised user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Successful Response</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2">401 Unauthorized</a></span> – Unauthorized</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5">404 Not Found</a></span> – Not Found</p></li>
+<li><p><span><a class="reference external" href="https://tools.ietf.org/html/rfc4918#section-11.2">422 Unprocessable Entity</a></span> – Validation Error</p></li>
+</ul>
+</dd>
+<dt class="field-even">Request Headers</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>Authorization</strong> – OIDC Access Token
+(Required)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
 <dt class="sig sig-object http" id="get--admin">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/admin</span></span><a class="headerlink" href="#get--admin" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Read Root</strong></p>
@@ -384,7 +409,7 @@ identified by issuer and subject claims.</p>
 </dd>
 <dt class="field-odd">Request Headers</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>Authorization</strong> – OIDC Access Token
+<li><p><strong>Authorization</strong> – OIDC Access Token or valid one-time token
 (Required)</p></li>
 </ul>
 </dd>

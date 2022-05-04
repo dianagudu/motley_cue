@@ -140,6 +140,23 @@
 <span class="c1">## location of swagger docs -- default: /docs</span><span class="w"></span>
 <span class="c1"># docs_url = /docs</span><span class="w"></span>
 
+<span class="c1">############</span><span class="w"></span>
+<span class="k">[mapper.otp]</span><span class="w"></span>
+<span class="c1">############</span><span class="w"></span>
+<span class="c1">## use one-time passwords (OTP) instead of tokens as ssh password -- default: False</span><span class="w"></span>
+<span class="c1">## this can be used when access tokens are too long to be used as passwords (&gt;1k)</span><span class="w"></span>
+<span class="c1"># use_otp = False</span><span class="w"></span>
+<span class="c1">##</span><span class="w"></span>
+<span class="c1">## backend for storing the OTP-AT mapping -- default: sqlite</span><span class="w"></span>
+<span class="c1">## supported backends: sqlite, sqlitedict</span><span class="w"></span>
+<span class="c1"># backend = sqlite</span><span class="w"></span>
+<span class="c1">##</span><span class="w"></span>
+<span class="c1">## location for storing token database -- default: /run/motley_cue/tokenmap.db</span><span class="w"></span>
+<span class="c1"># db_location = /run/motley_cue/tokenmap.db</span><span class="w"></span>
+<span class="c1">## path to file containing key for encrypting token db -- default: /run/motley_cue/motley_cue.key</span><span class="w"></span>
+<span class="c1">## key must be a URL-safe base64-encoded 32-byte key, and it will be created if it doesn&#39;t exist</span><span class="w"></span>
+<span class="c1"># keyfile = /run/motley_cue/motley_cue.key</span><span class="w"></span>
+
 
 <span class="c1">#########</span><span class="w"></span>
 <span class="k">[DEFAULT]</span><span class="w"></span>
@@ -235,6 +252,11 @@
 <span class="c1">#         &quot;c2370093c19496aeb46103cce3ccdc7b183f54ac9ba9c859dea94dfba23aacd5@egi.eu&quot;</span><span class="w"></span>
 <span class="c1">#     ]</span><span class="w"></span>
 <span class="c1"># authorise_admins_for_all_ops = True</span><span class="w"></span>
+
+<span class="c1">###################</span><span class="w"></span>
+<span class="k">[authorisation.egi-dev]</span><span class="w"></span>
+<span class="c1">###################</span><span class="w"></span>
+<span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://aai-dev.egi.eu/auth/realms/egi</span><span class="w"></span>
 
 
 <span class="c1">###################</span><span class="w"></span>
