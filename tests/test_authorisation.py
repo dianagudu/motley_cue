@@ -31,9 +31,7 @@ def test_info_authorisation(test_authorisation):
     assert set(InfoAuthorisation.valid_response.keys()) <= set(response.keys())
 
 
-@pytest.mark.parametrize(
-    "config_file", [CONFIGS["NOT_SUPPORTED"]], ids=["NOT_SUPPORTED"]
-)
+@pytest.mark.parametrize("config_file", [CONFIGS["NOT_SUPPORTED"]], ids=["NOT_SUPPORTED"])
 def test_info_authorisation_not_supported(test_authorisation, test_unauthorised):
     with pytest.raises(test_unauthorised):
         test_authorisation.info(MOCK_REQUEST)
@@ -45,9 +43,9 @@ def test_info_authorisation_not_supported(test_authorisation, test_unauthorised)
     ids=CONFIGS_AUTHORISED_USERS.keys(),
 )
 async def test_require_authorised_user_success(test_authorisation):
-    assert await test_authorisation.authorised_user_required(view_func)(
-        request=MOCK_REQUEST
-    ) == {"message": "Success"}
+    assert await test_authorisation.authorised_user_required(view_func)(request=MOCK_REQUEST) == {
+        "message": "Success"
+    }
 
 
 @pytest.mark.parametrize(
@@ -59,9 +57,7 @@ async def test_require_authorised_user_success(test_authorisation):
     ids=["SUPPORTED_NOT_AUTHORISED", "NOT_SUPPORTED"],
 )
 async def test_require_authorised_user_fail(test_authorisation, status_code):
-    response = await test_authorisation.authorised_user_required(view_func)(
-        request=MOCK_REQUEST
-    )
+    response = await test_authorisation.authorised_user_required(view_func)(request=MOCK_REQUEST)
     assert response.status_code == status_code
 
 
@@ -126,13 +122,9 @@ async def test_require_authenticated_user_success(test_authorisation):
     ) == {"message": "Success"}
 
 
-@pytest.mark.parametrize(
-    "config_file", [CONFIGS["NOT_SUPPORTED"]], ids=["NOT_SUPPORTED"]
-)
+@pytest.mark.parametrize("config_file", [CONFIGS["NOT_SUPPORTED"]], ids=["NOT_SUPPORTED"])
 async def test_require_authenticated_user_fail(test_authorisation):
-    response = await test_authorisation.authenticated_user_required(view_func)(
-        request=MOCK_REQUEST
-    )
+    response = await test_authorisation.authenticated_user_required(view_func)(request=MOCK_REQUEST)
     assert response.status_code == 401
 
 
@@ -150,22 +142,15 @@ async def test_require_authenticated_user_bad_request(test_authorisation):
     ids=CONFIGS_AUTHENTICATED_USERS.keys(),
 )
 def test_get_user_infos_from_access_token_success(test_authorisation):
-    response = test_authorisation.get_user_infos_from_access_token(
-        access_token=MOCK_TOKEN
-    )
+    response = test_authorisation.get_user_infos_from_access_token(access_token=MOCK_TOKEN)
     assert response.subject == MOCK_SUB
     assert response.issuer == MOCK_ISS
 
 
 @pytest.mark.parametrize("config_file", CONFIGS.values(), ids=CONFIGS.keys())
 def test_get_user_infos_from_access_token_fail(test_authorisation):
-    assert (
-        test_authorisation.get_user_infos_from_access_token(access_token="bad token")
-        == None
-    )
-    assert (
-        test_authorisation.get_user_infos_from_access_token(access_token=None) == None
-    )
+    assert test_authorisation.get_user_infos_from_access_token(access_token="bad token") == None
+    assert test_authorisation.get_user_infos_from_access_token(access_token=None) == None
 
 
 @pytest.mark.parametrize(

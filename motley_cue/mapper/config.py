@@ -36,9 +36,7 @@ class Config:
         if config_parser.has_section("mapper"):
             config_mapper = config_parser["mapper"]
         else:
-            raise InternalException(
-                "No [mapper] configuration found in configuration file!"
-            )
+            raise InternalException("No [mapper] configuration found in configuration file!")
         # log level
         self.__log_level = config_mapper.get("log_level", logging.WARNING)
         # log file
@@ -55,9 +53,7 @@ class Config:
         self.__otp = OTPConfig(otp_dict)
         # trusted OPs
         authz_sections = [
-            section
-            for section in config_parser.sections()
-            if section.startswith("authorisation")
+            section for section in config_parser.sections() if section.startswith("authorisation")
         ]
         self.__trusted_ops = []
         self.__authorisation = {}
@@ -65,9 +61,7 @@ class Config:
             op_url = config_parser[section].get("op_url", None)
             if op_url is not None:
                 self.__trusted_ops.append(op_url)
-                self.__authorisation[canonical_url(op_url)] = dict(
-                    config_parser[section].items()
-                )
+                self.__authorisation[canonical_url(op_url)] = dict(config_parser[section].items())
 
     def get_authorisation(self, op_url):
         """Return authorisation section in configuration for OP given by URL"""
@@ -141,8 +135,7 @@ class Config:
                 logging.getLogger(__name__).debug("Read config from %s", files_read)
                 return Config(config_parser)
         raise InternalException(
-            "No configuration file found at given or default locations: "
-            f"{list_of_config_files}"
+            "No configuration file found at given or default locations: " f"{list_of_config_files}"
         )
 
     @staticmethod
@@ -189,9 +182,7 @@ def to_bool(bool_str):
         return True
     if bool_str.lower() == "false":
         return False
-    raise InternalException(
-        f"Error reading config file: unrecognised boolean value {bool_str}."
-    )
+    raise InternalException(f"Error reading config file: unrecognised boolean value {bool_str}.")
 
 
 def to_list(list_str):
@@ -272,9 +263,7 @@ class OPAuthZ:
             )
 
         if len(self.authorised_users) > 0:
-            user_has_sub = (
-                lambda user_infos: user_infos.subject in self.authorised_users
-            )
+            user_has_sub = lambda user_infos: user_infos.subject in self.authorised_users
             req.add_requirement(IsTrue(user_has_sub))
 
         all_req = AllOf()
@@ -288,9 +277,7 @@ class OPAuthZ:
         for API admins.
         """
         if len(self.authorised_admins) > 0:
-            user_has_sub = (
-                lambda user_infos: user_infos.subject in self.authorised_admins
-            )
+            user_has_sub = lambda user_infos: user_infos.subject in self.authorised_admins
             return IsTrue(user_has_sub)
 
         return Unsatisfiable()

@@ -45,9 +45,7 @@ def test_public_endpoints_no_patch(test_api, endpoint):
 @pytest.mark.parametrize("method_to_patch,callback", [("", Info.callback_valid)])
 def test_info_endpoint(test_api, supported_ops):
     response = test_api.get(Info.url)
-    assert [
-        url.rstrip("/") for url in response.json()["supported_OPs"]
-    ] == supported_ops
+    assert [url.rstrip("/") for url in response.json()["supported_OPs"]] == supported_ops
 
 
 @pytest.mark.parametrize(

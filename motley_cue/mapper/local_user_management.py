@@ -115,9 +115,7 @@ class LocalUserManager:
             logging.getLogger(__name__).error(
                 "Something went wrong when trying to get userinfo for feudal."
             )
-            raise InternalServerError(
-                "Something went wrong when trying to retrieve user info."
-            )
+            raise InternalServerError("Something went wrong when trying to retrieve user info.")
         # build input for feudalAdapter
         data = {
             "state_target": state_target.name,

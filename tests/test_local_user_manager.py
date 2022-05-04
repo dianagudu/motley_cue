@@ -103,9 +103,7 @@ def test_admin_suspend_success(test_local_user_manager_patched):
 
 
 @pytest.mark.parametrize("mocker", [mock_exception()])
-def test_admin_suspend_fail(
-    test_local_user_manager_patched, test_internal_server_error
-):
+def test_admin_suspend_fail(test_local_user_manager_patched, test_internal_server_error):
     with pytest.raises(test_internal_server_error):
         test_local_user_manager_patched.admin_suspend(sub=MOCK_SUB, iss=MOCK_ISS)
 
@@ -150,10 +148,7 @@ def test_admin_resume_fail(test_local_user_manager_patched, test_internal_server
             for state in ["deployed", "suspended", "limited", "pending"]
             for username in ["not_same_user", "", None]
         ],
-        *[
-            (mock_not_deployed_result(), username, False)
-            for username in ["user", "", None]
-        ],
+        *[(mock_not_deployed_result(), username, False) for username in ["user", "", None]],
         *[
             (mock_status_result(state="rejected"), username, False)
             for username in ["user", "", None]
@@ -164,9 +159,7 @@ def test_admin_resume_fail(test_local_user_manager_patched, test_internal_server
         ],
     ],
 )
-def test_verify_user_success(
-    test_local_user_manager_patched, username: str, verified: bool
-):
+def test_verify_user_success(test_local_user_manager_patched, username: str, verified: bool):
     response = test_local_user_manager_patched.verify_user({}, username)
     assert set(response.keys()) == set(["state", "verified"])
     assert response["verified"] == verified
@@ -209,9 +202,7 @@ def test_verify_user_fail(
         mock_exception(),
     ],
 )
-def test_reach_state_no_userinfo(
-    test_local_user_manager_patched, test_internal_server_error
-):
+def test_reach_state_no_userinfo(test_local_user_manager_patched, test_internal_server_error):
     with pytest.raises(test_internal_server_error):
         state = 0  # any number (of State type)
         test_local_user_manager_patched._reach_state(None, state)

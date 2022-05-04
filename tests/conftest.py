@@ -9,9 +9,7 @@ from .utils import MockTokenManager, MockUser, MockBaseFlaat
 
 
 @pytest.fixture()
-def test_api(
-    config_file, method_to_patch: str, callback: Callable[..., Dict], monkeypatch
-):
+def test_api(config_file, method_to_patch: str, callback: Callable[..., Dict], monkeypatch):
     with monkeypatch.context() as mp:
         # mock the flaat UserInfos class
         import flaat
@@ -64,9 +62,7 @@ def test_local_user_manager():
 
 
 @pytest.fixture()
-def test_local_user_manager_patched(
-    monkeypatch, mocker: Callable[[str, str], Callable]
-):
+def test_local_user_manager_patched(monkeypatch, mocker: Callable[[str, str], Callable]):
     with monkeypatch.context() as mp:
         # mock User class to only contain a mock reach_state method,
         # which returns a valid response, either successful or failed

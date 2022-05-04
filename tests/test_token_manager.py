@@ -117,9 +117,7 @@ async def test_token_manager_inject_token_replace_otp(test_token_manager):
         return {"request_token": request_token, "header_token": header_token}
 
     test_token_manager.generate_otp(MOCK_TOKEN)
-    result = await mock_func(
-        request=MOCK_OTP_REQUEST, header=MOCK_OTP_HEADERS["Authorization"]
-    )
+    result = await mock_func(request=MOCK_OTP_REQUEST, header=MOCK_OTP_HEADERS["Authorization"])
     assert result["request_token"] == MOCK_TOKEN
     assert result["header_token"] == MOCK_TOKEN
 
