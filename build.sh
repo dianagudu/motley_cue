@@ -69,6 +69,7 @@ ubuntu_bionic_install_dependencies() {
     apt-get -y install python3.8 python3.8-dev python3.8-venv python3-pip libffi-dev
     update-alternatives --install /usr/bin/python3 python /usr/bin/python3.8 1
     python3 -m pip install -U pip
+    git config --global --add safe.directory /tmp/build/$PACKAGE
 }
 
 rocky8_install_dependencies() {
@@ -95,6 +96,7 @@ opensuse15_install_dependencies() {
     pip3 install virtualenv || {
         /usr/local/bin/pip3 install virtualenv
     }
+    git config --global --add safe.directory /tmp/build/$PACKAGE
 }
 centos7_patch_rpm() {
     # Force RPM's python-bytecompile script to use python3
