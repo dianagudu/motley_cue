@@ -1,4 +1,4 @@
-motley-cue (0.2.1-3) UNRELEASED; urgency=medium
+motley-cue (0.3.0-1) UNRELEASED; urgency=medium
 
   [ Marcus Hardt ]
   * Initial go for packageing
@@ -31,5 +31,7 @@ motley-cue (0.2.1-3) UNRELEASED; urgency=medium
   * Add support for additional_groups in feudal conf
   * Add flaat 1.0.1 -> jwt verification fixes
   * Add feudalAdapter 0.4.2 -> home base config
+  * New feature: support access tokens longer than 1k with one-time tokens
+  * Add flaat 1.0.2 -> google support fix
 
- -- Diana Gudu <diana.gudu@kit.edu>  Tue, 19 Apr 2022 14:25:21 +0200
+ -- Diana Gudu <diana.gudu@kit.edu>  Wed, 04 May 2022 15:21:28 +0200
