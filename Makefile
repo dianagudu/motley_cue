@@ -344,7 +344,8 @@ publish-to-repo:
 preparedeb: distclean
 	@quilt pop -a || true
 	@debian/rules clean
-	( cd ..; tar czf ${PKG_NAME}_${VERSION}.orig.tar.gz --exclude-vcs --exclude=debian --exclude=.pc ${PKG_NAME_UNDERSCORES})
+	( cd ..; tar czf ${PKG_NAME}_${VERSION}.orig.tar.gz --exclude-from=$(PKG_NAME_UNDERSCORES)/.gitignore \
+		--exclude-vcs --exclude=debian --exclude-caches-all ${PKG_NAME_UNDERSCORES})
 
 .PHONY: debsource
 debsource: preparedeb
