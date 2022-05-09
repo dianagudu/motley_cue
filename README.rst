@@ -1,4 +1,4 @@
-.. image:: https://readthedocs.org/projects/motley-cue/badge/?version=latest)
+.. image:: https://readthedocs.org/projects/motley-cue/badge/?version=latest
     :target: https://motley-cue.readthedocs.io/
     :alt: RTD
 .. image:: https://github.com/dianagudu/motley_cue/actions/workflows/publish-docs.yml/badge.svg
