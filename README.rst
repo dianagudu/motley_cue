@@ -1,3 +1,6 @@
+.. image:: https://readthedocs.org/projects/motley-cue/badge/?version=latest)
+    :target: https://motley-cue.readthedocs.io/
+    :alt: RTD
 .. image:: https://github.com/dianagudu/motley_cue/actions/workflows/publish-docs.yml/badge.svg
     :target: https://dianagudu.github.io/motley_cue
     :alt: Docs
@@ -24,7 +27,7 @@ This is a service for mapping OIDC identities to local identities.
 
 For SSH integration, see `SSH OIDC <https://github.com/EOSC-Synergy/ssh-oidc>`_.
 
-For client-side software, see `mccli <https://dianagudu.github.io/mccli>`_.
+For client-side software, see `mccli <https://mccli.readthedocs.io/>`_.
 
 Compatibility
 -------------
@@ -34,7 +37,10 @@ motley_cue works with Python 3 (>= 3.7), and only on Linux.
 Documentation
 -------------
 
-The documentation is available at https://dianagudu.github.io/motley_cue/.
+The documentation is available at `readthedocs <https://motley-cue.readthedocs.io/>`_.
+
+..
+    or `GitHub Pages <https://dianagudu.github.io/motley_cue/>`_.
 
 .. inclusion-marker-do-not-remove
 

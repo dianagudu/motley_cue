@@ -122,5 +122,5 @@ async def verify_user(
 # Logo for redoc (currently disabled).
 # This must be at the end after all the routes have been set!
 # api.openapi()["info"]["x-logo"] = {
-#     "url": "https://dianagudu.github.io/motley_cue/_static/logos/motley-cue.png"
+#     "url": "https://motley-cue.readthedocs.io/en/latest/_static/logos/motley-cue.png"
 # }
