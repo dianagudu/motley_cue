@@ -51,4 +51,4 @@ Client
 
 To SSH into a server that supports OIDC authentication, you'll need to trigger the deployment of a local account by calling the ``/user/deploy`` endpoint and then get the local username via ``/user/get_status``.
 
-Or you can have a look at `mccli <https://dianagudu.github.io/mccli>`_, an SSH client wrapper that does all this for you and can integrate with the ``oidc-agent``.
+Or you can have a look at `mccli <https://mccli.readthedocs.io>`_, an SSH client wrapper that does all this for you and can integrate with the ``oidc-agent``.
