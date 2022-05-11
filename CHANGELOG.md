@@ -1,3 +1,29 @@
+<a name="v0.3.0"></a>
+# [v0.3.0](https://github.com/dianagudu/motley_cue/releases/tag/v0.3.0) - 09 May 2022
+
+Features
+=======
+- add support for long-tokens (fixes #33)
+
+Enhancements
+============
+- add home_base option for local unix to feudal config (feudal v0.4.3)
+- build package for centos 8
+
+Bug fixes
+========
+- fix linting errors
+- fix rpm packaging & make source rpms smaller by excluding unnecessary files
+- fix required versions for dependencies
+
+## What's Changed
+* Fix centos8 docker target by @marcvs in https://github.com/dianagudu/motley_cue/pull/38
+* Long tokens by @dianagudu in https://github.com/dianagudu/motley_cue/pull/39
+* **Full Changelog**: https://github.com/dianagudu/motley_cue/compare/v0.2.1...v0.3.0
+
+[Changes][v0.3.0]
+
+
 <a name="v0.2.1"></a>
 # [v0.2.1](https://github.com/dianagudu/motley_cue/releases/tag/v0.2.1) - 21 Mar 2022
 
@@ -193,6 +219,7 @@ Add unit testing
 [Changes][v0.0.8]
 
 
+[v0.3.0]: https://github.com/dianagudu/motley_cue/compare/v0.2.1...v0.3.0
 [v0.2.1]: https://github.com/dianagudu/motley_cue/compare/v0.2.0...v0.2.1
 [v0.2.0]: https://github.com/dianagudu/motley_cue/compare/v0.1.5...v0.2.0
 [v0.1.5]: https://github.com/dianagudu/motley_cue/compare/v0.1.4...v0.1.5
