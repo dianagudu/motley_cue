@@ -16,6 +16,9 @@
 .. image:: https://img.shields.io/badge/License-MIT-yellow.svg
     :target: https://opensource.org/licenses/MIT
     :alt: License: MIT
+.. image:: https://img.shields.io/github/v/release/dianagudu/motley_cue.svg
+   :target: https://github.com/dianagudu/motley_cue/releases/latest
+   :alt: Release: latest
 
 .. from-this-marker-in-docs
 
