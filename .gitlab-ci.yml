@@ -12,7 +12,7 @@ variables:
 build-centos-7:
   extends:
     - .build-centos-7
-    - .on-master
+    - .on-push
   script:
     - |
       # Force RPM's python-bytecompile script to use python3
