@@ -111,7 +111,7 @@ rpm_copy_output() {
     ls -l rpm/rpmbuild/RPMS/*/*
     ls -l rpm/rpmbuild/SRPMS/
     echo "-----"
-    mv rpm/rpmbuild/RPMS/x86_64/${PKG_NAME}*rpm $OUTPUT/$DIST/
+    mv rpm/rpmbuild/RPMS/*/${PKG_NAME}*rpm $OUTPUT/$DIST/
     mv rpm/rpmbuild/SRPMS/*rpm $OUTPUT/$DIST
 }
 
