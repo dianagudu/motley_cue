@@ -3,6 +3,11 @@ include:
   - 'https://git.scc.kit.edu/m-team/ci-voodoo/raw/master/ci-include/generic-ci.yml'
   - 'https://git.scc.kit.edu/m-team/ci-voodoo/raw/master/ci-include/pipeline-jobs-on-push.yml'
 
+variables:
+  STAGING_BRANCH_NAME: 'staging'
+  DOCKER_IMAGE_NAMESPACE: 'marcvs/build'
+  DOCKER_IMAGE_NAME: 'motley-cue'
+
 #build-centos-7:
 #  stage: build
 #  tags:
