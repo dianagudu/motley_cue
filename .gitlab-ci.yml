@@ -1,13 +1,20 @@
 ---
 include:
-  - 'https://git.scc.kit.edu/m-team/ci-voodoo/raw/master/ci-include/generic-ci.yml'
-  - 'https://git.scc.kit.edu/m-team/ci-voodoo/raw/master/ci-include/pipeline-jobs.yml'
+  - 'http://marcus.hardt-it.de/ci-voodoo/ci-include/generic-ci.yml'
+  - 'http://marcus.hardt-it.de/ci-voodoo/ci-include/pipeline-jobs.yml'
+  #- 'https://git.scc.kit.edu/m-team/ci-voodoo/raw/master/ci-include/generic-ci.yml'
+  #- 'https://git.scc.kit.edu/m-team/ci-voodoo/raw/master/ci-include/pipeline-jobs.yml'
 
 variables:
   STAGING_BRANCH_NAME: 'staging'
   DOCKER_IMAGE_NAMESPACE: 'marcvs/build'
   DOCKER_IMAGE_NAME: 'motley-cue'
 
+
+build-opensuse-leap-15.4:
+  extends:
+    - .build-opensuse-leap-154
+    - .on-push
 
 build-centos-7:
   extends:
