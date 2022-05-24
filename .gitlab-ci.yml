@@ -1,0 +1,26 @@
+---
+include:
+  - 'https://git.scc.kit.edu/m-team/ci-voodoo/raw/master/ci-include/generic-ci.yml'
+  - 'https://git.scc.kit.edu/m-team/ci-voodoo/raw/master/ci-include/pipeline-jobs.yml'
+
+variables:
+  STAGING_BRANCH_NAME: 'staging'
+  DOCKER_IMAGE_NAMESPACE: 'marcvs/build'
+  DOCKER_IMAGE_NAME: 'motley-cue'
+
+
+build-opensuse-leap-15.4:
+  extends:
+    - .build-opensuse-leap-154
+    - .on-push-and-master
+
+build-centos-7:
+  extends:
+    - .build-centos-7
+    - .on-push-and-master
+  script:
+    - |
+      # Force RPM's python-bytecompile script to use python3
+      sed "s@^default_python@default_python=python3\n#default_python@" -i /usr/lib/rpm/brp-python-bytecompile
+      echo "typing-extensions" >> requirements.txt
+    - make rpms
