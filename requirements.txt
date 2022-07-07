@@ -1,4 +1,4 @@
-feudalAdapter>=0.4.3
+feudalAdapter>=0.4.4
 flaat>=1.0.2
 fastapi==0.*
 uvicorn[standard]==0.*
