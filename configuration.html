@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Configuration &#8212; motley_cue</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/clipboard.min.js"></script>
     <script src="_static/copybutton.js"></script>
@@ -99,7 +100,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -117,14 +118,14 @@
           <div class="body" role="main">
             
   <section id="configuration">
-<span id="id1"></span><h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading">¶</a></h1>
 <p>Two configuration files are required:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">motley_cue.conf</span></code>: contains configuration options relating to <a class="reference internal" href="#authorisation">authorisation</a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">feudal_adapter.conf</span></code>: contains configuration options relating to the <a class="reference internal" href="#account-creation">account creation</a>.</p></li>
 </ul>
 <section id="configuration-templates">
-<h2>Configuration templates<a class="headerlink" href="#configuration-templates" title="Permalink to this headline">¶</a></h2>
+<h2>Configuration templates<a class="headerlink" href="#configuration-templates" title="Permalink to this heading">¶</a></h2>
 <p>Example config files explaining the options are included with <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code>. If you installed it via package manager, they will be located at <code class="docutils literal notranslate"><span class="pre">/etc/motley_cue</span></code>.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="configs/motley_cue_conf.html#motley-cue-conf"><span class="std std-ref">motley_cue.conf</span></a></p></li>
@@ -136,7 +137,7 @@
 </div>
 </section>
 <section id="config-files-search-paths">
-<h2>Config files search paths<a class="headerlink" href="#config-files-search-paths" title="Permalink to this headline">¶</a></h2>
+<h2>Config files search paths<a class="headerlink" href="#config-files-search-paths" title="Permalink to this heading">¶</a></h2>
 <p>The config files will be searched in several places. Once one is found no further config files will be considered.</p>
 <ul class="simple">
 <li><p><strong>motley_cue.conf</strong></p>
@@ -159,7 +160,7 @@
 </ul>
 </section>
 <section id="authorisation-configuration">
-<span id="authorisation"></span><h2>Authorisation configuration<a class="headerlink" href="#authorisation-configuration" title="Permalink to this headline">¶</a></h2>
+<span id="authorisation"></span><h2>Authorisation configuration<a class="headerlink" href="#authorisation-configuration" title="Permalink to this heading">¶</a></h2>
 <p>You can configure who is allowed to use your service in <code class="docutils literal notranslate"><span class="pre">motley_cue.conf</span></code>.</p>
 <p>You can support multiple OPs and configure authorisation for each OP separately. There are three options to authorise users from the supported OPs:</p>
 <ul class="simple">
@@ -210,7 +211,7 @@
 </div>
 </section>
 <section id="account-creation-configuration">
-<span id="account-creation"></span><h2>Account creation configuration<a class="headerlink" href="#account-creation-configuration" title="Permalink to this headline">¶</a></h2>
+<span id="account-creation"></span><h2>Account creation configuration<a class="headerlink" href="#account-creation-configuration" title="Permalink to this heading">¶</a></h2>
 <p>This is handled by the feudal adapter in <code class="docutils literal notranslate"><span class="pre">feudal_adapter.conf</span></code> (see the <a class="reference external" href="https://git.scc.kit.edu/feudal/feudalAdapterLdf">documentation</a> for details).</p>
 <p>Pay close attention to the following configurations:</p>
 <ul class="simple">
@@ -220,7 +221,7 @@
 </ul>
 </section>
 <section id="additional-configurations">
-<span id="id2"></span><h2>Additional configurations<a class="headerlink" href="#additional-configurations" title="Permalink to this headline">¶</a></h2>
+<span id="id2"></span><h2>Additional configurations<a class="headerlink" href="#additional-configurations" title="Permalink to this heading">¶</a></h2>
 <p class="rubric">One-time tokens</p>
 <p>To enable SSH support for large access tokens (longer than 1k), you can enable the use of one-time tokens in the <code class="docutils literal notranslate"><span class="pre">[mapper.otp]</span></code> section in <code class="docutils literal notranslate"><span class="pre">motley_cue.conf</span></code>.</p>
 <p>Calling the <code class="docutils literal notranslate"><span class="pre">/user/generate_otp</span></code> endpoint will generate a shorter, one-time token and store it in a local, encrypted database. This token can then be used as an SSH password instead of the access token, and the <code class="docutils literal notranslate"><span class="pre">/verify_user</span></code> will be able to verify the username with this one-time token by retrieving the corresponding access token from the database.</p>

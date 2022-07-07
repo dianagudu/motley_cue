@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>SSH Integration &#8212; motley_cue</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/clipboard.min.js"></script>
     <script src="_static/copybutton.js"></script>
@@ -96,7 +97,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -114,10 +115,10 @@
           <div class="body" role="main">
             
   <section id="ssh-integration">
-<span id="id1"></span><h1>SSH Integration<a class="headerlink" href="#ssh-integration" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>SSH Integration<a class="headerlink" href="#ssh-integration" title="Permalink to this heading">¶</a></h1>
 <p>A detailed documentation of all the required components to enable SSH access via OIDC with on-the-fly account provisioning can be found at: <a class="reference external" href="https://github.com/EOSC-synergy/ssh-oidc">https://github.com/EOSC-synergy/ssh-oidc</a>. A quick summary below.</p>
 <section id="pam">
-<h2>PAM<a class="headerlink" href="#pam" title="Permalink to this headline">¶</a></h2>
+<h2>PAM<a class="headerlink" href="#pam" title="Permalink to this heading">¶</a></h2>
 <p>You’ll need <a class="reference external" href="https://git.man.poznan.pl/stash/scm/pracelab/pam.git">this</a> PAM module that supports OIDC authentication by prompting the user for a token instead of a password.</p>
 <p>You can also install it from the <a class="reference external" href="http://repo.data.kit.edu/">http://repo.data.kit.edu/</a> repo:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt-get install pam-ssh-oidc
@@ -145,7 +146,7 @@ yum install pam-ssh-oidc
 <p>Note that this may enable password based logins that you need to disable separately.</p>
 </section>
 <section id="client">
-<h2>Client<a class="headerlink" href="#client" title="Permalink to this headline">¶</a></h2>
+<h2>Client<a class="headerlink" href="#client" title="Permalink to this heading">¶</a></h2>
 <p>To SSH into a server that supports OIDC authentication, you’ll need to trigger the deployment of a local account by calling the <code class="docutils literal notranslate"><span class="pre">/user/deploy</span></code> endpoint and then get the local username via <code class="docutils literal notranslate"><span class="pre">/user/get_status</span></code>.</p>
 <p>Or you can have a look at <a class="reference external" href="https://mccli.readthedocs.io">mccli</a>, an SSH client wrapper that does all this for you and can integrate with the <code class="docutils literal notranslate"><span class="pre">oidc-agent</span></code>.</p>
 </section>

@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Running &#8212; motley_cue</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/clipboard.min.js"></script>
     <script src="_static/copybutton.js"></script>
@@ -102,7 +103,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -120,7 +121,7 @@
           <div class="body" role="main">
             
   <section id="running">
-<span id="id1"></span><h1>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>Running<a class="headerlink" href="#running" title="Permalink to this heading">¶</a></h1>
 <p>If you installed <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> using a package manager, you can simply start the service by:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>systemctl start motley-cue
 </pre></div>
@@ -129,7 +130,7 @@
 <p>It is highly recommended to use HTTPS. The nginx site file installed with the package also provides an example configuration for that in the comments (see section on <a class="reference internal" href="#nginx"><span class="std std-ref">how to manually configure nginx with motley_cue</span></a> for more details).</p>
 <p>You will also need certificates for your server. Probably the simplest way to do that is by using <a class="reference external" href="https://letsencrypt.org/">https://letsencrypt.org/</a>.</p>
 <section id="development">
-<h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
+<h2>Development<a class="headerlink" href="#development" title="Permalink to this heading">¶</a></h2>
 <p>If you installed <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> with <code class="docutils literal notranslate"><span class="pre">pip</span></code>, for quick testing you can simply run it with <code class="docutils literal notranslate"><span class="pre">uvicorn</span></code> (as user with permissions to add users):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo motley_cue_uvicorn
 </pre></div>
@@ -137,7 +138,7 @@
 <p>The API will then be available at <a class="reference external" href="http://localhost:8080">http://localhost:8080</a>.</p>
 </section>
 <section id="production">
-<span id="id2"></span><h2>Production<a class="headerlink" href="#production" title="Permalink to this headline">¶</a></h2>
+<span id="id2"></span><h2>Production<a class="headerlink" href="#production" title="Permalink to this heading">¶</a></h2>
 <p>This section describes how to run <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> in production if you installed it with <code class="docutils literal notranslate"><span class="pre">pip</span></code>.
 If you used the package, these configuration options are already applied.</p>
 <p>To set up the production environment, we recommended using:</p>
@@ -149,7 +150,7 @@ If you used the package, these configuration options are already applied.</p>
 <p>The code examples below assume a python virtualenv at <code class="docutils literal notranslate"><span class="pre">/usr/lib/motley-cue</span></code>, where you have installed <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> and its dependencies. Adapt paths if necessary.</p>
 <p>Templates for all referred configuration files are provided with either the package or the <code class="docutils literal notranslate"><span class="pre">pip</span></code> installation.</p>
 <section id="gunicorn">
-<h3>gunicorn<a class="headerlink" href="#gunicorn" title="Permalink to this headline">¶</a></h3>
+<h3>gunicorn<a class="headerlink" href="#gunicorn" title="Permalink to this heading">¶</a></h3>
 <p>To configure <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> to run with <code class="docutils literal notranslate"><span class="pre">gunicorn</span></code>, you will need two additional configuration files.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="configs/gunicorn_conf.html#gunicorn-conf"><span class="std std-ref">gunicorn.conf.py</span></a>: config file for gunicorn with sane default values.</p></li>
@@ -162,7 +163,7 @@ If you used the package, these configuration options are already applied.</p>
 </ul>
 </section>
 <section id="systemd">
-<h3>systemd<a class="headerlink" href="#systemd" title="Permalink to this headline">¶</a></h3>
+<h3>systemd<a class="headerlink" href="#systemd" title="Permalink to this heading">¶</a></h3>
 <p>Create the <a class="reference internal" href="configs/motley_cue_service.html#motley-cue-service"><span class="std std-ref">service file</span></a> to run gunicorn under <code class="docutils literal notranslate"><span class="pre">systemd</span></code> and place it in <code class="docutils literal notranslate"><span class="pre">/lib/systemd/system/motley-cue.service</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">[</span>Unit<span class="o">]</span>
 <span class="nv">Description</span><span class="o">=</span>motley_cue with gunicorn service
@@ -187,7 +188,7 @@ If you used the package, these configuration options are already applied.</p>
 </div>
 </section>
 <section id="nginx">
-<span id="id3"></span><h3>nginx<a class="headerlink" href="#nginx" title="Permalink to this headline">¶</a></h3>
+<span id="id3"></span><h3>nginx<a class="headerlink" href="#nginx" title="Permalink to this heading">¶</a></h3>
 <p>An example <a class="reference internal" href="configs/nginx_motley_cue.html#nginx-motley-cue"><span class="std std-ref">site configuration</span></a> is provided below:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># # if you uncomment this block, make sure that the default site</span>
 <span class="c1"># # that might come with a clean nginx install is disabled</span>
@@ -227,7 +228,7 @@ server <span class="o">{</span>
 <p>Copy it to the appropriate location (e.g. <code class="docutils literal notranslate"><span class="pre">/etc/nginx/sites-enabled/nginx.motley_cue</span></code>) and reload <code class="docutils literal notranslate"><span class="pre">nginx</span></code>.</p>
 </section>
 <section id="config-files">
-<h3>Config files<a class="headerlink" href="#config-files" title="Permalink to this headline">¶</a></h3>
+<h3>Config files<a class="headerlink" href="#config-files" title="Permalink to this heading">¶</a></h3>
 <p>This is the list of the required configuration files, which are usually present when you install <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> with a package manager:</p>
 <div class="toctree-wrapper compound">
 <ul>

@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>For developers &#8212; motley_cue</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/clipboard.min.js"></script>
     <script src="_static/copybutton.js"></script>
@@ -96,7 +97,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -114,9 +115,9 @@
           <div class="body" role="main">
             
   <section id="for-developers">
-<span id="development"></span><h1>For developers<a class="headerlink" href="#for-developers" title="Permalink to this headline">¶</a></h1>
+<span id="development"></span><h1>For developers<a class="headerlink" href="#for-developers" title="Permalink to this heading">¶</a></h1>
 <section id="building-the-linux-packages">
-<h2>Building the Linux packages<a class="headerlink" href="#building-the-linux-packages" title="Permalink to this headline">¶</a></h2>
+<h2>Building the Linux packages<a class="headerlink" href="#building-the-linux-packages" title="Permalink to this heading">¶</a></h2>
 <p>To build the Linux packages, a Makefile is provided, which uses docker
 for building:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make dockerised_&lt;name&gt;
@@ -138,7 +139,7 @@ for building:</p>
 <p>The resulting files are copied out of the build container to the <code class="docutils literal notranslate"><span class="pre">../results</span></code> folder.</p>
 </section>
 <section id="docker-for-ssh-oidc">
-<h2>Docker for SSH-OIDC<a class="headerlink" href="#docker-for-ssh-oidc" title="Permalink to this headline">¶</a></h2>
+<h2>Docker for SSH-OIDC<a class="headerlink" href="#docker-for-ssh-oidc" title="Permalink to this heading">¶</a></h2>
 <p><a class="reference external" href="https://github.com/dianagudu/motley_cue_docker">motley_cue_docker</a> allows you to run the whole SSH-OIDC set-up in Docker containers.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
