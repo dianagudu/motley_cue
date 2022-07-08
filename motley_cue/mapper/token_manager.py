@@ -175,11 +175,11 @@ class SQLiteTokenDB(TokenDB):
         sql_get = "select at from tokenmap where otp=?"
         with self.connection:
             result = self.connection.execute(sql_get, [otp]).fetchall()
-        if len(result) == 0:
-            return None
-        if len(result) > 1:
-            logger.warning("Multiple entries found in token db for OTP: %s", otp)
-        return self.encryption.decrypt(result[0][0])
+            if len(result) == 0:
+                return None
+            if len(result) > 1:
+                logger.warning("Multiple entries found in token db for OTP: %s", otp)
+            return self.encryption.decrypt(result[0][0])
 
     def remove(self, otp: str) -> None:
         sql_del = "delete from tokenmap where otp=?"
