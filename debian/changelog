@@ -1,4 +1,4 @@
-motley-cue (0.3.0-2) UNRELEASED; urgency=medium
+motley-cue (0.3.0-3) UNRELEASED; urgency=medium
 
   [ Marcus Hardt ]
   * Initial go for packageing
@@ -34,5 +34,6 @@ motley-cue (0.3.0-2) UNRELEASED; urgency=medium
   * New feature: support access tokens longer than 1k with one-time tokens
   * Add flaat 1.0.2 -> google support fix
   * Add feudalAdapter 0.4.4 -> fix group name shortening for unix backend
+  * Add feudalAdapter 0.4.5 -> revert name shortening and fix duplicate unix groups
 
- -- Diana Gudu <diana.gudu@kit.edu>  Thu, 07 Jul 2022 18:48:45 +0200
+ -- Diana Gudu <diana.gudu@kit.edu>  Tue, 12 Jul 2022 17:57:28 +0200
