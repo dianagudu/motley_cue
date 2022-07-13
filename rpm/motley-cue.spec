@@ -68,7 +68,7 @@ the creation, deletion, and information of a user-account.
 
 %install
 make install DESTDIR=%{buildroot}
-./rpm/fix-venv-paths.sh %{buildroot} %{name}
+./rpm/fix-venv-paths.sh %{buildroot} %{name} %{_basedir}
 ./rpm/compile-semodules.sh %{installroot}%{se_dir}
 
 mkdir -p %{buildroot}{%{etc_dir},%{log_dir},%{run_dir},%{se_dir},/etc/nginx/conf.d,/lib/systemd/system}
@@ -141,8 +141,8 @@ cd $SAVED_DIR
     setsebool -P nis_enabled 1
 ) || true
 %endif
-systemctl enable %{name} nginx
-systemctl restart %{name} nginx
+systemctl enable %{name} nginx || true
+systemctl restart %{name} nginx || true
 
 %postun
 echo "Postun: $0 $1"
@@ -158,4 +158,4 @@ if [ $1 = 0 ]; then
     ) || true
     %endif
 fi
-systemctl restart nginx
+systemctl restart nginx || true

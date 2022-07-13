@@ -384,11 +384,11 @@ rpms: srpm rpm
 rpm: srctar
 	echo ${PATH}
 	pip --version
-	rpmbuild --define "_topdir ${PWD}/rpm/rpmbuild" --define "_build_id_links none" -bb  rpm/${PKG_NAME}.spec
+	rpmbuild --define "_basedir ${PWD}" --define "_topdir ${PWD}/rpm/rpmbuild" --define "_build_id_links none" -bb  rpm/${PKG_NAME}.spec
 
 .PHONY: srpm
 srpm: srctar
-	rpmbuild --define "_topdir ${PWD}/rpm/rpmbuild" -bs  rpm/${PKG_NAME}.spec
+	rpmbuild --define "_basedir ${PWD}" --define "_topdir ${PWD}/rpm/rpmbuild" -bs  rpm/${PKG_NAME}.spec
 
 .PHONY: install # called from specfile
 install:
