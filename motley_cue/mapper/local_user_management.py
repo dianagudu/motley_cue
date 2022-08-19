@@ -70,11 +70,7 @@ class LocalUserManager:
     def login_info(self):
         """Returns a dict containing the login information for the configured feudal backend."""
         try:
-            login_info = dict(
-                LDF_ADAPTER_CONFIG[
-                    f"backend.{LDF_ADAPTER_CONFIG['ldf_adapter']['backend']}.login_info"
-                ]
-            )
+            login_info = LDF_ADAPTER_CONFIG.login_info.to_dict()
         except Exception:  # pylint: disable=broad-except
             login_info = {}
         return login_info
@@ -132,6 +128,7 @@ class LocalUserManager:
                 raise Unauthorised(msg) from result
             raise InternalServerError(msg) from result
         except Exception as ex:
+            logging.getLogger(__name__).warning(ex)
             raise InternalServerError(
                 f"Something went wrong when trying to reach state {data['state_target']}"
             ) from ex
