@@ -1,5 +1,5 @@
-feudalAdapter>=0.4.5
-flaat>=1.0.2
+feudalAdapter>=0.5.0
+flaat>=1.1.5
 fastapi==0.*
 uvicorn[standard]==0.*
 gunicorn==20.*

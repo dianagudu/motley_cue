@@ -55,6 +55,7 @@ Requires: nginx >= 1.16.1
 %define log_dir /var/log/%{modname}
 %define etc_dir /etc/%{modname}
 %define run_dir /run/%{modname}
+%define lib_dir /var/lib/%{modname}
 
 %description
 This tool provides an OIDC-protected REST interface that allows requesting
@@ -71,8 +72,8 @@ make install DESTDIR=%{buildroot}
 ./rpm/fix-venv-paths.sh %{buildroot} %{name} %{_basedir}
 ./rpm/compile-semodules.sh %{installroot}%{se_dir}
 
-mkdir -p %{buildroot}{%{etc_dir},%{log_dir},%{run_dir},%{se_dir},/etc/nginx/conf.d,/lib/systemd/system}
-install %{installroot}%{etc_dir}/* %{buildroot}%{etc_dir}/
+mkdir -p %{buildroot}{%{etc_dir},%{log_dir},%{run_dir},%{se_dir},%{lib_dir},/etc/nginx/conf.d,/lib/systemd/system}
+cp -r %{installroot}%{etc_dir}/* %{buildroot}%{etc_dir}/
 install %{installroot}%{se_dir}/* %{buildroot}%{se_dir}/
 install %{installroot}/etc/nginx/nginx.motley_cue %{buildroot}/etc/nginx/conf.d/nginx.motley_cue.conf
 install %{installroot}/etc/systemd/system/motley-cue.service %{buildroot}/lib/systemd/system/
@@ -84,6 +85,7 @@ install %{installroot}/etc/systemd/system/motley-cue.service %{buildroot}/lib/sy
 %dir %{etc_dir}
 %dir %{log_dir}
 %dir %{run_dir}
+%dir %{lib_dir}
 %if 0%{?centos}
 %dir %{se_dir}
 %endif

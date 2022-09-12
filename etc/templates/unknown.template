@@ -1,0 +1,14 @@
+Dear admin,
+
+This is an unknown notification type. Something might be wrong with your configuration.
+
+Here's some information about the user:
+
+unique_id: ${unique_id}
+name: ${full_name}
+email: ${email}
+sub: ${sub}
+iss: ${iss}
+
+Best,
+Your humble email bot.

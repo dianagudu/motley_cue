@@ -2,3 +2,4 @@ etc/motley_cue.env etc/motley_cue
 etc/motley_cue.conf etc/motley_cue
 etc/feudal_adapter.conf etc/motley_cue
 etc/nginx.motley_cue etc/nginx/sites-available
+etc/templates etc/motley_cue

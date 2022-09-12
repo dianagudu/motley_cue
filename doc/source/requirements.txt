@@ -5,3 +5,4 @@ sphinx-copybutton
 sphinxcontrib-openapi
 mistune<2.0.0
 m2r==0.2.1
+docutils<0.19.0

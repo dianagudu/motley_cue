@@ -1,0 +1,12 @@
+Dear admin,
+
+This is a test notification for the approval of deployment requests to the host '${hostname}'.
+
+If you can read this message, the notification system is configured correctly. Here's a summary of your configuration:
+
+Notifier: ${notifier}
+Settings:
+${settings}
+
+Best,
+Your humble email bot.

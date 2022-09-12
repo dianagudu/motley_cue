@@ -1,0 +1,56 @@
+Dear admin,
+
+There has been an update to the following user's request access to the host '${hostname}':
+
+    unique_id: ${unique_id}
+    name: ${full_name}
+    email: ${email}
+
+Below are the backend-specific commands to create the local account for them.
+
+Creating the necessary local groups:
+====
+${groups_cmd}
+====
+
+Creating the local account:
+====
+${user_cmd}
+====
+
+Adding the user to local groups:
+====
+${memberships_cmd}
+====
+
+Fill in any necessary information.
+
+If you wish to accept this deployment as it is using feudal-adapter:
+====
+echo '{
+    "state_target": "accepted",
+    "user": {
+        "userinfo": {
+            "sub": "${sub}",
+            "iss": "${iss}"
+        }
+    }
+}' | feudal-adapter
+====
+
+If you wish to reject the deployment, fill in the reason for rejection in the command below and execute it:
+====
+echo '{
+    "state_target": "rejected",
+    "reason": "",
+    "user": {
+        "userinfo": {
+            "sub": "${sub}",
+            "iss": "${iss}"
+        }
+    }
+}' | feudal-adapter
+====
+
+Best,
+Your humble email bot.
