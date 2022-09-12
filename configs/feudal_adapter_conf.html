@@ -128,7 +128,7 @@
 
 <span class="k">[ldf_adapter]</span><span class="w"></span>
 
-<span class="c1">### backend </span><span class="w"></span>
+<span class="c1">### backend -- default: local_unix</span><span class="w"></span>
 <span class="c1"># The Backend to use. Currently supported:</span><span class="w"></span>
 <span class="c1">#  - local_unix</span><span class="w"></span>
 <span class="c1">#  - bwidm</span><span class="w"></span>
@@ -203,6 +203,62 @@
 <span class="c1"># couple of names. If set to yes, we will log all the names that will be</span><span class="w"></span>
 <span class="c1"># tried</span><span class="w"></span>
 <span class="na">log_username_creation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">no</span><span class="w"></span>
+
+<span class="k">[approval]</span><span class="w"></span>
+<span class="c1">#####################</span><span class="w"></span>
+<span class="c1">### Approval Section</span><span class="w"></span>
+<span class="c1"># Here we configure the approval workflow for deploying local accounts</span><span class="w"></span>
+
+<span class="c1">### enabled --  default: False</span><span class="w"></span>
+<span class="c1"># whether approval is required from local admin to deploy local accounts</span><span class="w"></span>
+<span class="c1"># enabled = False</span><span class="w"></span>
+
+<span class="c1">### user db location -- default: /var/lib/feudal/pending_users.db</span><span class="w"></span>
+<span class="c1"># currently, only sqlite is used as db for pending requests.</span><span class="w"></span>
+<span class="na">user_db_location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/var/lib/motley_cue/pending_users.db</span><span class="w"></span>
+
+<span class="c1">### notifier -- default: email</span><span class="w"></span>
+<span class="c1"># how to notify admins of incoming deployment requests; supported: email</span><span class="w"></span>
+<span class="c1"># to test that the configuration works, try `feudal-adapter --test`</span><span class="w"></span>
+<span class="na">notifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">email</span><span class="w"></span>
+
+<span class="c1">### [notifier.*] configurations specific to each notifier</span><span class="w"></span>
+
+<span class="k">[notifier.email]</span><span class="w"></span>
+<span class="c1">################</span><span class="w"></span>
+<span class="c1">### configure email notifier (via SMTP)</span><span class="w"></span>
+
+<span class="c1">## smtp server for sending emails -- default: localhost</span><span class="w"></span>
+<span class="c1">## examples: smarthost.kit.edu, smtp.gmail.com</span><span class="w"></span>
+<span class="c1"># smtp_server = localhost</span><span class="w"></span>
+
+<span class="c1">## port smtp server listens on --  default: 25</span><span class="w"></span>
+<span class="c1">## gmail SSL port: 465</span><span class="w"></span>
+<span class="c1"># smtp_port = 25</span><span class="w"></span>
+
+<span class="c1">## use ssl -- default: False</span><span class="w"></span>
+<span class="c1"># use_ssl = False</span><span class="w"></span>
+
+<span class="c1">## email address to send the notification emails from -- default: admin@localhost</span><span class="w"></span>
+<span class="c1">## can use a test gmail address</span><span class="w"></span>
+<span class="c1"># sent_from = admin@localhost</span><span class="w"></span>
+
+<span class="c1">## password of email the notification emails are sent from -- default: None (no login needed)</span><span class="w"></span>
+<span class="c1"># required with test gmail address: create app password</span><span class="w"></span>
+<span class="c1"># sent_from_password = </span><span class="w"></span>
+
+<span class="c1">## email address of admin in charge of approving deployment requests -- default: admin@localhost</span><span class="w"></span>
+<span class="c1"># admin_email = admin@localhost</span><span class="w"></span>
+
+<span class="c1">## directory containing templates for notification emails -- default: /etc/feudal/templates</span><span class="w"></span>
+<span class="na">templates_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/etc/motley_cue/templates</span><span class="w"></span>
+
+<span class="c1"># [notifier.courier]</span><span class="w"></span>
+<span class="c1">################</span><span class="w"></span>
+<span class="c1">### configure Courier notifier</span><span class="w"></span>
+
+<span class="c1">## api key</span><span class="w"></span>
+<span class="c1"># api_key = </span><span class="w"></span>
 
 
 <span class="k">[assurance]</span><span class="w"></span>
@@ -308,6 +364,18 @@
 <span class="c1"># Use with care</span><span class="w"></span>
 <span class="c1">#strip_sub_groups = no</span><span class="w"></span>
 
+<span class="k">[login_info]</span><span class="w"></span>
+<span class="c1"># Static information displayed to the user when deployed to a service.</span><span class="w"></span>
+<span class="c1"># Each key and value field will be shown to the user in the &quot;Credentials&quot;</span><span class="w"></span>
+<span class="c1"># screen.</span><span class="w"></span>
+<span class="c1"># ssh_host defaults to &quot;localhost&quot; when missing</span><span class="w"></span>
+<span class="c1"># ssh_user is usually filled by the backend</span><span class="w"></span>
+<span class="c1"># all other information is optional and can be extended with any desired information</span><span class="w"></span>
+<span class="c1">#</span><span class="w"></span>
+<span class="na">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Local SSH Test Service</span><span class="w"></span>
+<span class="na">login_help</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Login via `mccli ssh {ssh_host}`.</span><span class="w"></span>
+<span class="na">ssh_host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">test-host</span><span class="w"></span>
+
 <span class="c1">###################################</span><span class="w"></span>
 <span class="c1">### Backend specific configuration.</span><span class="w"></span>
 <span class="c1"># You can find available backends in the</span><span class="w"></span>
@@ -330,16 +398,6 @@
 <span class="c1"># Allows using ssh keys, when they are found in the deployment request</span><span class="w"></span>
 <span class="na">deploy_user_ssh_keys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">no</span><span class="w"></span>
 
-<span class="k">[backend.local_unix.login_info]</span><span class="w"></span>
-<span class="c1"># Static information displayed to the user when deployed to a service.</span><span class="w"></span>
-<span class="c1"># Each key and value field will be shown to the user in the &quot;Credentials&quot;</span><span class="w"></span>
-<span class="c1"># screen.</span><span class="w"></span>
-<span class="c1"># ssh_host and ssh_user are usually filled by the backend</span><span class="w"></span>
-<span class="c1">#</span><span class="w"></span>
-<span class="na">Description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Local SSH Test Service</span><span class="w"></span>
-<span class="na">login_help</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Login via `mccli ssh {login_host}`.</span><span class="w"></span>
-<span class="na">ssh_host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">localhost</span><span class="w"></span>
-
 <span class="k">[backend.bwidm]</span><span class="w"></span>
 <span class="c1"># Configuration for the bwidm backend</span><span class="w"></span>
 
@@ -354,24 +412,12 @@
 <span class="c1">### log_outgoing_http_requests -- default: false</span><span class="w"></span>
 <span class="c1">#log_outgoing_http_requests = false</span><span class="w"></span>
 
-<span class="k">[backend.bwidm.auth]</span><span class="w"></span>
 <span class="c1"># HTTP basic auth to connect to BWIDM API</span><span class="w"></span>
 <span class="na">http_user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">foo</span><span class="w"></span>
 <span class="na">http_pass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">bar</span><span class="w"></span>
 
-<span class="k">[backend.bwidm.service]</span><span class="w"></span>
 <span class="c1"># The name of the service the user should be added to on BWIDM:</span><span class="w"></span>
-<span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">sshtest</span><span class="w"></span>
-
-<span class="k">[backend.bwidm.login_info]</span><span class="w"></span>
-<span class="c1"># Static information displayed to the user when deployed to a service.</span><span class="w"></span>
-<span class="c1"># Each key and value field will be shown to the user in the &quot;Credentials&quot;</span><span class="w"></span>
-<span class="c1"># screen.</span><span class="w"></span>
-<span class="c1"># ssh_host and ssh_user are usually filled by the backend</span><span class="w"></span>
-<span class="c1">#</span><span class="w"></span>
-<span class="na">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">SSH Test Service</span><span class="w"></span>
-<span class="na">ssh_host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">hdf-login.lsdf.kit.edu</span><span class="w"></span>
-<span class="na">ssh_host_alternative</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">hdf-ssh.data.kit.edu</span><span class="w"></span>
+<span class="na">service_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">sshtest</span><span class="w"></span>
 
 <span class="k">[backend.ldap]</span><span class="w"></span>
 <span class="c1"># Configuration for the ldap backend</span><span class="w"></span>
@@ -391,7 +437,7 @@
 <span class="na">host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ldap_server</span><span class="w"></span>
 
 <span class="c1"># port where server is listening, default: 1389 or 636 if TLS is enabled</span><span class="w"></span>
-<span class="na">port</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1389</span><span class="w"></span>
+<span class="c1"># port = 1389</span><span class="w"></span>
 
 <span class="c1"># OPTIONAL: admin credentials to authenticate to the ldap</span><span class="w"></span>
 <span class="c1"># NEEDED for modifying the LDAP</span><span class="w"></span>
@@ -402,20 +448,20 @@
 
 <span class="c1"># set to true if tls is enabled; default: False</span><span class="w"></span>
 <span class="c1"># not supported yet</span><span class="w"></span>
-<span class="na">tls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">False</span><span class="w"></span>
+<span class="c1"># tls = False</span><span class="w"></span>
 
 <span class="c1"># ldap base for user namespace; default: ou=users,dc=example</span><span class="w"></span>
 <span class="c1"># can include any number of ou / o / dc entries separated by commas</span><span class="w"></span>
-<span class="na">user_base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ou=usershpc,ou=users,dc=cesga,dc=es</span><span class="w"></span>
+<span class="c1"># user_base = ou=users,dc=example</span><span class="w"></span>
 
 <span class="c1"># user entry attributes containing uids for mapping a user; defaults: gecos &amp; uid</span><span class="w"></span>
 <span class="c1"># users have to be have (at least) the following objectClass: inetOrgPerson, posixAccount</span><span class="w"></span>
-<span class="na">attribute_oidc_uid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">labeledURI</span><span class="w"></span>
-<span class="na">attribute_local_uid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">uid</span><span class="w"></span>
+<span class="c1"># attribute_oidc_uid = gecos</span><span class="w"></span>
+<span class="c1"># attribute_local_uid = uid</span><span class="w"></span>
 
 <span class="c1"># ldap base for group namespace; default: ou=groups,dc=example</span><span class="w"></span>
 <span class="c1"># can include any number of ou / o / dc entries separated by commas</span><span class="w"></span>
-<span class="na">group_base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ou=groupshpc,ou=groups,dc=cesga,dc=es</span><span class="w"></span>
+<span class="c1"># group_base = ou=groups,dc=example</span><span class="w"></span>
 
 
 <span class="c1">#### Options only needed for full_access mode when accounts need to be created</span><span class="w"></span>
@@ -434,16 +480,6 @@
 <span class="c1">## GID range -- default 1000 -&gt; 60000</span><span class="w"></span>
 <span class="c1"># gid_min = 1000</span><span class="w"></span>
 <span class="c1"># gid_max = 60000</span><span class="w"></span>
-
-<span class="k">[backend.ldap.login_info]</span><span class="w"></span>
-<span class="c1"># Static information displayed to the user when deployed to a service.</span><span class="w"></span>
-<span class="c1"># Each key and value field will be shown to the user in the &quot;Credentials&quot;</span><span class="w"></span>
-<span class="c1"># screen.</span><span class="w"></span>
-<span class="c1"># ssh_host and ssh_user are usually filled by the backend</span><span class="w"></span>
-<span class="c1">#</span><span class="w"></span>
-<span class="na">Description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Local SSH Test Service</span><span class="w"></span>
-<span class="na">login_help</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Login via `mccli ssh {login_host}`.</span><span class="w"></span>
-<span class="na">ssh_host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">localhost</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
