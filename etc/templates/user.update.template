@@ -1,0 +1,11 @@
+Dear user,
+
+You are receiving this email because there has been an update to your local group memberships for your account on host '${hostname}', corresponding to the federated account identified by:
+
+    sub: ${sub}
+    iss: ${iss}
+
+The update request has been submitted for approval to the site admin. You might NOT be notified if your request has been processed.
+
+Best,
+Your humble email bot.

@@ -1,0 +1,13 @@
+Dear user,
+
+You are receiving this email because there has been an update to your request to access '${hostname}' via your federated account identified by:
+
+    sub: ${sub}
+    iss: ${iss}
+
+The updated request has been re-submitted for approval to the site admin.
+
+Please check again to see if your request has been accepted. You might NOT be notified if your request has been processed.
+
+Best,
+Your humble email bot.
