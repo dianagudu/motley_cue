@@ -110,10 +110,11 @@ This is handled by the feudal adapter in ``feudal_adapter.conf`` (see the `docum
 
 Pay close attention to the following configurations:
 
-- **backend**: how are the users managed locally (e.g. local UNIX accounts, LDAP, ...)
+- **backend**: how are the users managed locally (e.g. local UNIX accounts, `LDAP <https://git.scc.kit.edu/feudal/feudalAdapterLdf/-/blob/master/LDAP.md>`_, ...)
 - **assurance**: specifying minimum acceptable assurance (according to the `REFEDS Assurance Framework <https://refeds.org/assurance>`_)
 - **username generator**: how local usernames are generated for users (e.g. trying to honour incoming ``preferred username`` from the OP, or using pooled accounts with a custom prefix)
 
+An `approval workflow <https://git.scc.kit.edu/feudal/feudalAdapterLdf/-/tree/master#approval-workflow>`_ is supported as well, where local admins can approve or reject account creation requests. The notification system supported so far is email.
 
 .. _additional_configurations:
 

@@ -8,20 +8,15 @@ The recommended way to install ``motley_cue`` is via your Linux package manager.
 
 Supported Linux distributions:
 
-- Debian: 10, 11, 12
-- Ubuntu: 18.04, 20.04
-- CentOS: 7, Stream 8
-- Rocky Linux: 8, 8.5
-- openSUSE: Tumbleweed, Leap 15.3
+- Debian
+- Ubuntu
+- CentOS
+- Rocky Linux
+- openSUSE
 
-Since v.0.2.0, the following distributions are no longer supported due to having reached EOL:
+We strive to support all LTS releases of the above distributions, as well as the latest stable release. Please check the repository at http://repo.data.kit.edu for all supported distributions and versions.
 
-- CentOS 8
-- openSUSE Leap 15.2
-
-The packages are available at http://repo.data.kit.edu/. Follow the instructions there to support the repository on your system.
-
-Then install ``motley_cue`` with your favourite package manager:
+Follow the instructions there to support the repository on your system. Then install ``motley_cue`` with your favourite package manager:
 
 .. code-block:: bash
 

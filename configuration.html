@@ -215,10 +215,11 @@
 <p>This is handled by the feudal adapter in <code class="docutils literal notranslate"><span class="pre">feudal_adapter.conf</span></code> (see the <a class="reference external" href="https://git.scc.kit.edu/feudal/feudalAdapterLdf">documentation</a> for details).</p>
 <p>Pay close attention to the following configurations:</p>
 <ul class="simple">
-<li><p><strong>backend</strong>: how are the users managed locally (e.g. local UNIX accounts, LDAP, …)</p></li>
+<li><p><strong>backend</strong>: how are the users managed locally (e.g. local UNIX accounts, <a class="reference external" href="https://git.scc.kit.edu/feudal/feudalAdapterLdf/-/blob/master/LDAP.md">LDAP</a>, …)</p></li>
 <li><p><strong>assurance</strong>: specifying minimum acceptable assurance (according to the <a class="reference external" href="https://refeds.org/assurance">REFEDS Assurance Framework</a>)</p></li>
 <li><p><strong>username generator</strong>: how local usernames are generated for users (e.g. trying to honour incoming <code class="docutils literal notranslate"><span class="pre">preferred</span> <span class="pre">username</span></code> from the OP, or using pooled accounts with a custom prefix)</p></li>
 </ul>
+<p>An <a class="reference external" href="https://git.scc.kit.edu/feudal/feudalAdapterLdf/-/tree/master#approval-workflow">approval workflow</a> is supported as well, where local admins can approve or reject account creation requests. The notification system supported so far is email.</p>
 </section>
 <section id="additional-configurations">
 <span id="id2"></span><h2>Additional configurations<a class="headerlink" href="#additional-configurations" title="Permalink to this heading">¶</a></h2>
