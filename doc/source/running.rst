@@ -109,6 +109,7 @@ This is the list of the required configuration files, which are usually present 
     /etc/motley_cue/motley_cue.conf  <configs/motley_cue_conf>
     /etc/motley_cue/feudal_adapter.conf <configs/feudal_adapter_conf>
     /etc/motley_cue/motley_cue.env <configs/motley_cue_env>
+    /etc/motley_cue/templates <configs/templates>
     /lib/systemd/system/motley-cue.service <configs/motley_cue_service>
     /etc/nginx/sites-available/nginx.motley_cue <configs/nginx_motley_cue>
     /usr/lib/motley-cue/etc/gunicorn/gunicorn.conf.py <configs/gunicorn_conf>
