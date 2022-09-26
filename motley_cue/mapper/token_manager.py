@@ -334,7 +334,7 @@ class TokenManager:
             if "request" in kwargs:
                 header = kwargs["request"].headers.get("authorization", None)
             if header and header.startswith("Bearer "):
-                return header.lstrip("Bearer ")
+                return header[len("Bearer "):]
             return None
 
         def _replace_token_in_kwargs(kwargs: dict, token: str) -> dict:
