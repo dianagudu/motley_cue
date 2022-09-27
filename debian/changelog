@@ -1,4 +1,4 @@
-motley-cue (0.4.0-1) UNRELEASED; urgency=medium
+motley-cue (0.4.1-1) UNRELEASED; urgency=medium
 
   [ Marcus Hardt ]
   * Initial go for packageing
@@ -37,5 +37,6 @@ motley-cue (0.4.0-1) UNRELEASED; urgency=medium
   * Add feudalAdapter 0.4.5 -> revert name shortening and fix duplicate unix groups
   * Add feudalAdapter 0.5.0 -> approval workflow
   * Add flaat 1.1.5 -> fixes and support for new EGI OP
+  * Fix #49 one-time tokens header parse
 
- -- Diana Gudu <diana.gudu@kit.edu>  Mon, 12 Sep 2022 17:10:06 +0200
+ -- Diana Gudu <diana.gudu@kit.edu>  Tue, 27 Sep 2022 14:40:04 +0200
