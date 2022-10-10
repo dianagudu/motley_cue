@@ -12,6 +12,7 @@ import json
 import sqlite3
 import sqlitedict
 from cryptography.fernet import Fernet
+from pathlib import Path
 
 from .config import OTPConfig
 from .exceptions import InternalException
@@ -49,6 +50,7 @@ class Encryption:
         """
         try:
             key = Fernet.generate_key()
+            Path(keyfile).parent.mkdir(mode=0o700, parents=True, exist_ok=True)
             open(keyfile, "xb").write(key)  # pylint: disable=consider-using-with
             os.chmod(keyfile, 0o600)
             logger.debug("Created secret key for encryption and saved it to %s.", keyfile)
@@ -123,7 +125,9 @@ class SQLiteTokenDB(TokenDB):
     def __init__(self, location: str, keyfile: str) -> None:
         self.encryption = Encryption(keyfile)
         # new db connection for location (does not need to exist)
-        self.connection = sqlite3.connect(self.rename_location(location))
+        db_name = self.rename_location(location)
+        Path(db_name).parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        self.connection = sqlite3.connect(db_name)
         with self.connection:  # con.commit() is called automatically afterwards on success
             # create table
             self.connection.execute(
@@ -199,8 +203,10 @@ class SQLiteDictTokenDB(TokenDB):
 
     def __init__(self, location: str, keyfile: str) -> None:
         self.encryption = Encryption(keyfile)
+        db_name = self.rename_location(location)
+        Path(db_name).parent.mkdir(mode=0o700, parents=True, exist_ok=True)
         self.database = sqlitedict.SqliteDict(
-            self.rename_location(location),
+            db_name,
             tablename="tokenmap",
             flag="c",
             encode=self._encrypted_encode,
