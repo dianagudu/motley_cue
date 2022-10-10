@@ -20,7 +20,7 @@ def test_encryption(test_encryption):
     secret = "this is my secret string to be encrypted"
 
     encryption = test_encryption(keyfile)
-    assert oct(os.stat(keyfile).st_mode & 0o777) == "0o600"
+    assert oct(os.stat(keyfile).st_mode & 0o777) == "0o400"
     assert secret == encryption.decrypt(encryption.encrypt(secret))
 
     os.remove(keyfile)
