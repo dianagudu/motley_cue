@@ -52,7 +52,7 @@ class Encryption:
             key = Fernet.generate_key()
             Path(keyfile).parent.mkdir(mode=0o700, parents=True, exist_ok=True)
             open(keyfile, "xb").write(key)  # pylint: disable=consider-using-with
-            os.chmod(keyfile, 0o600)
+            os.chmod(keyfile, 0o400)
             logger.debug("Created secret key for encryption and saved it to %s.", keyfile)
         except FileExistsError:
             logger.debug("Key already exists in %s, nothing to do here.", keyfile)
