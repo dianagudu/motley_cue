@@ -1,3 +1,56 @@
+<a name="v0.4.3"></a>
+# [v0.4.3](https://github.com/dianagudu/motley_cue/releases/tag/v0.4.3) - 01 Jan 0001
+
+Enhancements
+===========
+- change default install locations for token db (`/var/cache/motley_cue`) and encryption key (`/var/lib/motley_cue`)
+- require feudalAdapter v0.5.3 -> fix pending db init
+
+Bug fixes
+=======
+- create all parent folders for token db & encryption keyfile if they don't exist
+- fix encryption key permissions to 0o400
+
+## What's Changed
+* V0.4.2 by @dianagudu in https://github.com/dianagudu/motley_cue/pull/50
+
+
+**Full Changelog**: https://github.com/dianagudu/motley_cue/compare/v0.4.2...v0.4.3
+
+[Changes][v0.4.3]
+
+
+<a name="v0.4.2"></a>
+# [v0.4.2](https://github.com/dianagudu/motley_cue/releases/tag/v0.4.2) - 01 Jan 0001
+
+Enhancements
+============
+- update EGI OP in default motley_cue.conf to new keycloak endpoint
+
+Bug fixes
+=======
+- fix issue with multiple group renaming calls (in feudalAdapter v0.5.2)
+- temporary fix for long group names for punch4nfdi (in feudalAdapter v0.5.2)
+
+## What changed
+**Full Changelog**: https://github.com/dianagudu/motley_cue/compare/v0.4.1...v0.4.2
+
+[Changes][v0.4.2]
+
+
+<a name="v0.4.1"></a>
+# [v0.4.1](https://github.com/dianagudu/motley_cue/releases/tag/v0.4.1) - 11 Oct 2022
+
+Bug fixes
+========
+- fix #49: long tokens occasional fail due to bug in getting token from header
+
+## What's Changed
+**Full Changelog**: https://github.com/dianagudu/motley_cue/compare/v0.4.0...v0.4.1
+
+[Changes][v0.4.1]
+
+
 <a name="v0.4.0"></a>
 # [v0.4.0](https://github.com/dianagudu/motley_cue/releases/tag/v0.4.0) - 14 Sep 2022
 
@@ -244,6 +297,9 @@ Add unit testing
 [Changes][v0.0.8]
 
 
+[v0.4.3]: https://github.com/dianagudu/motley_cue/compare/v0.4.2...v0.4.3
+[v0.4.2]: https://github.com/dianagudu/motley_cue/compare/v0.4.1...v0.4.2
+[v0.4.1]: https://github.com/dianagudu/motley_cue/compare/v0.4.0...v0.4.1
 [v0.4.0]: https://github.com/dianagudu/motley_cue/compare/v0.3.0...v0.4.0
 [v0.3.0]: https://github.com/dianagudu/motley_cue/compare/v0.2.1...v0.3.0
 [v0.2.1]: https://github.com/dianagudu/motley_cue/compare/v0.2.0...v0.2.1
