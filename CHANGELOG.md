@@ -1,5 +1,5 @@
 <a name="v0.4.3"></a>
-# [v0.4.3](https://github.com/dianagudu/motley_cue/releases/tag/v0.4.3) - 01 Jan 0001
+# [v0.4.3](https://github.com/dianagudu/motley_cue/releases/tag/v0.4.3) - 11 Oct 2022
 
 Enhancements
 ===========
@@ -21,7 +21,7 @@ Bug fixes
 
 
 <a name="v0.4.2"></a>
-# [v0.4.2](https://github.com/dianagudu/motley_cue/releases/tag/v0.4.2) - 01 Jan 0001
+# [v0.4.2](https://github.com/dianagudu/motley_cue/releases/tag/v0.4.2) - 11 Oct 2022
 
 Enhancements
 ============
