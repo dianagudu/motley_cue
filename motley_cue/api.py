@@ -3,6 +3,7 @@ This module contains the definition of motley_cue's REST API.
 """
 from fastapi import FastAPI, Depends, Request, Query, Header
 from fastapi.exceptions import RequestValidationError
+from fastapi.responses import HTMLResponse
 from pydantic import ValidationError
 
 from .dependencies import mapper, Settings
@@ -12,7 +13,6 @@ from .mapper.exceptions import (
     validation_exception_handler,
     request_validation_exception_handler,
 )
-
 
 settings = Settings(docs_url=mapper.config.docs_url)
 api = FastAPI(
@@ -117,6 +117,11 @@ async def verify_user(
     :param username: username to compare to local username
     """
     return mapper.verify_user(request, username)
+
+
+@api.get("/privacy", response_class=HTMLResponse)
+async def privacy():
+    return mapper.get_privacy_policy()
 
 
 # Logo for redoc (currently disabled).

@@ -51,6 +51,11 @@ class Config:
         if config_parser.has_section("mapper.otp"):
             otp_dict = dict(config_parser["mapper.otp"])
         self.__otp = OTPConfig(otp_dict)
+        # privacy policy
+        privacy_dict = {}
+        if config_parser.has_section("privacy"):
+            privacy_dict = dict(config_parser["privacy"])
+        self.__privacy = PrivacyConfig(privacy_dict)
         # trusted OPs
         authz_sections = [
             section for section in config_parser.sections() if section.startswith("authorisation")
@@ -94,8 +99,13 @@ class Config:
 
     @property
     def otp(self):
-        """Return whether OTPs are enabled"""
+        """Return OTP configuration"""
         return self.__otp
+
+    @property
+    def privacy(self):
+        """Return privacy policy configuration"""
+        return self.__privacy
 
     @property
     def verbosity(self):
@@ -298,3 +308,20 @@ class OTPConfig:
         self.backend = otp_config.get("backend", "sqlite").lower()
         self.db_location = otp_config.get("db_location", "/var/cache/motley_cue/tokenmap.db")
         self.keyfile = otp_config.get("keyfile", "/var/lib/motley_cue/motley_cue.key")
+
+
+@dataclass
+class PrivacyConfig:
+    """Class describing the privacy policy configuration"""
+
+    def __init__(self, privacy_config: dict) -> None:
+        """Initialises all fields from given dict or with default values,
+        and converts them to the appropriate type when necessary.
+
+        Args:
+            privacy_config (dict): ConfigParser section for privacy policy
+        """
+        self.privacy_contact = privacy_config.get("privacy_contact", "NOT CONFIGURED")
+        self.privacy_file = privacy_config.get(
+            "privacy_file", "/etc/motley_cue/privacystatement.md"
+        )

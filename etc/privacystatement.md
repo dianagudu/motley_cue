@@ -62,4 +62,4 @@ Personal data will be protected according to the [Code of Conduct for Service Pr
 
 ## Contact Information
 
-Service Operator: {Service Operator Email}
+Service Operator: {{privacy_contact}}

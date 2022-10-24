@@ -6,12 +6,14 @@ import logging
 import logging.handlers
 from fastapi import Request
 from fastapi.security import HTTPBearer
+from fastapi.responses import HTMLResponse
 
 from .config import Config
 from .authorisation import Authorisation
 from .local_user_management import LocalUserManager
 from .exceptions import Unauthorised
 from .token_manager import TokenManager
+from ..static import md_to_html
 
 
 class Mapper:
@@ -165,3 +167,23 @@ class Mapper:
         """
         userinfo = self.__authorisation.get_uid_from_request(request)
         return self.__lum.verify_user(userinfo, username)
+
+    def get_privacy_policy(self):
+        """Retrieve the privacy policy as html.
+
+        Returns dict with fields:
+        * content: html content containing the privacy policy
+        * status_code: HTTP status code
+        """
+        try:
+            html = md_to_html(
+                mdfile=self.config.privacy.privacy_file, title="motley-cue privacy policy"
+            )
+            html = html.replace("{{privacy_contact}}", self.config.privacy.privacy_contact)
+            return HTMLResponse(content=html, status_code=200)
+        except FileNotFoundError as e:
+            logging.getLogger(__name__).error("Privacy policy file not found: %s", e)
+            return HTMLResponse(content="Privacy policy not found", status_code=404)
+        except Exception as e:
+            logging.getLogger(__name__).error("Error retrieving privacy policy: %s", e)
+            return HTMLResponse(content=f"Error retrieving privacy policy", status_code=500)
