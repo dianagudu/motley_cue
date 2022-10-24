@@ -93,8 +93,13 @@ install %{installroot}/etc/init.d/motley-cue %{buildroot}/etc/init.d/
 %if 0%{?centos}
 %dir %{share_dir}
 %endif
-# %{venv_dir}/*
 %config(noreplace) %{etc_dir}/*
+%{venv_dir}/*
+%if 0%{?centos}
+%{share_dir}/*
+%else
+%exclude %{share_dir}/*
+%endif
 %config(noreplace) /etc/nginx/conf.d/nginx.motley_cue.conf
 /lib/systemd/system/motley-cue.service
 /usr/sbin/motley-cue
