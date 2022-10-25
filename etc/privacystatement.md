@@ -8,14 +8,12 @@ The service **motley-cue** is a service for mapping OIDC identities to local ide
 
 Users of the motley-cue service use it to map their OIDC identities to local identities. This is done by the user providing an OIDC access token to the service, and the service provisioning and providing a local identity to the user, if the user is authorised. The user can then use the local identity to access services that are protected by the service.
 
-Therefore, motley-cue receives these tokens and requests information about the user from the OIDC provider. The following information is requested from the OIDC provider, if supported by the OP:
+Therefore, motley-cue receives these tokens and requests information about the user from the OIDC provider. The following scopes requested from the OIDC provider, if supported by the OP:
 
 - openid
 - profile
-- preferred_username
 - email
 - eduperson_entitlement
-- eduperson_scoped_affiliation
 - eduperson_assurance
 
 Example of information released by Google when asked for the OpenID Scope:
