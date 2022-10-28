@@ -34,3 +34,5 @@ build-ubuntu-bionic:
       | sed s/"dh_virtualenv --python python3"/"dh_virtualenv --python python3.8"/ \
       > debian/new-rules
       cat debian/new-rules > debian/rules
+      make debsource
+      dpkg-buildpackage -uc -us
