@@ -31,6 +31,6 @@ build-ubuntu-bionic:
   script:
     - |
       cat debian/rules \
-      |sed s/"dh_virtualenv --python python3"/"dh_virtualenv --python python3.8"/
+      | sed s/"dh_virtualenv --python python3"/"dh_virtualenv --python python3.8"/ \
       > debian/new-rules
       cat debian/new-rules > debian/rules
