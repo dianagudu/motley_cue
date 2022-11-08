@@ -4,5 +4,5 @@ fastapi==0.*
 uvicorn[standard]==0.*
 gunicorn==20.*
 sqlitedict==2.*
-cryptography==37.*
+cryptography==38.*
 markdown==3.*
