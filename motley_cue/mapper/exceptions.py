@@ -7,6 +7,7 @@ from starlette.responses import JSONResponse
 from starlette.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_401_UNAUTHORIZED,
+    HTTP_404_NOT_FOUND,
     HTTP_500_INTERNAL_SERVER_ERROR,
 )
 
@@ -30,6 +31,13 @@ class InternalServerError(HTTPException):
 
     def __init__(self, message):
         super().__init__(status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail=message)
+
+
+class NotFound(HTTPException):
+    """Wrapper for HTTP Not Found error."""
+
+    def __init__(self, message: str):
+        super().__init__(status_code=HTTP_404_NOT_FOUND, detail=message)
 
 
 class MissingParameter(JSONResponse):

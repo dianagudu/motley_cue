@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse
 from .config import Config
 from .authorisation import Authorisation
 from .local_user_management import LocalUserManager
-from .exceptions import Unauthorised
+from .exceptions import Unauthorised, NotFound
 from .token_manager import TokenManager
 from ..static import md_to_html
 
@@ -79,6 +79,13 @@ class Mapper:
             "login_info": self.__lum.login_info(),
             "supported_OPs": self.__authorisation.trusted_op_list,
         }
+
+    def info_op(self, url: str):
+        """Return information about a given OP"""
+        info = self.__config.get_op_info(url)
+        if info is None:
+            raise NotFound(message="OP not supported")
+        return info
 
     def info_authorisation(self, request):
         """Return authorisation information for issuer of token.
@@ -177,7 +184,8 @@ class Mapper:
         """
         try:
             html = md_to_html(
-                mdfile=self.config.privacy.privacy_file, title="motley-cue privacy policy"
+                mdfile=self.config.privacy.privacy_file,
+                title="motley-cue privacy policy",
             )
             html = html.replace("{{privacy_contact}}", self.config.privacy.privacy_contact)
             return HTMLResponse(content=html, status_code=200)

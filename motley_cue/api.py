@@ -8,7 +8,7 @@ from pydantic import ValidationError
 
 from .dependencies import mapper, Settings
 from .routers import user, admin
-from .models import Info, InfoAuthorisation, VerifyUser, responses
+from .models import Info, InfoAuthorisation, InfoOp, VerifyUser, responses, ClientError
 from .mapper.exceptions import (
     validation_exception_handler,
     request_validation_exception_handler,
@@ -47,6 +47,10 @@ async def read_root():
                 "Authorisation information for specific OP; "
                 "requires valid access token from a supported OP."
             ),
+            "/info/op": (
+                "Information about a specific OP specified via a query parameter 'url'; "
+                "does not require an access token."
+            ),
             "/user": "User API; requires valid access token of an authorised user.",
             "/admin": (
                 "Admin API; requires valid access token of an authorised user with admin role."
@@ -73,7 +77,10 @@ async def info():
     dependencies=[Depends(mapper.user_security)],
     response_model=InfoAuthorisation,
     response_model_exclude_unset=True,
-    responses={**responses, 200: {"model": InfoAuthorisation}},
+    responses={
+        200: {"model": InfoAuthorisation},
+        404: {"model": ClientError},
+    },
 )
 @mapper.authenticated_user_required
 async def info_authorisation(
@@ -88,6 +95,24 @@ async def info_authorisation(
     * authentication with this OP
     """
     return mapper.info_authorisation(request)
+
+
+@api.get(
+    "/info/op",
+    response_model=InfoOp,
+    response_model_exclude_unset=True,
+    responses={**responses, 200: {"model": InfoOp}},
+)
+async def info_op(
+    request: Request,
+    url: str = Query(..., description="OP URL"),
+):  # pylint: disable=unused-argument
+    """Retrieve additional information for specific OP, such as required scopes.
+
+    \f
+    :param url: OP URL
+    """
+    return mapper.info_op(url)
 
 
 @api.get(

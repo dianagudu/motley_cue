@@ -14,7 +14,7 @@ import sqlitedict
 from cryptography.fernet import Fernet
 from pathlib import Path
 
-from .config import OTPConfig
+from .config import ConfigOTP
 from .exceptions import InternalException
 
 logger = logging.getLogger(__name__)
@@ -278,7 +278,7 @@ class TokenManager:
     - security: one-time use (remove mapping once it is used)
     """
 
-    def __init__(self, otp_config: OTPConfig) -> None:
+    def __init__(self, otp_config: ConfigOTP) -> None:
         """Any DB-related initialisations"""
         if otp_config.backend == "sqlite":
             self.__db = SQLiteTokenDB(otp_config.db_location, otp_config.keyfile)
@@ -293,7 +293,7 @@ class TokenManager:
         return self.__db
 
     @classmethod
-    def from_config(cls, otp_config: OTPConfig):
+    def from_config(cls, otp_config: ConfigOTP):
         """Load TokenManager from given config object"""
         if otp_config.use_otp:
             return cls(otp_config)
