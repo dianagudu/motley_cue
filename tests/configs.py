@@ -26,7 +26,7 @@ def load_config(s_config: str) -> ConfigParser:
     return config
 
 
-CONFIG_INVALID = load_config("")
+CONFIG_EMPTY = load_config("")
 
 CONFIG_NOT_SUPPORTED = load_config(
     f"""
