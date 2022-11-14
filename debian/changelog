@@ -1,4 +1,4 @@
-motley-cue (0.4.3-2) UNRELEASED; urgency=medium
+motley-cue (0.4.4-1) UNRELEASED; urgency=medium
 
   [ Marcus Hardt ]
   * Initial go for packageing
@@ -43,5 +43,6 @@ motley-cue (0.4.3-2) UNRELEASED; urgency=medium
   * Add feudalAdapter 0.5.3
   * fix default paths to token db and keyfile
   * add initd script for motley-cue
+  * fix versioning and packaging via pyproject.toml
 
- -- Diana Gudu <diana.gudu@kit.edu>  Fri, 14 Oct 2022 16:01:32 +0200
+ -- Diana Gudu <diana.gudu@kit.edu>  Mon, 14 Nov 2022 16:35:15 +0100
