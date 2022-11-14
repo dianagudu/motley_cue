@@ -3,7 +3,7 @@
 from typing import Optional
 from pydantic import BaseSettings, validator
 
-from .version import __version__
+from ._version import __version__
 from .mapper import Mapper, Config
 
 

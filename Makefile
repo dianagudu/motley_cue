@@ -36,9 +36,9 @@ info:
 default: sdist bdist_wheel
 
 sdist:
-	python3 ./setup.py sdist
+	python3 -m build --sdist
 bdist_wheel:
-	python3 ./setup.py bdist_wheel
+	python3 -m build --wheel
 
 dist: sdist bdist_wheel
 
@@ -373,7 +373,7 @@ virtualenv:
 		echo "PATH"; \
 		echo ${PATH}; \
 		pip --version; \
-		pip install -I -r requirements.txt; \
+		pip install -I -r requirements.txt build; \
 		pip freeze > venv/all_versions.txt; \
 	)
 
@@ -396,6 +396,6 @@ install:
 	cp -af venv/* ${DESTDIR}/usr/lib/${PKG_NAME}
 	( \
 		source ${DESTDIR}/usr/lib/${PKG_NAME}/bin/activate; \
-		python3 ./setup.py install --prefix ${DESTDIR}/usr/lib/${PKG_NAME}; \
+		pip install . --prefix ${DESTDIR}/usr/lib/${PKG_NAME}; \
 	)
 	@test -e ${DESTDIR}/usr/lib/motley-cue/.gitignore && rm ${DESTDIR}/usr/lib/motley-cue/.gitignore || true
