@@ -34,3 +34,8 @@ build-ubuntu-bionic:
       cat debian/new-rules > debian/rules
       make debsource
       dpkg-buildpackage -uc -us
+
+integration-tests:
+  extends:
+    - .integration-tests-ssh-oidc
+
