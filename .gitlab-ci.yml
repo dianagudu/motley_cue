@@ -39,7 +39,7 @@ build-ubuntu-bionic:
 # Integration (These might to to a central job def)
 integration-tests:
   extends:
-    - .integration-tests-ssh-oidc
+    - .trigger-integration-tests-ssh-oidc
 
 publish-to-devel:
   extends:
