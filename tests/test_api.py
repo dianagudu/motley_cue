@@ -7,6 +7,7 @@ from .utils import (
     PROTECTED_ENDPOINTS,
     QUERY_ENDPOINTS,
     Info,
+    InfoOp,
     build_query_string,
 )
 from .utils import MOCK_HEADERS, MOCK_ISS
@@ -46,6 +47,21 @@ def test_public_endpoints_no_patch(test_api, endpoint):
 def test_info_endpoint(test_api, supported_ops):
     response = test_api.get(Info.url)
     assert [url.rstrip("/") for url in response.json()["supported_OPs"]] == supported_ops
+
+
+@pytest.mark.parametrize(
+    "config_file",
+    [
+        *CONFIGS_AUTHENTICATED_USERS.values(),
+        CONFIG_NOT_SUPPORTED,
+    ],
+    ids=[*CONFIGS_AUTHENTICATED_USERS.keys(), "NOT_SUPPORTED"],
+)
+@pytest.mark.parametrize("method_to_patch,callback", [("", InfoOp.callback_valid)])
+def test_info_op_not_supported(test_api):
+    params = {param: "INVALID_PARAM" for param in InfoOp.params}
+    response = test_api.get("{}?{}".format(InfoOp.url, build_query_string(params)))
+    assert response.status_code == 404
 
 
 @pytest.mark.parametrize(

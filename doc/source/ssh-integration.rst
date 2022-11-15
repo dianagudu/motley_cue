@@ -19,7 +19,9 @@ You can also install it from the http://repo.data.kit.edu/ repo:
     yum install pam-ssh-oidc
 
 
-Check out the documentation for how to configure it. Make sure you set SSH to use the PAM module.
+Check out the documentation for how to configure it, and make sure you set SSH to use the PAM module.
+
+If you install the package `pam-ssh-oidc-autoconfig`, it will automatically configure SSH to use the PAM module.
 
 In ``/etc/pam.d/sshd`` add on the first line:
 
@@ -41,8 +43,10 @@ Finally, make sure you have in your ``/etc/ssh/sshd_config``:
 
 .. code-block::
 
-    ChallengeResponseAuthentication yes
     UsePam yes
+    # one of the following, depending on your version of OpenSSH:
+    ChallengeResponseAuthentication yes
+    KbdInteractiveAuthentication yes
 
 Note that this may enable password based logins that you need to disable separately.
 

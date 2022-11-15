@@ -1,4 +1,4 @@
-/var/log/motley_cue
-/var/lib/motley_cue
-/var/cache/motley_cue
-/run/motley_cue
+var/log/motley_cue
+var/lib/motley_cue
+var/cache/motley_cue
+run/motley_cue

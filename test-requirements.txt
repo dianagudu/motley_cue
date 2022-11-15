@@ -4,3 +4,5 @@ pytest-cov>=2.10.0
 pytest-env
 python-dotenv
 pytest-asyncio
+pytest-httpx
+

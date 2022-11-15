@@ -12,7 +12,6 @@ from ldf_adapter.results import (
     Question,
     Questionnaire,
 )
-from flaat import BaseFlaat
 from flaat.user_infos import UserInfos
 from flaat.access_tokens import AccessTokenInfo
 
@@ -49,6 +48,13 @@ InfoAuthorisation = Endpoint(
     valid_response={"OP": "", "authorisation_type": "", "authorisation_info": ""},
     mapper_method="info_authorisation",
     protected=True,
+)
+
+InfoOp = Endpoint(
+    url="/info/op",
+    valid_response={"audience": "", "scopes": []},
+    params=["url"],
+    mapper_method="info_op",
 )
 
 VerifyUser = Endpoint(
@@ -103,7 +109,7 @@ Admin = Endpoint(
 Root = Endpoint(
     url="/",
     valid_response={"description": "", "endpoints": {}, "usage": ""},
-    children=[Info, InfoAuthorisation, User, Admin, VerifyUser],
+    children=[Info, InfoAuthorisation, InfoOp, User, Admin, VerifyUser],
 )
 
 
@@ -119,7 +125,9 @@ def getListOfEndpoints(endpoint: Endpoint, condition: Callable[[Endpoint], bool]
     return endpoints
 
 
-PUBLIC_ENDPOINTS = getListOfEndpoints(Root, condition=lambda x: not x.protected)
+PUBLIC_ENDPOINTS = getListOfEndpoints(
+    Root, condition=lambda x: not x.protected and len(x.params) == 0
+)
 PROTECTED_ENDPOINTS = getListOfEndpoints(Root, condition=lambda x: x.protected)
 QUERY_ENDPOINTS = getListOfEndpoints(Root, condition=lambda x: len(x.params) > 0)
 
@@ -207,22 +215,19 @@ def mock_not_deployed_result() -> Callable[..., Result]:
     return lambda *x: NotDeployed(message="")
 
 
-class MockBaseFlaat(BaseFlaat):
-    """Mock Flaat base class."""
-
-    def get_user_infos_from_access_token(
-        self, access_token: str, issuer_hint: str = ""
-    ) -> Optional[UserInfos]:
-        """Mock function that returns a mock UserInfos object for a
-        mock token. Otherwise behave as usual.
-        """
-        if access_token == MOCK_TOKEN and MOCK_ISS in self.trusted_op_list:
-            return UserInfos(
-                access_token_info=MOCK_TOKEN_INFO,
-                user_info=MOCK_USER_INFO,
-                introspection_info=None,
-            )
-        super().get_user_infos_from_access_token(access_token, issuer_hint)
+def mock_flaat_get_user_infos_from_access_token(
+    self, access_token: str, issuer_hint: str = ""
+) -> Optional[UserInfos]:
+    """Mock function in Flaat that returns a mock UserInfos object for a
+    mock token. Otherwise return None.
+    """
+    if access_token == MOCK_TOKEN and MOCK_ISS in self.trusted_op_list:
+        return UserInfos(
+            access_token_info=MOCK_TOKEN_INFO,
+            user_info=MOCK_USER_INFO,
+            introspection_info=None,
+        )
+    return None
 
 
 class MockTokenDB:
