@@ -9,15 +9,13 @@ variables:
   DOCKER_IMAGE_NAME: 'motley-cue'
 
 
-build-opensuse-leap-15.4:
+build-opensuse-15.4:
   extends:
-    - .build-opensuse-leap-154
-    - .on-push-and-master
+    - .build-opensuse-154
 
 build-centos-7:
   extends:
     - .build-centos-7
-    - .on-push-and-master
   script:
     - |
       # Force RPM's python-bytecompile script to use python3
