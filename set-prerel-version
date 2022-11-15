@@ -6,5 +6,5 @@ VERSION_FILE=motley_cue/VERSION
 DISTANCE=$(git rev-list --count HEAD ^$MASTER_BRANCH)
 VERSION=$(cat $VERSION_FILE)
 PREREL_VERSION="${VERSION}-pr${DISTANCE}"
-echo "$PREREL_VERSION" > $VERSION_FILE
+bump2version --no-commit --no-tag --new-version "${PREREL_VERSION}" --allow-dirty prerel
 
