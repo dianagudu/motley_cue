@@ -8,16 +8,9 @@ variables:
   DOCKER_IMAGE_NAMESPACE: 'marcvs/build'
   DOCKER_IMAGE_NAME: 'motley-cue'
 
-
-build-opensuse-leap-15.4:
-  extends:
-    - .build-opensuse-leap-154
-    - .on-push-and-master
-
 build-centos-7:
   extends:
     - .build-centos-7
-    - .on-push-and-master
   script:
     - |
       # Force RPM's python-bytecompile script to use python3
@@ -36,3 +29,21 @@ build-ubuntu-bionic:
       cat debian/new-rules > debian/rules
       make debsource
       dpkg-buildpackage -uc -us
+
+##########################################################################
+# Integration (These might to to a central job def)
+integration-tests:
+  extends:
+    - .trigger-integration-tests-ssh-oidc
+
+publish-to-devel:
+  extends:
+    - .publish-to-devel
+
+publish-to-prerel:
+  extends:
+    - .publish-to-prerel
+
+publish-to-preprod:
+  extends:
+    - .publish-to-preprod
