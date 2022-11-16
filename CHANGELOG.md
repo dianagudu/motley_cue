@@ -1,3 +1,21 @@
+# v0.5.0
+
+Features
+========
+* init.d script and launcher script, update packaging to install them in the appropriate locations
+* provide template for privacy statement and serve it at `/privacy` endpoint
+* fix #43 : specify required scopes per OP and retrieve via `/info/op?url=...` endpoint
+
+Enhancements
+============
+- refactor config loading
+- use bump2version and VERSION file for versioning
+
+Bug fixes
+========
+- clean up in deb & rpm package removal section
+- update cryptography required version to patched one
+
 <a name="v0.4.3"></a>
 # [v0.4.3](https://github.com/dianagudu/motley_cue/releases/tag/v0.4.3) - 11 Oct 2022
 
