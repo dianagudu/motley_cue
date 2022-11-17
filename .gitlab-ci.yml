@@ -38,6 +38,9 @@ build-ubuntu-bionic:
 integration-tests:
   extends:
     - .trigger-integration-tests-ssh-oidc
+  variables:
+    UPSTREAM_PREREL_BRANCH_NAME: $PREREL_BRANCH_NAME
+    OTHERWISE_UNDEFINED_VARIABLE: $PREREL_BRANCH_NAME
 
 publish-to-devel:
   extends:
