@@ -24,7 +24,7 @@ PREREL=$(git rev-list --count HEAD ^$MASTER_BRANCH)
 # if we use a version file, things are easy:
 [ -e $VERSION_FILE ] && {
     VERSION=$(cat $VERSION_FILE)
-    PR_VERSION="${VERSION}-pr${PREREL}"
+    PR_VERSION="${VERSION}.dev${PREREL}"
     echo "$PR_VERSION" > $VERSION_FILE
 }
 
