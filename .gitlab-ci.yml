@@ -9,6 +9,7 @@ variables:
   DOCKER_IMAGE_NAME: 'motley-cue'
   PREREL_BRANCH_NAME: 'ci/fix-bionic'
   REPO_USER: 'thisisatest'
+  JUST_A_TEST: 'marcusistesting'
 
 build-centos-7:
   extends:
@@ -49,3 +50,4 @@ publish-to-prerel:
 publish-to-preprod:
   extends:
     - .publish-to-preprod
+
