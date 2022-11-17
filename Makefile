@@ -1,7 +1,8 @@
 PKG_NAME  = motley-cue
 PKG_NAME_UNDERSCORES  = motley_cue
 
-DEBIAN_VERSION := $(shell head debian/changelog  -n 1 | cut -d \( -f 2 | cut -d \) -f 1 | cut -d \- -f 1)
+BASE_VERSION := $(shell head debian/changelog  -n 1 | cut -d \( -f 2 | cut -d \) -f 1 | cut -d \- -f 1)
+DEBIAN_VERSION := $(shell head debian/changelog  -n 1 | cut -d \( -f 2 | cut -d \) -f 1 | sed s/-[0-9][0-9]*//)
 VERSION := $(DEBIAN_VERSION)
 
 # Parallel builds:
@@ -360,7 +361,7 @@ deb: cleanapi create_obj_dir_structure preparedeb
 .PHONY: srctar
 srctar: virtualenv
 	(cd ..; tar czf $(SRC_TAR) --exclude-from=$(PKG_NAME_UNDERSCORES)/.gitignore --exclude-vcs --exclude-caches-all \
-		$(PKG_NAME_UNDERSCORES) --transform='s^${PKG_NAME_UNDERSCORES}^${PKG_NAME}-$(VERSION)^')
+		$(PKG_NAME_UNDERSCORES) --transform='s^${PKG_NAME_UNDERSCORES}^${PKG_NAME}-$(BASE_VERSION)^')
 	mkdir -p rpm/rpmbuild/SOURCES
 	mv ../$(SRC_TAR) rpm/rpmbuild/SOURCES/
 	cp rpm/logfiles.patch rpm/rpmbuild/SOURCES/
