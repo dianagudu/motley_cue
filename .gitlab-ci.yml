@@ -1,5 +1,6 @@
 ---
 include:
+  - 'https://git.scc.kit.edu/m-team/ci-voodoo/raw/master/ci-include/global-defaults.yml'
   - 'https://git.scc.kit.edu/m-team/ci-voodoo/raw/master/ci-include/generic-ci.yml'
   - 'https://git.scc.kit.edu/m-team/ci-voodoo/raw/master/ci-include/pipeline-jobs.yml'
 
