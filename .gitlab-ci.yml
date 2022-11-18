@@ -70,9 +70,10 @@ build-ubuntu-bionic:
 # Integration (These might to to a central job def)
 integration-tests:
   stage: integration
-  #inherit:
-  #  variables: false
+  inherit:
+    variables: false
   variables:
+    JUST_A_TEST: "aaaaa"
     UPSTREAM_PREREL_BRANCH_NAME: $PREREL_BRANCH_NAME
     OTHERWISE_UNDEFINED_VARIABLE: $PREREL_BRANCH_NAME
     # these variables are actually transported to the other side,
