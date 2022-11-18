@@ -9,6 +9,7 @@ variables:
   DOCKER_IMAGE_NAME: 'motley-cue'
   PREREL_BRANCH_NAME: 'ci/fix-bionic-anotherone'
   REPO_USER: 'thisisatest'
+  JUST_A_TEST: 'marcusistesting'
 
 build-centos-7:
   extends:
@@ -40,7 +41,6 @@ build-centos-7:
       echo "PREPROD_RESOLVE_DEPENDENCIES_REPO:      $PREPROD_RESOLVE_DEPENDENCIES_REPO"
       echo "PREPROD_PUBLISH_RESULTS_REPO:           $PREPROD_PUBLISH_RESULTS_REPO"
       echo "PREREL_BRANCH_NAME:             $PREREL_BRANCH_NAME"
-      echo "JUST_A_TEST:                    $JUST_A_TEST"
       echo "UPSTREAM_PREREL_BRANCH_NAME:    $UPSTREAM_PREREL_BRANCH_NAME"
       echo "REPO_USER: $REPO_USER"
       echo "UPSTREAM_REPO_USER: $UPSTREAM_REPO_USER"
@@ -68,45 +68,11 @@ build-ubuntu-bionic:
 ##########################################################################
 # Integration (These might to to a central job def)
 integration-tests:
-  stage: integration
-  inherit:
-    variables:
-      - PREREL_BRANCH_NAME
-      - JUST_A_TEST
-
   variables:
-    # These are needed to find the artifacts:
-    CI_UPSTREAM_PROJECT_PATH: $CI_PROJECT_PATH
-    CI_UPSTREAM_COMMIT_REF_NAME: $CI_COMMIT_REF_NAME
-    # These are needed to synchronise the rules
-    CI_UPSTREAM_PIPELINE_SOURCE: $CI_PIPELINE_SOURCE
-    CI_UPSTREAM_COMMIT_BRANCH: $CI_COMMIT_BRANCH
-    CI_UPSTREAM_DEFAULT_BRANCH: $CI_DEFAULT_BRANCH
-
-    #UPSTREAM_PREREL_BRANCH_NAME: $PREREL_BRANCH_NAME
-    #OTHERWISE_UNDEFINED_VARIABLE: $PREREL_BRANCH_NAME
-    ## these variables are actually transported to the other side,
-    ## even though inherit:variables:false
-    #RESOLVE_DEPENDENCIES_REPO: $ANYBRANCH_RESOLVE_DEPENDENCIES_REPO
-    #CI_UPSTREAM_PROJECT_NAME: $CI_PROJECT_NAME
-    #CI_UPSTREAM_BUILD_REF: $CI_BUILD_REF
-    #CI_UPSTREAM_BUILD_REF_NAME: $CI_BUILD_REF_NAME
-    #CI_UPSTREAM_JOB_NAME: $CI_JOB_NAME
-    #UPSTREAM_REPO_USER: $REPO_USER
-
-  rules:
-    - if: $CI_COMMIT_BRANCH == $PREREL_BRANCH_NAME
-      variables:
-        RESOLVE_DEPENDENCIES_REPO: $PREREL_RESOLVE_DEPENDENCIES_REPO
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      variables:
-        RESOLVE_DEPENDENCIES_REPO: $PREPROD_RESOLVE_DEPENDENCIES_REPO
-    - when: always
-  trigger:
-    project: m-team/integration/test-ssh-oidc
-    branch: main
-    strategy: depend
-
+    UPSTREAM_PREREL_BRANCH_NAME: $PREREL_BRANCH_NAME
+    OTHERWISE_UNDEFINED_VARIABLE: $PREREL_BRANCH_NAME
+  extends:
+    - .trigger-integration-tests-ssh-oidc
 
 publish-to-devel:
   extends:
