@@ -45,7 +45,7 @@ build-centos-7:
       echo "REPO_USER: $REPO_USER"
       echo "UPSTREAM_REPO_USER: $UPSTREAM_REPO_USER"
       echo "OTHERWISE_UNDEFINED_VARIABLE: $OTHERWISE_UNDEFINED_VARIABLE"
-  
+
   script:
     - |
       # Force RPM's python-bytecompile script to use python3
@@ -85,6 +85,7 @@ publish-to-prerel:
 publish-to-preprod:
   extends:
     - .publish-to-preprod
+
 
 
 
