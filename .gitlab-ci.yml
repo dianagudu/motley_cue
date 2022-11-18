@@ -41,6 +41,7 @@ build-centos-7:
       echo "PREPROD_RESOLVE_DEPENDENCIES_REPO:      $PREPROD_RESOLVE_DEPENDENCIES_REPO"
       echo "PREPROD_PUBLISH_RESULTS_REPO:           $PREPROD_PUBLISH_RESULTS_REPO"
       echo "PREREL_BRANCH_NAME:             $PREREL_BRANCH_NAME"
+      echo "JUST_A_TEST:                    $JUST_A_TEST"
       echo "UPSTREAM_PREREL_BRANCH_NAME:    $UPSTREAM_PREREL_BRANCH_NAME"
       echo "REPO_USER: $REPO_USER"
       echo "UPSTREAM_REPO_USER: $UPSTREAM_REPO_USER"
@@ -68,13 +69,12 @@ build-ubuntu-bionic:
 ##########################################################################
 # Integration (These might to to a central job def)
 integration-tests:
-  variables:
-    UPSTREAM_PREREL_BRANCH_NAME: $PREREL_BRANCH_NAME
-    OTHERWISE_UNDEFINED_VARIABLE: $PREREL_BRANCH_NAME
   stage: integration
   inherit:
     variables: false
   variables:
+    UPSTREAM_PREREL_BRANCH_NAME: $PREREL_BRANCH_NAME
+    OTHERWISE_UNDEFINED_VARIABLE: $PREREL_BRANCH_NAME
     # these variables are actually transported to the other side,
     # even though inherit:variables:false
     CI_UPSTREAM_PIPELINE_SOURCE: $CI_PIPELINE_SOURCE
