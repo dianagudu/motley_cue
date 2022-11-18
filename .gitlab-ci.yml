@@ -68,13 +68,14 @@ build-ubuntu-bionic:
 ##########################################################################
 # Integration (These might to to a central job def)
 integration-tests:
-  variables:
     UPSTREAM_PREREL_BRANCH_NAME: $PREREL_BRANCH_NAME
     OTHERWISE_UNDEFINED_VARIABLE: $PREREL_BRANCH_NAME
   stage: integration
   inherit:
     variables: false
   variables:
+    UPSTREAM_PREREL_BRANCH_NAME: $PREREL_BRANCH_NAME
+    OTHERWISE_UNDEFINED_VARIABLE: $PREREL_BRANCH_NAME
     # these variables are actually transported to the other side,
     # even though inherit:variables:false
     CI_UPSTREAM_PIPELINE_SOURCE: $CI_PIPELINE_SOURCE
@@ -99,7 +100,7 @@ integration-tests:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       variables:
         RESOLVE_DEPENDENCIES_REPO: $PREPROD_RESOLVE_DEPENDENCIES_REPO
-    - when: alwayso
+    - when: always
   trigger:
     project: m-team/integration/test-ssh-oidc
     branch: main
