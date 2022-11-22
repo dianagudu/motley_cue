@@ -45,6 +45,9 @@ build-centos-7:
       echo "REPO_USER: $REPO_USER"
       echo "UPSTREAM_REPO_USER: $UPSTREAM_REPO_USER"
       echo "OTHERWISE_UNDEFINED_VARIABLE: $OTHERWISE_UNDEFINED_VARIABLE"
+      echo "DISTRO:  ${DISTRO}"
+      echo "RELEASE: ${RELEASE}"
+      echo "REPO_TO_PUBLISH_TO:           $REPO_TO_PUBLISH_TO"
 
   script:
     - |
