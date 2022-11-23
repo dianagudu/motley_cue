@@ -1,9 +1,29 @@
 #!/bin/bash
 
+DEVSTRING="pr"
 VERSION_FILE=motley_cue/VERSION
 
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --devstring)
+      DEVSTRING="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    --version_file)
+      VERSION_FILE="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -*|--*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+  esac
+done
 
-[ "$CI" == "true" ] && {
+
+[ "x${CI}" == "xtrue" ] && {
     git config --global --add safe.directory "$PWD"
 }
 
@@ -16,7 +36,7 @@ for R in $REMOTES; do
         | sed -n '/HEAD branch/s/.*: //p')
     MASTER_BRANCH="refs/remotes/${R}/${MASTER}"
     #echo "Master-branch: ${MASTER_BRANCH}"
-    [ "$R" == "origin" ] && break
+    [ "x${R}" == "xorigin" ] && break
 done
 
 PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
@@ -39,7 +59,7 @@ PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
         | cut -d\) -f 1)
     DEBIAN_VERSION=$(echo "$CHANGELOG_VERSION" | cut -d- -f 1)
     DEBIAN_RELEASE=$(echo "$CHANGELOG_VERSION" | cut -d- -f 2)
-    PR_VERSION="${DEBIAN_VERSION}-pr${PREREL}-${DEBIAN_RELEASE}"
+    PR_VERSION="${DEBIAN_VERSION}~${DEVSTRING}${PREREL}-${DEBIAN_RELEASE}"
     sed "s/${CHANGELOG_VERSION}/${PR_VERSION}/" -i debian/changelog
     echo "$PR_VERSION"
 }
@@ -48,7 +68,7 @@ PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
 SPEC_FILES=$(ls rpm/*spec)
 [ -z "$SPEC_FILES" ] || {
     [ -z "$VERSION" ] || {
-        PR_VERSION="${VERSION}~pr${PREREL}"
+        PR_VERSION="${VERSION}~${DEVSTRING}${PREREL}"
         for SPEC_FILE in $SPEC_FILES; do
             grep -q "$VERSION" "$SPEC_FILE" && { # version found, needs update
                 sed "s/${VERSION}/${PR_VERSION}/" -i "$SPEC_FILE"
