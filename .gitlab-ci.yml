@@ -8,6 +8,20 @@ variables:
   STAGING_BRANCH_NAME: 'staging'
   DOCKER_IMAGE_NAMESPACE: 'marcvs/build'
   DOCKER_IMAGE_NAME: 'motley-cue'
+  PREREL_BRANCH_NAME: 'ci/adapt-to-pam-ssh-oidc'
+  #TARGET_REPO: 'devel'
+  # The following varialbes can be overwritten only in specific targets
+  # See generic-ci.yml -> .repo-definition for the full list
+  # REPO_BASE => deprecated
+  # REPO_USER
+  # REPO_HOST
+  # PUBLISH_BUILD_RESULTS_REPO: 'devel'
+  # PUBLISH_TESTED_RESULTS_REPO: 'prerel'
+  # PUBLISH_MASTER_RESULTS_REPO: 'for-prod'
+  # PREREL_BRANCH_NAME: 'prerel'
+  # See generic-ci.yml -> .build-definition for the full list
+  # DOCKER_IMAGE_VERSION
+  # DOCKER_IMAGE_VERSION_WINDOWS
 
 build-centos-7:
   extends:
