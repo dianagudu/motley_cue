@@ -8,7 +8,7 @@ variables:
   STAGING_BRANCH_NAME: 'staging'
   DOCKER_IMAGE_NAMESPACE: 'marcvs/build'
   DOCKER_IMAGE_NAME: 'motley-cue'
-  PREREL_BRANCH_NAME: 'ci/adapt-to-pam-ssh-oidc'
+  #PREREL_BRANCH_NAME: 'ci/adapt-to-pam-ssh-oidc'
   #TARGET_REPO: 'devel'
   # The following varialbes can be overwritten only in specific targets
   # See generic-ci.yml -> .repo-definition for the full list
