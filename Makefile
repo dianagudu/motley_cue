@@ -1,7 +1,11 @@
 PKG_NAME  = motley-cue
 PKG_NAME_UNDERSCORES  = motley_cue
 
-DEBIAN_VERSION := $(shell head debian/changelog  -n 1 | cut -d \( -f 2 | cut -d \) -f 1 | cut -d \- -f 1)
+SPECFILE := rpm/${PKG_NAME}.spec
+RPM_VERSION := $(shell grep ^Version ${SPECFILE} | cut -d : -f 2 | sed s/\ //g)
+
+BASE_VERSION := $(shell head debian/changelog  -n 1 | cut -d \( -f 2 | cut -d \) -f 1 | cut -d \- -f 1)
+DEBIAN_VERSION := $(shell head debian/changelog  -n 1 | cut -d \( -f 2 | cut -d \) -f 1 | sed s/-[0-9][0-9]*//)
 VERSION := $(DEBIAN_VERSION)
 
 # Parallel builds:
@@ -26,19 +30,22 @@ endif
 
 info:
 	@echo "############################################################"
-	@echo "DESTDIR: ${DESTDIR}"
+	@echo "DESTDIR:         $(DESTDIR)"
+	@echo "INSTALLDIRS:     $(INSTALLDIRS)"
+	@echo "VERSION:         $(VERSION)"
+	@echo "RPM_VERSION:     $(RPM_VERSION)"
+	@echo "DEBIAN_VERSION:  $(DEBIAN_VERSION)"
+	@echo "BASE_VERSION:    ${BASE_VERSION}"
 	@echo "BASEDIR: ${BASEDIR}"
-	@echo "VIRTUALENV: ${VIRTUALENV}"
-	#env
 	@echo "############################################################"
 
 ### Actual targets
 default: sdist bdist_wheel
 
 sdist:
-	python3 ./setup.py sdist
+	python3 -m build --sdist
 bdist_wheel:
-	python3 ./setup.py bdist_wheel
+	python3 -m build --wheel
 
 dist: sdist bdist_wheel
 
@@ -344,7 +351,7 @@ publish-to-repo:
 preparedeb: distclean
 	@quilt pop -a || true
 	@debian/rules clean
-	( cd ..; tar czf ${PKG_NAME}_${VERSION}.orig.tar.gz --exclude-vcs --exclude=debian --exclude=.pc ${PKG_NAME_UNDERSCORES})
+	( cd ..; tar czf ${PKG_NAME}_${DEBIAN_VERSION}.orig.tar.gz --exclude-vcs --exclude=debian --exclude=.pc ${PKG_NAME_UNDERSCORES})
 
 .PHONY: debsource
 debsource: preparedeb
@@ -360,7 +367,7 @@ deb: cleanapi create_obj_dir_structure preparedeb
 .PHONY: srctar
 srctar: virtualenv
 	(cd ..; tar czf $(SRC_TAR) --exclude-from=$(PKG_NAME_UNDERSCORES)/.gitignore --exclude-vcs --exclude-caches-all \
-		$(PKG_NAME_UNDERSCORES) --transform='s^${PKG_NAME_UNDERSCORES}^${PKG_NAME}-$(VERSION)^')
+		$(PKG_NAME_UNDERSCORES) --transform='s^${PKG_NAME_UNDERSCORES}^${PKG_NAME}-$(RPM_VERSION)^')
 	mkdir -p rpm/rpmbuild/SOURCES
 	mv ../$(SRC_TAR) rpm/rpmbuild/SOURCES/
 	cp rpm/logfiles.patch rpm/rpmbuild/SOURCES/
@@ -373,7 +380,7 @@ virtualenv:
 		echo "PATH"; \
 		echo ${PATH}; \
 		pip --version; \
-		pip install -I -r requirements.txt; \
+		pip install -I -r requirements.txt build; \
 		pip freeze > venv/all_versions.txt; \
 	)
 
@@ -396,6 +403,6 @@ install:
 	cp -af venv/* ${DESTDIR}/usr/lib/${PKG_NAME}
 	( \
 		source ${DESTDIR}/usr/lib/${PKG_NAME}/bin/activate; \
-		python3 ./setup.py install --prefix ${DESTDIR}/usr/lib/${PKG_NAME}; \
+		pip install . --prefix ${DESTDIR}/usr/lib/${PKG_NAME}; \
 	)
 	@test -e ${DESTDIR}/usr/lib/motley-cue/.gitignore && rm ${DESTDIR}/usr/lib/motley-cue/.gitignore || true

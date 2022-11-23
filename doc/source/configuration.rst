@@ -167,3 +167,36 @@ If ``motley_cue`` is running on ``localhost``, these settings will enable the in
   :width: 80%
   :align: center
   :alt: Swagger docs
+
+
+Privacy policy
+--------------
+
+We provide a default privacy statement that you can use when running motley-cue.
+
+When installing from Linux packages, the privacy statement is installed in:
+
+.. code-block:: bash
+
+  /etc/motley_cue/privacystatement.md
+
+To run the service, you must configure the service contact information in the ``[privacy]`` section of ``motley_cue.conf``:
+
+.. code-block:: ini
+
+  #########
+  [privacy]
+  #########
+  ## configuration related to privacy policy
+  ##
+  ## contact information for service operator to be included in privacy policy -- default: None
+  ## this is an email address and MUST be filled in
+  # privacy_contact = None
+  ##
+  ## privacy policy location (markdown file) -- default: /etc/motley_cue/privacystatement.md
+  # privacy_file = /etc/motley_cue/privacystatement.md
+
+
+You can also modify the privacy statement to fit your organisation's needs by editing the markdown file directly.
+
+The privacy statement can be retrieved using the REST API from the the ``/privacy`` endpoint.

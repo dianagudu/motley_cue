@@ -35,6 +35,8 @@ dh_venv_safe_lib_symlinks_update() {
 case "$1" in
     configure|triggered|reconfigure)
         dh_venv_safe_lib_symlinks_update
-        nginx -s reload || true
+        systemctl enable motley-cue || update-rc.d motley-cue defaults || true
+        systemctl restart motley-cue || service motley-cue restart || /etc/init.d/motley-cue restart || true
+        systemctl restart nginx || service nginx restart || nginx -s reload || nginx || true
         ;;
 esac

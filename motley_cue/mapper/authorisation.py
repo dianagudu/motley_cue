@@ -13,7 +13,7 @@ from flaat.requirements import CheckResult, Requirement
 from flaat.user_infos import UserInfos
 from flaat.exceptions import FlaatException
 
-from .config import Config, OPAuthZ, canonical_url
+from .config import Config, ConfigAuthorisation, canonical_url
 from .exceptions import Unauthorised
 
 
@@ -24,7 +24,7 @@ class AuthRequirement(Requirement):
     """Base class for authorisation requirements corresponding to an OP."""
 
     # pylint: disable=too-few-public-methods
-    def __init__(self, authorisation: dict):
+    def __init__(self, authorisation: ConfigAuthorisation):
         self.authorisation = authorisation
 
 
@@ -34,7 +34,7 @@ class AuthenticatedUserRequirement(AuthRequirement):
     # pylint: disable=too-few-public-methods
     def is_satisfied_by(self, user_infos: UserInfos) -> CheckResult:
         """override method to use configured authorisation"""
-        op_authz = OPAuthZ.load(self.authorisation, user_infos)
+        op_authz = self.authorisation.get_op_authz(user_infos)
         if op_authz is None:
             return CheckResult(False, "OP is not configured")
 
@@ -47,7 +47,7 @@ class AuthorisedUserRequirement(AuthRequirement):
     # pylint: disable=too-few-public-methods
     def is_satisfied_by(self, user_infos: UserInfos) -> CheckResult:
         """override method to use configured authorisation"""
-        op_authz = OPAuthZ.load(self.authorisation, user_infos)
+        op_authz = self.authorisation.get_op_authz(user_infos)
         if op_authz is None:
             return CheckResult(False, "OP is not configured")
 
@@ -60,7 +60,7 @@ class AuthorisedAdminRequirement(AuthRequirement):
     # pylint: disable=too-few-public-methods
     def is_satisfied_by(self, user_infos: UserInfos) -> CheckResult:
         """override method to use configured authorisation"""
-        op_authz = OPAuthZ.load(self.authorisation, user_infos)
+        op_authz = self.authorisation.get_op_authz(user_infos)
         if op_authz is None:
             return CheckResult(False, "OP is not configured")
 
@@ -133,7 +133,7 @@ class Authorisation(Flaat):
             user_infos = None
         if user_infos is None:
             raise Unauthorised("Could not get user infos from request.")
-        op_authz = OPAuthZ.load(self.__authorisation, user_infos)
+        op_authz = self.__authorisation.get_op_authz(user_infos)
         # if OP not supported
         if op_authz is None:
             return {
@@ -190,16 +190,16 @@ class Authorisation(Flaat):
         def _check_request(user_infos: UserInfos, *_, **kwargs) -> CheckResult:
             user_iss = kwargs.get("iss", "")
             if user_iss != "":
-                op_authz = OPAuthZ.load(self.__authorisation, user_infos)
+                op_authz = self.__authorisation.get_op_authz(user_infos)
                 if op_authz is None:
                     return CheckResult(False, "No OP config")
 
-                if not op_authz.authorise_admins_for_all_ops and op_authz.op_url != canonical_url(
-                    user_iss
-                ):
+                if not op_authz.authorise_admins_for_all_ops and canonical_url(
+                    op_authz.op_url
+                ) != canonical_url(user_iss):
                     return CheckResult(
                         False,
-                        f"Admin {user_infos} is not authorised to manage "
+                        f"Admin from issuer {op_authz.op_url} is not authorised to manage "
                         f"users of issuer '{user_iss}'",
                     )
 

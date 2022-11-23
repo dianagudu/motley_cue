@@ -1,9 +1,11 @@
+from motley_cue.mapper.config import Configuration
 import pytest
+from dataclasses import fields
 
 from .configs import (
     CONFIG_CUSTOM_DOC,
     CONFIG_DOC_ENABLED,
-    CONFIG_INVALID,
+    CONFIG_EMPTY,
     CONFIG_NOT_SUPPORTED,
     CONFIG_OTP_NOT_SUPPORTED,
     CONFIG_OTP_SUPPORTED,
@@ -74,9 +76,10 @@ def test_to_bool_invalid(test_config, test_internal_exception, bool_str):
         test_config.to_bool(bool_str)
 
 
-def test_invalid_config(test_config):
-    with pytest.raises(test_config.InternalException):
-        test_config.Config(CONFIG_INVALID)
+def test_empty_config(test_config):
+    empty_config = test_config.Config(CONFIG_EMPTY).CONFIG
+    default_config = Configuration()
+    assert empty_config.to_dict() == default_config.to_dict()
 
 
 @pytest.mark.parametrize(

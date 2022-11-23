@@ -5,16 +5,18 @@ from starlette.testclient import TestClient
 import sys
 import os
 
-from .utils import MockTokenManager, MockUser, MockBaseFlaat
+from .utils import (
+    MockTokenManager,
+    MockUser,
+    mock_flaat_get_user_infos_from_access_token,
+)
 
 
 @pytest.fixture()
-def test_api(config_file, method_to_patch: str, callback: Callable[..., Dict], monkeypatch):
+def test_api(
+    config_file, method_to_patch: str, callback: Callable[..., Dict], monkeypatch
+):
     with monkeypatch.context() as mp:
-        # mock the flaat UserInfos class
-        import flaat
-
-        mp.setattr(flaat, "BaseFlaat", MockBaseFlaat)
         # patch the config to return minimal config instead of reading through files
         from motley_cue.mapper import config
 
@@ -44,13 +46,18 @@ def test_api(config_file, method_to_patch: str, callback: Callable[..., Dict], m
 @pytest.fixture()
 def test_authorisation(config_file: ConfigParser, monkeypatch):
     with monkeypatch.context() as mp:
-        import flaat
-
-        mp.setattr(flaat, "BaseFlaat", MockBaseFlaat)
         from motley_cue.mapper import authorisation, config
 
+        mp.setattr(
+            "motley_cue.mapper.authorisation.Flaat.get_user_infos_from_access_token",
+            mock_flaat_get_user_infos_from_access_token,
+        )
         authz = authorisation.Authorisation(config.Config(config_file))
         yield authz
+
+        # unload all motley_cue modules
+        for m in [x for x in sys.modules if x.startswith("motley_cue")]:
+            del sys.modules[m]
 
 
 @pytest.fixture()
@@ -62,7 +69,9 @@ def test_local_user_manager():
 
 
 @pytest.fixture()
-def test_local_user_manager_patched(monkeypatch, mocker: Callable[[str, str], Callable]):
+def test_local_user_manager_patched(
+    monkeypatch, mocker: Callable[[str, str], Callable]
+):
     with monkeypatch.context() as mp:
         # mock User class to only contain a mock reach_state method,
         # which returns a valid response, either successful or failed
@@ -124,25 +133,25 @@ def test_encryption():
 def test_token_manager(monkeypatch):
     with monkeypatch.context() as mp:
         from motley_cue.mapper.token_manager import TokenManager
-        from motley_cue.mapper.config import OTPConfig
+        from motley_cue.mapper.config import ConfigOTP
 
         mp.setattr(TokenManager, "__init__", MockTokenManager.__init__)
         mp.setattr(TokenManager, "_new_otp", MockTokenManager._new_otp)
         mp.setattr(TokenManager, "database", MockTokenManager.database)
 
-        yield TokenManager(OTPConfig({"use_otp": "True"}))
+        yield TokenManager(ConfigOTP(use_otp=True))
 
 
 @pytest.fixture()
 def test_token_manager_original_new_otp(monkeypatch):
     with monkeypatch.context() as mp:
         from motley_cue.mapper.token_manager import TokenManager
-        from motley_cue.mapper.config import OTPConfig
+        from motley_cue.mapper.config import ConfigOTP
 
         mp.setattr(TokenManager, "__init__", MockTokenManager.__init__)
         mp.setattr(TokenManager, "database", MockTokenManager.database)
 
-        yield TokenManager(OTPConfig({"use_otp": "True"}))
+        yield TokenManager(ConfigOTP(use_otp=True))
 
 
 @pytest.fixture()

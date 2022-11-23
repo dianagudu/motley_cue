@@ -44,6 +44,14 @@ class InfoAuthorisation:
 
 
 @dataclass
+class InfoOp:
+    """Data model for responses on the /info/op endpoint."""
+
+    scopes: Optional[List[str]] = Field([], example=["openid", "profile", "email"])
+    audience: Optional[Union[str, List[str]]] = Field("", example="ssh_localhost")
+
+
+@dataclass
 class VerifyUser:
     """Data model for responses on the /verify_user endpoint."""
 

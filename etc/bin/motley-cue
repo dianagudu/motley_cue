@@ -1,0 +1,8 @@
+#!/bin/bash
+
+while read -r line; do
+  echo export "${line}"
+  export "${line?}"
+done </etc/motley_cue/motley_cue.env
+
+/usr/lib/motley-cue/bin/gunicorn motley_cue.api:api -k "uvicorn.workers.UvicornWorker" --config /usr/lib/motley-cue/etc/gunicorn/gunicorn.conf.py

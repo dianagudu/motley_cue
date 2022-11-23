@@ -20,3 +20,4 @@ debian/*substvars
 .pc
 docker*log
 *.sqlite
+.coverage
