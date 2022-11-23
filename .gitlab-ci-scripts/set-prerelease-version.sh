@@ -22,7 +22,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-
 [ "x${CI}" == "xtrue" ] && {
     git config --global --add safe.directory "$PWD"
 }
@@ -43,6 +42,7 @@ PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
 
 # if we use a version file, things are easy:
 [ -e $VERSION_FILE ] && {
+    # version for python packages
     VERSION=$(cat $VERSION_FILE)
     PR_VERSION="${VERSION}.dev${PREREL}"
     echo "$PR_VERSION" > $VERSION_FILE
@@ -52,23 +52,23 @@ PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
 # if we store the version in debian changelog:
 [ -e debian/changelog ] && {
     # get the latest version
-    CHANGELOG_VERSION=$(cat debian/changelog \
+    DEBIAN_VERSION=$(cat debian/changelog \
         | grep "(.*) " \
         | head -n 1 \
         | cut -d\( -f 2 \
         | cut -d\) -f 1)
-    DEBIAN_VERSION=$(echo "$CHANGELOG_VERSION" | cut -d- -f 1)
-    DEBIAN_RELEASE=$(echo "$CHANGELOG_VERSION" | cut -d- -f 2)
-    PR_VERSION="${DEBIAN_VERSION}~${DEVSTRING}${PREREL}-${DEBIAN_RELEASE}"
-    sed "s/${CHANGELOG_VERSION}/${PR_VERSION}/" -i debian/changelog
-    echo "$PR_VERSION"
+    VERSION=$(echo "$DEBIAN_VERSION" | cut -d- -f 1)
+    RELEASE=$(echo "$DEBIAN_VERSION" | cut -d- -f 2)
+    PR_VERSION="${VERSION}~pr${PREREL}"
+    sed s%${VERSION}%${PR_VERSION}% -i debian/changelog
+    #echo "$VERSION => $DEBIAN_VERSION + $DEBIAN_RELEASE => $PR_VERSION"
 }
 
 # lets see if RPM also needs a version to be set
 SPEC_FILES=$(ls rpm/*spec)
-[ -z "$SPEC_FILES" ] || {
-    [ -z "$VERSION" ] || {
-        PR_VERSION="${VERSION}~${DEVSTRING}${PREREL}"
+[ -z "${SPEC_FILES}" ] || {
+    [ -z "${VERSION}" ] || {
+        PR_VERSION="${VERSION}~pr${PREREL}"
         for SPEC_FILE in $SPEC_FILES; do
             grep -q "$VERSION" "$SPEC_FILE" && { # version found, needs update
                 sed "s/${VERSION}/${PR_VERSION}/" -i "$SPEC_FILE"

@@ -1,9 +1,12 @@
 PKG_NAME  = motley-cue
 PKG_NAME_UNDERSCORES  = motley_cue
 
-DEBIAN_VERSION := $(shell head debian/changelog -n 1 | cut -d \( -f 2 | cut -d \) -f 1 | sed "s/-[0-9][0-9]*//")
-RPM_VERSION := $(shell grep Version: rpm/motley-cue.spec | cut -d : -f 2 | sed "s/ //")
-PYTHON_VERSION := $(shell cat motley_cue/VERSION)
+SPECFILE := rpm/${PKG_NAME}.spec
+RPM_VERSION := $(shell grep ^Version ${SPECFILE} | cut -d : -f 2 | sed s/\ //g)
+
+BASE_VERSION := $(shell head debian/changelog  -n 1 | cut -d \( -f 2 | cut -d \) -f 1 | cut -d \- -f 1)
+DEBIAN_VERSION := $(shell head debian/changelog  -n 1 | cut -d \( -f 2 | cut -d \) -f 1 | sed s/-[0-9][0-9]*//)
+VERSION := $(DEBIAN_VERSION)
 
 # Parallel builds:
 MAKEFLAGS += -j5
@@ -27,10 +30,13 @@ endif
 
 info:
 	@echo "############################################################"
-	@echo "DESTDIR: ${DESTDIR}"
+	@echo "DESTDIR:         $(DESTDIR)"
+	@echo "INSTALLDIRS:     $(INSTALLDIRS)"
+	@echo "VERSION:         $(VERSION)"
+	@echo "RPM_VERSION:     $(RPM_VERSION)"
+	@echo "DEBIAN_VERSION:  $(DEBIAN_VERSION)"
+	@echo "BASE_VERSION:    ${BASE_VERSION}"
 	@echo "BASEDIR: ${BASEDIR}"
-	@echo "VIRTUALENV: ${VIRTUALENV}"
-	#env
 	@echo "############################################################"
 
 ### Actual targets
