@@ -72,6 +72,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#authorisation-configuration">Authorisation configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#account-creation-configuration">Account creation configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-configurations">Additional configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#privacy-policy">Privacy policy</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="running.html">Running</a></li>
@@ -256,6 +257,30 @@
 </div>
 <p>If <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> is running on <code class="docutils literal notranslate"><span class="pre">localhost</span></code>, these settings will enable the interactive Swagger docs at <a class="reference external" href="http://localhost:8080/api/v1/docs">http://localhost:8080/api/v1/docs</a>:</p>
 <a class="reference internal image-reference" href="_images/swagger_docs.png"><img alt="Swagger docs" class="align-center" src="_images/swagger_docs.png" style="width: 80%;" /></a>
+</section>
+<section id="privacy-policy">
+<h2>Privacy policy<a class="headerlink" href="#privacy-policy" title="Permalink to this heading">¶</a></h2>
+<p>We provide a default privacy statement that you can use when running motley-cue.</p>
+<p>When installing from Linux packages, the privacy statement is installed in:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/etc/motley_cue/privacystatement.md
+</pre></div>
+</div>
+<p>To run the service, you must configure the service contact information in the <code class="docutils literal notranslate"><span class="pre">[privacy]</span></code> section of <code class="docutils literal notranslate"><span class="pre">motley_cue.conf</span></code>:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1">#########</span><span class="w"></span>
+<span class="k">[privacy]</span><span class="w"></span>
+<span class="c1">#########</span><span class="w"></span>
+<span class="c1">## configuration related to privacy policy</span><span class="w"></span>
+<span class="c1">##</span><span class="w"></span>
+<span class="c1">## contact information for service operator to be included in privacy policy -- default: None</span><span class="w"></span>
+<span class="c1">## this is an email address and MUST be filled in</span><span class="w"></span>
+<span class="c1"># privacy_contact = None</span><span class="w"></span>
+<span class="c1">##</span><span class="w"></span>
+<span class="c1">## privacy policy location (markdown file) -- default: /etc/motley_cue/privacystatement.md</span><span class="w"></span>
+<span class="c1"># privacy_file = /etc/motley_cue/privacystatement.md</span><span class="w"></span>
+</pre></div>
+</div>
+<p>You can also modify the privacy statement to fit your organisation’s needs by editing the markdown file directly.</p>
+<p>The privacy statement can be retrieved using the REST API from the the <code class="docutils literal notranslate"><span class="pre">/privacy</span></code> endpoint.</p>
 </section>
 </section>
 

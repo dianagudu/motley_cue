@@ -161,6 +161,19 @@
 
 
 <span class="c1">#########</span><span class="w"></span>
+<span class="k">[privacy]</span><span class="w"></span>
+<span class="c1">#########</span><span class="w"></span>
+<span class="c1">## configuration related to privacy policy</span><span class="w"></span>
+<span class="c1">##</span><span class="w"></span>
+<span class="c1">## contact information for service operator to be included in privacy policy -- default: NOT CONFIGURED</span><span class="w"></span>
+<span class="c1">## this is an email address and MUST be filled in</span><span class="w"></span>
+<span class="c1"># privacy_contact = NOT CONFIGURED</span><span class="w"></span>
+<span class="c1">##</span><span class="w"></span>
+<span class="c1">## privacy policy location (markdown file) -- default: /etc/motley_cue/privacystatement.md</span><span class="w"></span>
+<span class="c1"># privacy_file = /etc/motley_cue/privacystatement.md</span><span class="w"></span>
+
+
+<span class="c1">#########</span><span class="w"></span>
 <span class="k">[DEFAULT]</span><span class="w"></span>
 <span class="c1">#########</span><span class="w"></span>
 <span class="c1">## Magic section that provides default values for all sections below.</span><span class="w"></span>
@@ -169,6 +182,10 @@
 <span class="c1">##</span><span class="w"></span>
 <span class="c1">## this is the only key without a default value, must be specified for each section</span><span class="w"></span>
 <span class="c1"># op_url =</span><span class="w"></span>
+<span class="c1">##</span><span class="w"></span>
+<span class="c1">## scopes required from the OP to access the service -- default: [&quot;openid&quot;, &quot;profile&quot;, &quot;email&quot;, &quot;eduperson_entitlement&quot;]</span><span class="w"></span>
+<span class="c1">## sane defaults for each OP are provided in the examples below</span><span class="w"></span>
+<span class="na">scopes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[&quot;openid&quot;, &quot;profile&quot;, &quot;email&quot;, &quot;eduperson_entitlement&quot;]</span><span class="w"></span>
 <span class="c1">##</span><span class="w"></span>
 <span class="c1">######################</span><span class="w"></span>
 <span class="c1">## USER AUTHORISATION</span><span class="w"></span>
@@ -266,6 +283,10 @@
 <span class="c1">###################</span><span class="w"></span>
 <span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="s">https://wlcg.cloud.cnaf.infn.it/</span><span class="w"></span>
 
+<span class="c1">## if you plan to use oidc-agent forwarding for delegation and need more scopes, add them too.</span><span class="w"></span>
+<span class="c1">## e.g. for wlcg: storage.read:/ storage.create:/ compute.read compute.modify compute.create compute.cancel storage.modify:/ storage.stage:/</span><span class="w"></span>
+<span class="na">scopes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[&quot;openid&quot;, &quot;profile&quot;, &quot;email&quot;, &quot;wlcg&quot;, &quot;wlcg.groups&quot;, &quot;eduperson_entitlement&quot;]</span><span class="w"></span>
+
 <span class="c1">## USER AUTHORISATION</span><span class="w"></span>
 <span class="c1">## In this example, there is one VO whose members can use the service,</span><span class="w"></span>
 <span class="c1">## found in the &#39;wlcg.groups&#39; claim</span><span class="w"></span>
@@ -301,6 +322,9 @@
 <span class="k">[authorisation.kit]</span><span class="w"></span>
 <span class="c1">###################</span><span class="w"></span>
 <span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://oidc.scc.kit.edu/auth/realms/kit</span><span class="w"></span>
+
+<span class="c1">## KIT supports scope &#39;entitlements&#39; instead of &#39;eduperson_entitlement&#39;</span><span class="w"></span>
+<span class="na">scopes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[&quot;openid&quot;, &quot;profile&quot;, &quot;email&quot;, &quot;entitlements&quot;]</span><span class="w"></span>
 
 <span class="c1">## USER AUTHORISATION</span><span class="w"></span>
 <span class="c1">## In this example, any KIT user can access the service.</span><span class="w"></span>
@@ -359,6 +383,9 @@
 <span class="c1">## Keep in mind that the assurance of google accounts is probably not sufficient</span><span class="w"></span>
 <span class="c1">## You can configure allowed assurance profiles in feudal_adapter.conf</span><span class="w"></span>
 <span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://accounts.google.com/</span><span class="w"></span>
+
+<span class="c1">## google does not support the eduperson_entitlement scope</span><span class="w"></span>
+<span class="na">scopes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[&quot;openid&quot;, &quot;profile&quot;]</span><span class="w"></span>
 
 <span class="c1">## USER AUTHORISATION</span><span class="w"></span>
 <span class="c1">## In this example, individual users are authorised by &#39;sub&#39; claim.</span><span class="w"></span>

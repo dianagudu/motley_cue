@@ -127,7 +127,8 @@ or
 yum install pam-ssh-oidc
 </pre></div>
 </div>
-<p>Check out the documentation for how to configure it. Make sure you set SSH to use the PAM module.</p>
+<p>Check out the documentation for how to configure it, and make sure you set SSH to use the PAM module.</p>
+<p>If you install the package <cite>pam-ssh-oidc-autoconfig</cite>, it will automatically configure SSH to use the PAM module.</p>
 <p>In <code class="docutils literal notranslate"><span class="pre">/etc/pam.d/sshd</span></code> add on the first line:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">auth</span>     <span class="n">sufficient</span> <span class="n">pam_oidc_token</span><span class="o">.</span><span class="n">so</span> <span class="n">config</span><span class="o">=/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">config</span><span class="o">.</span><span class="n">ini</span>
 </pre></div>
@@ -140,8 +141,10 @@ yum install pam-ssh-oidc
 </div>
 <p>where MOTLEY_CUE_ENDPOINT=&lt;<a class="reference external" href="http://localhost:8080">http://localhost:8080</a>&gt; with a default installation.</p>
 <p>Finally, make sure you have in your <code class="docutils literal notranslate"><span class="pre">/etc/ssh/sshd_config</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ChallengeResponseAuthentication</span> <span class="n">yes</span>
-<span class="n">UsePam</span> <span class="n">yes</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">UsePam</span> <span class="n">yes</span>
+<span class="c1"># one of the following, depending on your version of OpenSSH:</span>
+<span class="n">ChallengeResponseAuthentication</span> <span class="n">yes</span>
+<span class="n">KbdInteractiveAuthentication</span> <span class="n">yes</span>
 </pre></div>
 </div>
 <p>Note that this may enable password based logins that you need to disable separately.</p>
