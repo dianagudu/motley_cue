@@ -8,8 +8,6 @@ variables:
   DOCKER_IMAGE_NAMESPACE: 'marcvs/build'
   DOCKER_IMAGE_NAME: 'motley-cue'
   PREREL_BRANCH_NAME: 'ci/fix-bionic'
-  REPO_USER: 'thisisatest'
-  JUST_A_TEST: 'marcusistesting'
 
 build-centos-7:
   extends:
