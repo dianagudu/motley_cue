@@ -126,7 +126,8 @@ class Config:
                 logging.getLogger(__name__).debug("Read config from %s", files_read)
                 return Config(config_parser)
         raise InternalException(
-            "No configuration file found at given or default locations: " f"{list_of_config_files}"
+            "No configuration file found at given or default locations: "
+            f"{list_of_config_files}"
         )
 
     @staticmethod
@@ -159,7 +160,9 @@ def to_bool(bool_str):
         return True
     if bool_str.lower() in ["false", "no", "0"]:
         return False
-    raise InternalException(f"Error reading config file: unrecognised boolean value {bool_str}.")
+    raise InternalException(
+        f"Error reading config file: unrecognised boolean value {bool_str}."
+    )
 
 
 def to_list(list_str):
@@ -188,7 +191,9 @@ def to_int(int_str):
     try:
         return int(int_str)
     except ValueError:
-        raise InternalException(f"Error converting to int: unrecognised integer value {int_str}.")
+        raise InternalException(
+            f"Error converting to int: unrecognised integer value {int_str}."
+        )
 
 
 def to_loglevel(loglevel_str):
@@ -197,7 +202,9 @@ def to_loglevel(loglevel_str):
     """
     if loglevel_str.upper() in logging._nameToLevel.keys():
         return logging._nameToLevel[loglevel_str.upper()]
-    raise InternalException(f"Error reading config file: unrecognised loglevel {loglevel_str}.")
+    raise InternalException(
+        f"Error reading config file: unrecognised loglevel {loglevel_str}."
+    )
 
 
 def canonical_url(url: str) -> str:
@@ -227,7 +234,13 @@ class ConfigSection:
             if section_name is None:
                 section_name = cls.__section__name__()
             field_names = set(f.name for f in fields(cls))
-            return cls(**{k: v for k, v in {**config[section_name]}.items() if k in field_names})
+            return cls(
+                **{
+                    k: v
+                    for k, v in {**config[section_name]}.items()
+                    if k in field_names
+                }
+            )
         except KeyError:
             # logger.debug(
             #     "Missing config section %s, using default values.", cls.__section__name__()
@@ -349,7 +362,9 @@ class ConfigOPAuthZ(ConfigSection):
             )
 
         if len(self.authorised_users) > 0:
-            user_has_sub = lambda user_infos: user_infos.subject in self.authorised_users
+            user_has_sub = (
+                lambda user_infos: user_infos.subject in self.authorised_users
+            )
             req.add_requirement(IsTrue(user_has_sub))
 
         all_req = AllOf()
@@ -363,7 +378,9 @@ class ConfigOPAuthZ(ConfigSection):
         for API admins.
         """
         if len(self.authorised_admins) > 0:
-            user_has_sub = lambda user_infos: user_infos.subject in self.authorised_admins
+            user_has_sub = (
+                lambda user_infos: user_infos.subject in self.authorised_admins
+            )
             return IsTrue(user_has_sub)
 
         return Unsatisfiable()
@@ -425,4 +442,6 @@ class Configuration:
 
     def to_dict(self) -> dict:
         """Converts the config to a dict"""
-        return {field.name: getattr(self, field.name).to_dict() for field in fields(self)}
+        return {
+            field.name: getattr(self, field.name).to_dict() for field in fields(self)
+        }

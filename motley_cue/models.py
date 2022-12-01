@@ -32,14 +32,18 @@ class Info:
 class InfoAuthorisation:
     """Data model for responses on the /info/authorisation endpoint."""
 
-    OP: str = Field(..., example="https://wlcg.cloud.cnaf.infn.it/")  # pylint: disable=invalid-name
+    OP: str = Field(
+        ..., example="https://wlcg.cloud.cnaf.infn.it/"
+    )  # pylint: disable=invalid-name
     authorisation_type: str = Field(
         ..., example=AuthorisationType.VO_BASED.description()["authorisation_type"]
     )
     authorisation_info: str = Field(
         ..., example=AuthorisationType.VO_BASED.description()["authorisation_info"]
     )
-    supported_VOs: Optional[list] = Field([], example=["/wlcg"])  # pylint: disable=invalid-name
+    supported_VOs: Optional[list] = Field(
+        [], example=["/wlcg"]
+    )  # pylint: disable=invalid-name
     audience: Optional[Union[str, List[str]]] = Field("", example="ssh_localhost")
 
 

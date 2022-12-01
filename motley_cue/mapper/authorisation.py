@@ -116,9 +116,15 @@ class Authorisation(Flaat):
         self.set_verbosity(config.verbosity)
         self.__authorisation = config.authorisation
         self.access_levels = [
-            AccessLevel("authenticated_user", AuthenticatedUserRequirement(self.__authorisation)),
-            AccessLevel("authorised_user", AuthorisedUserRequirement(self.__authorisation)),
-            AccessLevel("authorised_admin", AuthorisedAdminRequirement(self.__authorisation)),
+            AccessLevel(
+                "authenticated_user", AuthenticatedUserRequirement(self.__authorisation)
+            ),
+            AccessLevel(
+                "authorised_user", AuthorisedUserRequirement(self.__authorisation)
+            ),
+            AccessLevel(
+                "authorised_admin", AuthorisedAdminRequirement(self.__authorisation)
+            ),
         ]
 
     def info(self, request: Request) -> dict:
@@ -159,7 +165,9 @@ class Authorisation(Flaat):
         if len(op_authz.authorised_users) > 0:
             return {
                 "OP": op_authz.op_url,
-                **AuthorisationType.INDIVIDUAL_USERS.description(audience=op_authz.audience),
+                **AuthorisationType.INDIVIDUAL_USERS.description(
+                    audience=op_authz.audience
+                ),
             }
 
         # OP is supported but no authorisation is configured
@@ -212,7 +220,9 @@ class Authorisation(Flaat):
         )
         return auth_flow.decorate_view_func(func)
 
-    def get_user_infos_from_access_token(self, access_token, issuer_hint="") -> Optional[UserInfos]:
+    def get_user_infos_from_access_token(
+        self, access_token, issuer_hint=""
+    ) -> Optional[UserInfos]:
         """Get a (flaat) UserInfos object from given OIDC Access Token."""
         user_infos = super().get_user_infos_from_access_token(access_token, issuer_hint)
         if (
@@ -226,7 +236,9 @@ class Authorisation(Flaat):
             if wlcg_groups is not None:
                 if "groups" in user_infos.user_info:
                     user_infos.user_info["groups"] += [
-                        g for g in wlcg_groups if g not in user_infos.user_info["groups"]
+                        g
+                        for g in wlcg_groups
+                        if g not in user_infos.user_info["groups"]
                     ]
                 else:
                     user_infos.user_info["groups"] = wlcg_groups

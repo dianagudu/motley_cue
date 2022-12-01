@@ -41,7 +41,9 @@ class Encryption:
                 "Something went wrong when trying to load secret key in %s",
                 keyfile,
             )
-            raise InternalException(message=f"Could not create secret key in {keyfile}") from ex
+            raise InternalException(
+                message=f"Could not create secret key in {keyfile}"
+            ) from ex
 
     @staticmethod
     def create_key(keyfile: str) -> None:
@@ -53,7 +55,9 @@ class Encryption:
             Path(keyfile).parent.mkdir(mode=0o700, parents=True, exist_ok=True)
             open(keyfile, "xb").write(key)  # pylint: disable=consider-using-with
             os.chmod(keyfile, 0o400)
-            logger.debug("Created secret key for encryption and saved it to %s.", keyfile)
+            logger.debug(
+                "Created secret key for encryption and saved it to %s.", keyfile
+            )
         except FileExistsError:
             logger.debug("Key already exists in %s, nothing to do here.", keyfile)
         except Exception as ex:
@@ -61,7 +65,9 @@ class Encryption:
                 "Something went wrong when trying to create secret key in %s",
                 keyfile,
             )
-            raise InternalException(message=f"Could not create secret key in {keyfile}") from ex
+            raise InternalException(
+                message=f"Could not create secret key in {keyfile}"
+            ) from ex
 
     def encrypt(self, secret: str) -> str:
         """Encrypt secret using Fernet key"""
@@ -285,7 +291,9 @@ class TokenManager:
         elif otp_config.backend == "sqlitedict":
             self.__db = SQLiteDictTokenDB(otp_config.db_location, otp_config.keyfile)
         else:
-            raise InternalException(f"Unknown backend for token manager: {otp_config.backend}")
+            raise InternalException(
+                f"Unknown backend for token manager: {otp_config.backend}"
+            )
 
     @property
     def database(self):
@@ -309,7 +317,9 @@ class TokenManager:
         try:
             return self.database.pop(otp)
         except Exception as ex:  # pylint: disable=broad-except
-            logger.debug("Failed to get or remove token mapping for otp %s: %s", otp, ex)
+            logger.debug(
+                "Failed to get or remove token mapping for otp %s: %s", otp, ex
+            )
             return None
 
     def generate_otp(self, token: str) -> dict:
@@ -358,7 +368,9 @@ class TokenManager:
                 if authz_header and authz_header.startswith("Bearer "):
                     new_headers = kwargs["request"].headers.mutablecopy()
                     new_headers["authorization"] = f"Bearer {token}"
-                    kwargs["request"]._headers = new_headers  # pylint: disable=protected-access
+                    kwargs[
+                        "request"
+                    ]._headers = new_headers  # pylint: disable=protected-access
                     kwargs["request"].scope.update(headers=new_headers.raw)
             return kwargs
 

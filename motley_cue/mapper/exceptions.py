@@ -52,7 +52,10 @@ class MissingParameter(JSONResponse):
         no_errors = len(errors)
         message = (
             f"{no_errors} request validation error{'' if no_errors == 1 else 's'}: "
-            + "; ".join(f"{e['msg']} ({(' -> '.join(str(l) for l in e['loc']))})" for e in errors)
+            + "; ".join(
+                f"{e['msg']} ({(' -> '.join(str(l) for l in e['loc']))})"
+                for e in errors
+            )
         )
         super().__init__(status_code=HTTP_400_BAD_REQUEST, content={"detail": message})
 
@@ -79,7 +82,9 @@ async def validation_exception_handler(request: Request, exc: ValidationError):
     )
 
 
-async def request_validation_exception_handler(request: Request, exc: RequestValidationError):
+async def request_validation_exception_handler(
+    request: Request, exc: RequestValidationError
+):
     """Replacement callback for handling RequestValidationError exceptions.
 
     :param request: request object that caused the RequestValidationError
