@@ -282,7 +282,7 @@ class ConfigMapper(ConfigSection):
 class ConfigOTP(ConfigSection):
     """Config section for OTP."""
 
-    use_otp: bool = False
+    use_otp: bool = True
     backend: str = "sqlite"
     db_location: str = "/var/cache/motley_cue/tokenmap.db"
     keyfile: str = "/var/lib/motley_cue/motley_cue.key"
