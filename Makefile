@@ -370,7 +370,7 @@ srctar: virtualenv
 		$(PKG_NAME_UNDERSCORES) --transform='s^${PKG_NAME_UNDERSCORES}^${PKG_NAME}-$(RPM_VERSION)^')
 	mkdir -p rpm/rpmbuild/SOURCES
 	mv ../$(SRC_TAR) rpm/rpmbuild/SOURCES/
-	cp rpm/logfiles.patch rpm/rpmbuild/SOURCES/
+	cp rpm/*.patch rpm/rpmbuild/SOURCES/
 
 .PHONY: virtualenv # called from specfile
 virtualenv:

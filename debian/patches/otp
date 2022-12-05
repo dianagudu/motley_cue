@@ -1,0 +1,23 @@
+diff --git a/etc/motley_cue.conf b/etc/motley_cue.conf
+index 63961a6..e987360 100644
+--- a/etc/motley_cue.conf
++++ b/etc/motley_cue.conf
+@@ -29,15 +29,15 @@ log_level = WARNING
+ ## sqlite: stores the mapping in a sqlite database
+ ## sqlitedict: stores the mapping in a sqlite database, but uses a python dict
+ ##             as cache, so that the database is only accessed on changes
+-# backend = memory
++backend = sqlite
+ ##
+ ## location for storing token database -- default: /tmp/tokenmap.db
+ ## only used when backend is sqlite or sqlitedict
+ ## a prefix of ${backend}_ is added to the filename to avoid conflicts
+-# db_location = /tmp/tokenmap.db
++db_location = /var/cache/motley_cue/tokenmap.db
+ ## path to file containing key for encrypting token db -- default: /tmp/motley_cue.key
+ ## key must be a URL-safe base64-encoded 32-byte key, and it will be created if it doesn't exist
+-# keyfile = /tmp/motley_cue.key
++keyfile = /var/lib/motley_cue/motley_cue.key
+ 
+ 
+ #########
