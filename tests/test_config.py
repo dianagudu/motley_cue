@@ -95,31 +95,34 @@ def test_docs_url(test_config, config_parser, docs_url):
 
 
 @pytest.mark.parametrize(
-    "config_parser,use_otp,db_location,keyfile",
+    "config_parser,use_otp,backend,db_location,keyfile",
     [
         (
             CONFIG_NOT_SUPPORTED,
-            False,
-            "/var/cache/motley_cue/tokenmap.db",
-            "/var/lib/motley_cue/motley_cue.key",
+            True,
+            "memory",
+            "/tmp/tokenmap.db",
+            "/tmp/motley_cue.key",
         ),
         (
             CONFIG_OTP_NOT_SUPPORTED,
             False,
-            "/var/cache/motley_cue/tokenmap.db",
-            "/var/lib/motley_cue/motley_cue.key",
+            "memory",
+            "/tmp/tokenmap.db",
+            "/tmp/motley_cue.key",
         ),
         (
             CONFIG_OTP_SUPPORTED,
             True,
+            "sqlite",
             "/run/motley_cue/tokenmap.db",
             "/run/motley_cue/motley_cue.key",
         ),
     ],
 )
-def test_otp(test_config, config_parser, use_otp, db_location, keyfile):
+def test_otp(test_config, config_parser, use_otp, backend, db_location, keyfile):
     otp_config = test_config.Config(config_parser).otp
     assert otp_config.use_otp == use_otp
-    assert otp_config.backend == "sqlite"
+    assert otp_config.backend == backend
     assert otp_config.db_location == db_location
     assert otp_config.keyfile == keyfile

@@ -202,6 +202,22 @@ class SQLiteTokenDB(TokenDB):
             self.connection.execute(sql_insert, (otp, self.encryption.encrypt(token)))
 
 
+class MemorySQLiteTokenDB(SQLiteTokenDB):
+    """In-memory SQLite-based DB for mapping one-time tokens to access tokens"""
+
+    backend = "memory"
+
+    def __init__(self, keyfile: str) -> None:
+        self.encryption = Encryption(keyfile)
+        self.connection = sqlite3.connect("file::memory:?cache=shared", uri=True)
+        with self.connection:  # con.commit() is called automatically afterwards on success
+            # create table
+            self.connection.execute(
+                """create table if not exists tokenmap
+                        (otp text primary key, at text)"""
+            )
+
+
 class SQLiteDictTokenDB(TokenDB):
     """SQLiteDict-based DB for mapping one-time tokens to access tokens"""
 
@@ -290,6 +306,8 @@ class TokenManager:
             self.__db = SQLiteTokenDB(otp_config.db_location, otp_config.keyfile)
         elif otp_config.backend == "sqlitedict":
             self.__db = SQLiteDictTokenDB(otp_config.db_location, otp_config.keyfile)
+        elif otp_config.backend == "memory":
+            self.__db = MemorySQLiteTokenDB(otp_config.keyfile)
         else:
             raise InternalException(
                 f"Unknown backend for token manager: {otp_config.backend}"

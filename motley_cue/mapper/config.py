@@ -296,9 +296,9 @@ class ConfigOTP(ConfigSection):
     """Config section for OTP."""
 
     use_otp: bool = True
-    backend: str = "sqlite"
-    db_location: str = "/var/cache/motley_cue/tokenmap.db"
-    keyfile: str = "/var/lib/motley_cue/motley_cue.key"
+    backend: str = "memory"
+    db_location: str = "/tmp/tokenmap.db"
+    keyfile: str = "/tmp/motley_cue.key"
 
     @classmethod
     def __section__name__(cls):
