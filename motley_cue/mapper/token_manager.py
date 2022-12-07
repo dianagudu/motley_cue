@@ -133,35 +133,45 @@ class SQLiteTokenDB(TokenDB):
         # new db connection for location (does not need to exist)
         db_name = self.rename_location(location)
         Path(db_name).parent.mkdir(mode=0o700, parents=True, exist_ok=True)
-        self.connection = sqlite3.connect(db_name)
-        with self.connection:  # con.commit() is called automatically afterwards on success
+        self.__db_name = db_name
+        with self.connect() as conn:  # con.commit() is called automatically afterwards on success
             # create table
-            self.connection.execute(
+            conn.execute(
                 """create table if not exists tokenmap
                         (otp text primary key, at text)"""
             )
+
+    def connect(self) -> sqlite3.Connection:
+        """Connect to DB and return Connection object.
+
+        In conjunction with the with statement, this will automatically connect to the db,
+        execute the code in the with block, commit the changes to the db and close the connection.
+        This allows for concurrency (e.g. when using gunicorn with multiple processes), as the
+        connection is closed after the with block, and mitigates errors such as "database is locked".
+        """
+        return sqlite3.connect(self.__db_name)
 
     def pop(self, otp: str) -> Optional[str]:
         """Override pop with db stransactions"""
         sql_get = "select at from tokenmap where otp=?"
         sql_del = "delete from tokenmap where otp=?"
         token = None
-        with self.connection:
-            result = self.connection.execute(sql_get, [otp]).fetchall()
+        with self.connect() as conn:
+            result = conn.execute(sql_get, [otp]).fetchall()
             if len(result) == 0:
                 return None
             if len(result) > 1:
                 logger.warning("Multiple entries found in token db for OTP: %s", otp)
             token = self.encryption.decrypt(result[0][0])
-            self.connection.execute(sql_del, [otp])
+            conn.execute(sql_del, [otp])
         return token
 
     def store(self, otp: str, token: str) -> bool:
         """Override store with db transactions"""
         sql_get = "select at from tokenmap where otp=?"
         sql_insert = "insert into tokenmap(otp, at) values (?,?)"
-        with self.connection:
-            result = self.connection.execute(sql_get, [otp]).fetchall()
+        with self.connect() as conn:
+            result = conn.execute(sql_get, [otp]).fetchall()
             if len(result) > 0:  # if already in db
                 stored_token = self.encryption.decrypt(result[0][0])
                 if stored_token == token:  # for the same token
@@ -175,7 +185,7 @@ class SQLiteTokenDB(TokenDB):
                 return False
             # when not found in db, insert new mapping; only encrypt access token
             logger.debug("Storing OTP [%s] for token [%s]", otp, token)
-            self.connection.execute(
+            conn.execute(
                 sql_insert,
                 (otp, self.encryption.encrypt(token)),
             )
@@ -183,8 +193,8 @@ class SQLiteTokenDB(TokenDB):
 
     def get(self, otp: str) -> Optional[str]:
         sql_get = "select at from tokenmap where otp=?"
-        with self.connection:
-            result = self.connection.execute(sql_get, [otp]).fetchall()
+        with self.connect() as conn:
+            result = conn.execute(sql_get, [otp]).fetchall()
             if len(result) == 0:
                 return None
             if len(result) > 1:
@@ -193,29 +203,90 @@ class SQLiteTokenDB(TokenDB):
 
     def remove(self, otp: str) -> None:
         sql_del = "delete from tokenmap where otp=?"
-        with self.connection:
-            self.connection.execute(sql_del, [otp])
+        with self.connect() as conn:
+            conn.execute(sql_del, [otp])
 
     def insert(self, otp: str, token: str) -> None:
         sql_insert = "insert into tokenmap(otp, at) values (?,?)"
-        with self.connection:
-            self.connection.execute(sql_insert, (otp, self.encryption.encrypt(token)))
+        with self.connect() as conn:
+            conn.execute(sql_insert, (otp, self.encryption.encrypt(token)))
 
 
-class MemorySQLiteTokenDB(SQLiteTokenDB):
+class MemorySQLiteTokenDB(TokenDB):
     """In-memory SQLite-based DB for mapping one-time tokens to access tokens"""
 
     backend = "memory"
 
     def __init__(self, keyfile: str) -> None:
         self.encryption = Encryption(keyfile)
+        # create connection to in-memory db once, so that it persists during the lifetime of the MemorySQLiteTokenDB object
         self.connection = sqlite3.connect("file::memory:?cache=shared", uri=True)
-        with self.connection:  # con.commit() is called automatically afterwards on success
-            # create table
-            self.connection.execute(
-                """create table if not exists tokenmap
-                        (otp text primary key, at text)"""
+        # create table
+        self.connection.cursor().execute(
+            """create table if not exists tokenmap
+                    (otp text primary key, at text)"""
+        )
+
+    def close(self):
+        """Close connection to in-memory db."""
+        self.connection.close()
+
+    def pop(self, otp: str) -> Optional[str]:
+        """Override pop with db stransactions"""
+        sql_get = "select at from tokenmap where otp=?"
+        sql_del = "delete from tokenmap where otp=?"
+        token = None
+        result = self.connection.cursor().execute(sql_get, [otp]).fetchall()
+        if len(result) == 0:
+            return None
+        if len(result) > 1:
+            logger.warning("Multiple entries found in token db for OTP: %s", otp)
+        token = self.encryption.decrypt(result[0][0])
+        self.connection.cursor().execute(sql_del, [otp])
+        return token
+
+    def store(self, otp: str, token: str) -> bool:
+        """Override store with db transactions"""
+        sql_get = "select at from tokenmap where otp=?"
+        sql_insert = "insert into tokenmap(otp, at) values (?,?)"
+        result = self.connection.cursor().execute(sql_get, [otp]).fetchall()
+        if len(result) > 0:  # if already in db
+            stored_token = self.encryption.decrypt(result[0][0])
+            if stored_token == token:  # for the same token
+                logger.debug("OTP already exists for token %s", token)
+                return True
+            # else:  # for another token => collision
+            logger.debug(
+                "Collision error: OTP for token %s collides with OTP for another token",
+                token,
             )
+            return False
+        # when not found in db, insert new mapping; only encrypt access token
+        logger.debug("Storing OTP [%s] for token [%s]", otp, token)
+        self.connection.cursor().execute(
+            sql_insert,
+            (otp, self.encryption.encrypt(token)),
+        )
+        return True
+
+    def get(self, otp: str) -> Optional[str]:
+        sql_get = "select at from tokenmap where otp=?"
+        result = self.connection.cursor().execute(sql_get, [otp]).fetchall()
+        if len(result) == 0:
+            return None
+        if len(result) > 1:
+            logger.warning("Multiple entries found in token db for OTP: %s", otp)
+        return self.encryption.decrypt(result[0][0])
+
+    def remove(self, otp: str) -> None:
+        sql_del = "delete from tokenmap where otp=?"
+        self.connection.cursor().execute(sql_del, [otp])
+
+    def insert(self, otp: str, token: str) -> None:
+        sql_insert = "insert into tokenmap(otp, at) values (?,?)"
+        self.connection.cursor().execute(
+            sql_insert, (otp, self.encryption.encrypt(token))
+        )
 
 
 class SQLiteDictTokenDB(TokenDB):
