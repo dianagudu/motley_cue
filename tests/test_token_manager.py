@@ -14,6 +14,8 @@ from .utils import (
     mock_exception,
 )
 
+DB_BACKENDS = ["memory", "sqlite", "sqlitedict"]
+
 
 def test_encryption(test_encryption):
     keyfile = "tmp_keyfile"
@@ -117,7 +119,9 @@ async def test_token_manager_inject_token_replace_otp(test_token_manager):
         return {"request_token": request_token, "header_token": header_token}
 
     test_token_manager.generate_otp(MOCK_TOKEN)
-    result = await mock_func(request=MOCK_OTP_REQUEST, header=MOCK_OTP_HEADERS["Authorization"])
+    result = await mock_func(
+        request=MOCK_OTP_REQUEST, header=MOCK_OTP_HEADERS["Authorization"]
+    )
     assert result["request_token"] == MOCK_TOKEN
     assert result["header_token"] == MOCK_TOKEN
 
@@ -140,7 +144,7 @@ async def test_token_manager_inject_token_keep_at(test_token_manager):
     assert result["header_token"] == MOCK_TOKEN
 
 
-@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict"])
+@pytest.mark.parametrize("backend", DB_BACKENDS)
 def test_token_db_empty(test_token_db):
     mock_otp = "mock_otp"
 
@@ -148,7 +152,7 @@ def test_token_db_empty(test_token_db):
     assert test_token_db.pop(mock_otp) == None
 
 
-@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict"])
+@pytest.mark.parametrize("backend", DB_BACKENDS)
 def test_token_db_insert(test_token_db):
     mock_otp = "mock_otp"
     mock_at = "mock_at"
@@ -158,7 +162,7 @@ def test_token_db_insert(test_token_db):
     assert test_token_db.get(mock_otp) == mock_at
 
 
-@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict"])
+@pytest.mark.parametrize("backend", DB_BACKENDS)
 def test_token_db_remove(test_token_db):
     mock_otp = "mock_otp"
     mock_at = "mock_at"
@@ -168,7 +172,7 @@ def test_token_db_remove(test_token_db):
     assert test_token_db.get(mock_otp) == None
 
 
-@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict"])
+@pytest.mark.parametrize("backend", DB_BACKENDS)
 def test_token_db_pop(test_token_db):
     mock_otp = "mock_otp"
     mock_at = "mock_at"
@@ -178,7 +182,7 @@ def test_token_db_pop(test_token_db):
     assert test_token_db.get(mock_otp) == None
 
 
-@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict"])
+@pytest.mark.parametrize("backend", DB_BACKENDS)
 def test_token_db_store(test_token_db):
     mock_otp = "mock_otp"
     mock_at = "mock_at"
@@ -187,7 +191,7 @@ def test_token_db_store(test_token_db):
     assert test_token_db.get(mock_otp) == mock_at
 
 
-@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict"])
+@pytest.mark.parametrize("backend", DB_BACKENDS)
 def test_token_db_store_twice(test_token_db):
     mock_otp = "mock_otp"
     mock_at = "mock_at"
@@ -198,7 +202,7 @@ def test_token_db_store_twice(test_token_db):
     assert test_token_db.get(mock_otp) == mock_at
 
 
-@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict"])
+@pytest.mark.parametrize("backend", DB_BACKENDS)
 def test_token_db_store_collision(test_token_db):
     mock_otp = "mock_otp"
     mock_at = "mock_at"

@@ -1,5 +1,5 @@
 Name: motley-cue
-Version: 0.5.0
+Version: 0.5.1
 Release: 1%{?dist}
 
 Summary: Mapper Oidc To Local idEntitY with loCal User managEment
@@ -8,6 +8,7 @@ License: MIT
 URL: https://github.com/dianagudu/motley_cue
 Source0: motley-cue.tar.gz
 Patch0: logfiles.patch
+Patch1: otp.patch
 AutoReq: no
 
 # OpenSUSE likes to have a Group
