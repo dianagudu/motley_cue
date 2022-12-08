@@ -145,19 +145,26 @@
 <span class="c1">############</span><span class="w"></span>
 <span class="k">[mapper.otp]</span><span class="w"></span>
 <span class="c1">############</span><span class="w"></span>
-<span class="c1">## use one-time passwords (OTP) instead of tokens as ssh password -- default: False</span><span class="w"></span>
+<span class="c1">## use one-time passwords (OTP) instead of tokens as ssh password -- default: True</span><span class="w"></span>
 <span class="c1">## this can be used when access tokens are too long to be used as passwords (&gt;1k)</span><span class="w"></span>
-<span class="c1"># use_otp = False</span><span class="w"></span>
+<span class="c1"># use_otp = True</span><span class="w"></span>
 <span class="c1">##</span><span class="w"></span>
-<span class="c1">## backend for storing the OTP-AT mapping -- default: sqlite</span><span class="w"></span>
-<span class="c1">## supported backends: sqlite, sqlitedict</span><span class="w"></span>
-<span class="c1"># backend = sqlite</span><span class="w"></span>
+<span class="c1">## backend for storing the OTP-AT mapping -- default: memory</span><span class="w"></span>
+<span class="c1">## supported backends: memory, sqlite, sqlitedict</span><span class="w"></span>
+<span class="c1">## memory: stores the mapping in memory, will be lost on restart; cannot be used in</span><span class="w"></span>
+<span class="c1">##         a multi-process environment, e.g. with gunicorn</span><span class="w"></span>
+<span class="c1">## sqlite: stores the mapping in a sqlite database</span><span class="w"></span>
+<span class="c1">## sqlitedict: stores the mapping in a sqlite database, but uses a python dict</span><span class="w"></span>
+<span class="c1">##             as cache, so that the database is only accessed on changes</span><span class="w"></span>
+<span class="c1"># backend = memory</span><span class="w"></span>
 <span class="c1">##</span><span class="w"></span>
-<span class="c1">## location for storing token database -- default: /var/cache/motley_cue/tokenmap.db</span><span class="w"></span>
-<span class="c1"># db_location = /var/cache/motley_cue/tokenmap.db</span><span class="w"></span>
-<span class="c1">## path to file containing key for encrypting token db -- default: /var/lib/motley_cue/motley_cue.key</span><span class="w"></span>
+<span class="c1">## location for storing token database -- default: /tmp/tokenmap.db</span><span class="w"></span>
+<span class="c1">## only used when backend is sqlite or sqlitedict</span><span class="w"></span>
+<span class="c1">## a prefix of ${backend}_ is added to the filename to avoid conflicts</span><span class="w"></span>
+<span class="c1"># db_location = /tmp/tokenmap.db</span><span class="w"></span>
+<span class="c1">## path to file containing key for encrypting token db -- default: /tmp/motley_cue.key</span><span class="w"></span>
 <span class="c1">## key must be a URL-safe base64-encoded 32-byte key, and it will be created if it doesn&#39;t exist</span><span class="w"></span>
-<span class="c1"># keyfile = /var/lib/motley_cue/motley_cue.key</span><span class="w"></span>
+<span class="c1"># keyfile = /tmp/motley_cue.key</span><span class="w"></span>
 
 
 <span class="c1">#########</span><span class="w"></span>
