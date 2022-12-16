@@ -162,9 +162,19 @@ def test_token_db(backend):
     db_location = "tmp.db"
 
     if backend == "sqlite":
-        yield token_manager.SQLiteTokenDB(db_location, keyfile)
-    else:  # if backend == "sqlitedict":
-        yield token_manager.SQLiteDictTokenDB(db_location, keyfile)
+        db = token_manager.SQLiteTokenDB(db_location, keyfile)
+    elif backend == "sqlitedict":
+        db = token_manager.SQLiteDictTokenDB(db_location, keyfile)
+    elif backend == "memory":
+        db = token_manager.MemorySQLiteTokenDB(keyfile)
+    else:
+        raise ValueError(f"Unknown backend: {backend}")
 
-    os.remove(keyfile)
-    os.remove(f"{backend}_{db_location}")
+    yield db
+
+    if os.path.exists(keyfile):
+        os.remove(keyfile)
+    if os.path.exists(f"{backend}_{db_location}"):
+        os.remove(f"{backend}_{db_location}")
+    if isinstance(db, token_manager.MemorySQLiteTokenDB):
+        db.close()
