@@ -74,10 +74,15 @@ class Mapper:
         """Return information about the local service:
         * supported OPs
         * login information
+        * ops_info per OP information, such as scopes, audience, etc.
         """
         return {
             "login_info": self.__lum.login_info(),
             "supported_OPs": self.__authorisation.trusted_op_list,
+            "ops_info": dict(
+                (op, self.__config.get_op_info(op))
+                for op in self.__authorisation.trusted_op_list
+            ),
         }
 
     def info_op(self, url: str):

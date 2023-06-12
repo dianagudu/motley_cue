@@ -68,6 +68,7 @@ async def info():
 
     * login info
     * supported OPs
+    * ops_info per OP information, such as scopes, audience, etc.
     """
     return mapper.info()
 

@@ -26,6 +26,19 @@ class Info:
             "https://login.helmholtz.de/oauth2",
         ],
     )
+    ops_info: Optional[dict] = Field(
+        {},
+        example={
+            "https://aai.egi.eu/oidc": {
+                "scopes": ["openid", "profile", "email"],
+                "audience": "ssh_localhost",
+            },
+            "https://login.helmholtz.de/oauth2": {
+                "scopes": ["openid", "profile", "email"],
+                "audience": "ssh_localhost",
+            },
+        },
+    )
 
 
 @dataclass
