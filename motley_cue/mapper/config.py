@@ -336,11 +336,13 @@ class ConfigOPAuthZ(ConfigSection):
 
     def get_info(self) -> dict:
         """Returns a dict with the info for this OP"""
-        return {
+        op_info = {
             "op_url": self.op_url,
             "scopes": self.scopes,
-            "audience": self.audience,
         }
+        if self.audience and self.audience != "":
+            op_info["audience"] = self.audience
+        return op_info
 
     # methods used in conjunction with flaat
     def get_user_requirement(self) -> Requirement:

@@ -1,10 +1,18 @@
 """Definitions of API response models
 """
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Dict
 from pydantic.dataclasses import dataclass
 from pydantic import Field
 
 from .mapper.authorisation import AuthorisationType
+
+
+@dataclass
+class InfoOp:
+    """Data model for responses on the /info/op endpoint."""
+
+    scopes: Optional[List[str]] = Field([], example=["openid", "profile", "email"])
+    audience: Optional[Union[str, List[str]]] = Field("", example="ssh_localhost")
 
 
 @dataclass
@@ -26,6 +34,19 @@ class Info:
             "https://login.helmholtz.de/oauth2",
         ],
     )
+    ops_info: Dict[str, InfoOp] = Field(
+        {},
+        example={
+            "https://aai.egi.eu/oidc": {
+                "scopes": ["openid", "profile", "email"],
+                "audience": "ssh_localhost",
+            },
+            "https://login.helmholtz.de/oauth2": {
+                "scopes": ["openid", "profile", "email"],
+                "audience": "ssh_localhost",
+            },
+        },
+    )
 
 
 @dataclass
@@ -44,14 +65,6 @@ class InfoAuthorisation:
     supported_VOs: Optional[list] = Field(
         [], example=["/wlcg"]
     )  # pylint: disable=invalid-name
-    audience: Optional[Union[str, List[str]]] = Field("", example="ssh_localhost")
-
-
-@dataclass
-class InfoOp:
-    """Data model for responses on the /info/op endpoint."""
-
-    scopes: Optional[List[str]] = Field([], example=["openid", "profile", "email"])
     audience: Optional[Union[str, List[str]]] = Field("", example="ssh_localhost")
 
 
