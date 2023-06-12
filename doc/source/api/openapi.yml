@@ -2,7 +2,7 @@ openapi: 3.0.2
 info:
   title: motley_cue
   description: A service for mapping OIDC identities to local identities
-  version: 0.3.0
+  version: 0.5.2
 paths:
   /user:
     get:
@@ -305,9 +305,7 @@ paths:
         identified by issuer and subject claims.
 
 
-        Requires a user with admin rights.
-
-        '
+        Requires a user with admin rights.'
       operationId: suspend_admin_suspend_get
       parameters:
         - description: sub claim of the user to be suspended
@@ -387,9 +385,7 @@ paths:
         identified by issuer and subject claims.
 
 
-        Requires a user with admin rights.
-
-        '
+        Requires a user with admin rights.'
       operationId: resume_admin_resume_get
       parameters:
         - description: sub claim of the user to be suspended
@@ -484,7 +480,9 @@ paths:
 
         * login info
 
-        * supported OPs'
+        * supported OPs
+
+        * ops_info per OP information, such as scopes, audience, etc.'
       operationId: info_info_get
       responses:
         '200':
@@ -557,6 +555,61 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
       security:
         - HTTPBearer: []
+  /info/op:
+    get:
+      summary: Info Op
+      description: Retrieve additional information for specific OP, such as required
+        scopes.
+      operationId: info_op_info_op_get
+      parameters:
+        - description: OP URL
+          required: true
+          schema:
+            title: Url
+            type: string
+            description: OP URL
+          name: url
+          in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InfoOp'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                title: Response 401 Info Op Info Op Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                title: Response 403 Info Op Info Op Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                title: Response 404 Info Op Info Op Get
+                anyOf:
+                  - $ref: '#/components/schemas/ClientError'
+                  - $ref: '#/components/schemas/FlaatError'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /verify_user:
     get:
       summary: Verify User
@@ -564,9 +617,7 @@ paths:
         given **username**.
 
 
-        Requires the user to be authorised on the service.
-
-        '
+        Requires the user to be authorised on the service.'
       operationId: verify_user_verify_user_get
       parameters:
         - description: username to compare to local username
@@ -627,6 +678,17 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
       security:
         - HTTPBearer: []
+  /privacy:
+    get:
+      summary: Privacy
+      operationId: privacy_privacy_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/html:
+              schema:
+                type: string
 components:
   schemas:
     ClientError:
@@ -638,6 +700,7 @@ components:
         detail:
           title: Detail
           type: string
+      description: Data model for responses on errors.
     FeudalResponse:
       title: FeudalResponse
       required:
@@ -663,6 +726,9 @@ components:
             login_help: Login via `mccli ssh {login_host}`.
             ssh_host: localhost
             ssh_user: wlcg001
+      description: 'Data model for any responses coming from FeudalAdapter,
+
+        on any /user/* and /admin/* endpoints.'
     FlaatError:
       title: FlaatError
       required:
@@ -680,6 +746,7 @@ components:
         error_details:
           title: Error Details
           type: string
+      description: Data model for responses on errors coming from FLAAT
     HTTPValidationError:
       title: HTTPValidationError
       type: object
@@ -710,6 +777,26 @@ components:
           example:
             - https://aai.egi.eu/oidc
             - https://login.helmholtz.de/oauth2
+        ops_info:
+          title: Ops Info
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/InfoOp'
+          default: {}
+          example:
+            https://aai.egi.eu/oidc:
+              scopes:
+                - openid
+                - profile
+                - email
+              audience: ssh_localhost
+            https://login.helmholtz.de/oauth2:
+              scopes:
+                - openid
+                - profile
+                - email
+              audience: ssh_localhost
+      description: Data model for responses on the /info endpoint.
     InfoAuthorisation:
       title: InfoAuthorisation
       required:
@@ -746,6 +833,31 @@ components:
                 type: string
           default: ''
           example: ssh_localhost
+      description: Data model for responses on the /info/authorisation endpoint.
+    InfoOp:
+      title: InfoOp
+      type: object
+      properties:
+        scopes:
+          title: Scopes
+          type: array
+          items:
+            type: string
+          default: []
+          example:
+            - openid
+            - profile
+            - email
+        audience:
+          title: Audience
+          anyOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          default: ''
+          example: ssh_localhost
+      description: Data model for responses on the /info/op endpoint.
     OTPResponse:
       title: OTPResponse
       required:
@@ -761,6 +873,13 @@ components:
           type: boolean
           default: false
           example: true
+      description: 'Data model for any responses coming from TokenManager,
+
+        on /user/generate_otp.
+
+        Information on whether OTPs are supported, in which case also
+
+        whether the OTP generation and storage succeeded.'
     ValidationError:
       title: ValidationError
       required:
@@ -773,7 +892,9 @@ components:
           title: Location
           type: array
           items:
-            type: string
+            anyOf:
+              - type: string
+              - type: integer
         msg:
           title: Message
           type: string
@@ -795,6 +916,7 @@ components:
           title: Verified
           type: boolean
           example: true
+      description: Data model for responses on the /verify_user endpoint.
   securitySchemes:
     HTTPBearer:
       type: http
