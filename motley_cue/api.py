@@ -78,10 +78,7 @@ async def info():
     dependencies=[Depends(mapper.user_security)],
     response_model=InfoAuthorisation,
     response_model_exclude_unset=True,
-    responses={
-        200: {"model": InfoAuthorisation},
-        404: {"model": ClientError},
-    },
+    responses={**responses, 200: {"model": InfoAuthorisation}},
 )
 @mapper.authenticated_user_required
 async def info_authorisation(
