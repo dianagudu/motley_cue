@@ -19,6 +19,7 @@ from .exceptions import Unauthorised
 
 logger = logging.getLogger(__name__)
 
+
 # We dynamically load the requirement in is_satisfied_by
 class AuthRequirement(Requirement):
     """Base class for authorisation requirements corresponding to an OP."""
