@@ -381,6 +381,7 @@ virtualenv:
 		echo ${PATH}; \
 		pip --version; \
 		pip install -I -r requirements.txt build; \
+		grep -q "CentOS Linux release 7" /etc/redhat-release && pip install --force-reinstall -v "urllib3==1.26.16"; \
 		pip freeze > venv/all_versions.txt; \
 	)
 
