@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -13,14 +12,11 @@
     <link rel="stylesheet" type="text/css" href="../_static/css/fonts.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
-    <link rel="shortcut icon" href="../_static/motley-cue.ico"/>
+    <link rel="icon" href="../_static/motley-cue.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="motley-cue.service" href="motley_cue_service.html" />
@@ -138,62 +134,62 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">user.update.template</span></code>: template for the email sent to users when a deployed user needs to be updated.</p></li>
 </ul>
 <p>Below an example template for <code class="docutils literal notranslate"><span class="pre">admin.deploy.template</span></code>:</p>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>Dear admin,
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>Dear<span class="w"> </span>admin,
 
-The following user requests access to the host &#39;<span class="cp">${</span><span class="n">hostname</span><span class="cp">}</span>&#39;:
+The<span class="w"> </span>following<span class="w"> </span>user<span class="w"> </span>requests<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>host<span class="w"> </span>&#39;<span class="cp">${</span><span class="n">hostname</span><span class="cp">}</span>&#39;:
 
-    unique_id: <span class="cp">${</span><span class="n">unique_id</span><span class="cp">}</span>
-    name: <span class="cp">${</span><span class="n">full_name</span><span class="cp">}</span>
-    email: <span class="cp">${</span><span class="n">email</span><span class="cp">}</span>
+<span class="w">    </span>unique_id:<span class="w"> </span><span class="cp">${</span><span class="n">unique_id</span><span class="cp">}</span>
+<span class="w">    </span>name:<span class="w"> </span><span class="cp">${</span><span class="n">full_name</span><span class="cp">}</span>
+<span class="w">    </span>email:<span class="w"> </span><span class="cp">${</span><span class="n">email</span><span class="cp">}</span>
 
-Below are the backend-specific commands to deploy a local account for them.
+Below<span class="w"> </span>are<span class="w"> </span>the<span class="w"> </span>backend-specific<span class="w"> </span>commands<span class="w"> </span>to<span class="w"> </span>deploy<span class="w"> </span>a<span class="w"> </span>local<span class="w"> </span>account<span class="w"> </span>for<span class="w"> </span>them.
 
-Creating the necessary local groups:
+Creating<span class="w"> </span>the<span class="w"> </span>necessary<span class="w"> </span>local<span class="w"> </span>groups:
 ====
 <span class="cp">${</span><span class="n">groups_cmd</span><span class="cp">}</span>
 ====
 
-Creating the local account:
+Creating<span class="w"> </span>the<span class="w"> </span>local<span class="w"> </span>account:
 ====
 <span class="cp">${</span><span class="n">user_cmd</span><span class="cp">}</span>
 ====
 
-Adding the user to local groups:
+Adding<span class="w"> </span>the<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>local<span class="w"> </span>groups:
 ====
 <span class="cp">${</span><span class="n">memberships_cmd</span><span class="cp">}</span>
 ====
 
-You are free to change the user&#39;s local username as needed, and fill in any necessary information.
+You<span class="w"> </span>are<span class="w"> </span>free<span class="w"> </span>to<span class="w"> </span>change<span class="w"> </span>the<span class="w"> </span>user&#39;s<span class="w"> </span>local<span class="w"> </span>username<span class="w"> </span>as<span class="w"> </span>needed,<span class="w"> </span>and<span class="w"> </span>fill<span class="w"> </span>in<span class="w"> </span>any<span class="w"> </span>necessary<span class="w"> </span>information.
 
-If you wish to accept this deployment as it is using feudal-adapter:
+If<span class="w"> </span>you<span class="w"> </span>wish<span class="w"> </span>to<span class="w"> </span>accept<span class="w"> </span>this<span class="w"> </span>deployment<span class="w"> </span>as<span class="w"> </span>it<span class="w"> </span>is<span class="w"> </span>using<span class="w"> </span>feudal-adapter:
 ====
-echo &#39;{
-    &quot;state_target&quot;: &quot;accepted&quot;,
-    &quot;user&quot;: {
-        &quot;userinfo&quot;: {
-            &quot;sub&quot;: &quot;<span class="cp">${</span><span class="n">sub</span><span class="cp">}</span>&quot;,
-            &quot;iss&quot;: &quot;<span class="cp">${</span><span class="n">iss</span><span class="cp">}</span>&quot;
-        }
-    }
-}&#39; | feudal-adapter
+echo<span class="w"> </span>&#39;{
+<span class="w">    </span>&quot;state_target&quot;:<span class="w"> </span>&quot;accepted&quot;,
+<span class="w">    </span>&quot;user&quot;:<span class="w"> </span>{
+<span class="w">        </span>&quot;userinfo&quot;:<span class="w"> </span>{
+<span class="w">            </span>&quot;sub&quot;:<span class="w"> </span>&quot;<span class="cp">${</span><span class="n">sub</span><span class="cp">}</span>&quot;,
+<span class="w">            </span>&quot;iss&quot;:<span class="w"> </span>&quot;<span class="cp">${</span><span class="n">iss</span><span class="cp">}</span>&quot;
+<span class="w">        </span>}
+<span class="w">    </span>}
+}&#39;<span class="w"> </span>|<span class="w"> </span>feudal-adapter
 ====
 
-If you wish to reject the deployment, fill in the reason for rejection in the command below and execute it:
+If<span class="w"> </span>you<span class="w"> </span>wish<span class="w"> </span>to<span class="w"> </span>reject<span class="w"> </span>the<span class="w"> </span>deployment,<span class="w"> </span>fill<span class="w"> </span>in<span class="w"> </span>the<span class="w"> </span>reason<span class="w"> </span>for<span class="w"> </span>rejection<span class="w"> </span>in<span class="w"> </span>the<span class="w"> </span>command<span class="w"> </span>below<span class="w"> </span>and<span class="w"> </span>execute<span class="w"> </span>it:
 ====
-echo &#39;{
-    &quot;state_target&quot;: &quot;rejected&quot;,
-    &quot;reason&quot;: &quot;&quot;,
-    &quot;user&quot;: {
-        &quot;userinfo&quot;: {
-            &quot;sub&quot;: &quot;<span class="cp">${</span><span class="n">sub</span><span class="cp">}</span>&quot;,
-            &quot;iss&quot;: &quot;<span class="cp">${</span><span class="n">iss</span><span class="cp">}</span>&quot;
-        }
-    }
-}&#39; | feudal-adapter
+echo<span class="w"> </span>&#39;{
+<span class="w">    </span>&quot;state_target&quot;:<span class="w"> </span>&quot;rejected&quot;,
+<span class="w">    </span>&quot;reason&quot;:<span class="w"> </span>&quot;&quot;,
+<span class="w">    </span>&quot;user&quot;:<span class="w"> </span>{
+<span class="w">        </span>&quot;userinfo&quot;:<span class="w"> </span>{
+<span class="w">            </span>&quot;sub&quot;:<span class="w"> </span>&quot;<span class="cp">${</span><span class="n">sub</span><span class="cp">}</span>&quot;,
+<span class="w">            </span>&quot;iss&quot;:<span class="w"> </span>&quot;<span class="cp">${</span><span class="n">iss</span><span class="cp">}</span>&quot;
+<span class="w">        </span>}
+<span class="w">    </span>}
+}&#39;<span class="w"> </span>|<span class="w"> </span>feudal-adapter
 ====
 
 Best,
-Your humble email bot.
+Your<span class="w"> </span>humble<span class="w"> </span>email<span class="w"> </span>bot.
 </pre></div>
 </div>
 </section>

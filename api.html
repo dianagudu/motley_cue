@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -13,14 +12,11 @@
     <link rel="stylesheet" type="text/css" href="_static/css/fonts.css" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/clipboard.min.js"></script>
     <script src="_static/copybutton.js"></script>
-    <link rel="shortcut icon" href="_static/motley-cue.ico"/>
+    <link rel="icon" href="_static/motley-cue.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="For developers" href="development.html" />
@@ -348,6 +344,7 @@ identified by issuer and subject claims.</p>
 <ul class="simple">
 <li><p>login info</p></li>
 <li><p>supported OPs</p></li>
+<li><p>ops_info per OP information, such as scopes, audience, etc.</p></li>
 </ul>
 <dl class="field-list simple">
 <dt class="field-odd">Status Codes<span class="colon">:</span></dt>
@@ -388,6 +385,30 @@ identified by issuer and subject claims.</p>
 </dd></dl>
 
 <dl class="http get">
+<dt class="sig sig-object http" id="get--info-op">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/info/op</span></span><a class="headerlink" href="#get--info-op" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Info Op</strong></p>
+<p>Retrieve additional information for specific OP, such as required scopes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<em>string</em>) – OP URL
+(Required)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Successful Response</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2">401 Unauthorized</a></span> – Unauthorized</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5">404 Not Found</a></span> – Not Found</p></li>
+<li><p><span><a class="reference external" href="https://www.rfc-editor.org/rfc/rfc4918#section-11.2">422 Unprocessable Entity</a></span> – Validation Error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
 <dt class="sig sig-object http" id="get--verify_user">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/verify_user</span></span><a class="headerlink" href="#get--verify_user" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Verify User</strong></p>
@@ -413,6 +434,19 @@ identified by issuer and subject claims.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>Authorization</strong> – OIDC Access Token or valid one-time token
 (Required)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--privacy">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/privacy</span></span><a class="headerlink" href="#get--privacy" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Privacy</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Status Codes<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Successful Response</p></li>
 </ul>
 </dd>
 </dl>

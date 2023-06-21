@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -13,14 +12,11 @@
     <link rel="stylesheet" type="text/css" href="../_static/css/fonts.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
-    <link rel="shortcut icon" href="../_static/motley-cue.ico"/>
+    <link rel="icon" href="../_static/motley-cue.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="gunicorn.conf.py" href="gunicorn_conf.html" />
@@ -134,29 +130,29 @@
 <span class="c1">#     return 301 https://$server_name$request_uri;</span>
 <span class="c1"># }</span>
 
-server <span class="o">{</span>
-    listen <span class="m">8080</span><span class="p">;</span>
-    listen <span class="o">[</span>::<span class="o">]</span>:8080<span class="p">;</span>
+server<span class="w"> </span><span class="o">{</span>
+<span class="w">    </span>listen<span class="w"> </span><span class="m">8080</span><span class="p">;</span>
+<span class="w">    </span>listen<span class="w"> </span><span class="o">[</span>::<span class="o">]</span>:8080<span class="p">;</span>
 
-    <span class="c1"># # if you uncomment this block, make sure you remove the two directives above</span>
-    <span class="c1"># # also consider uncommenting the server block above for port 80 redirects to 443</span>
-    <span class="c1"># # alternatively, you could use port 8443 instead of 443, as this port is also</span>
-    <span class="c1"># # checked by default by the mccli client software.</span>
-    <span class="c1"># listen 443 ssl;</span>
-    <span class="c1"># listen [::]:443 ssl;</span>
-    <span class="c1"># ssl_certificate /etc/ssl/private/nginx.pem;</span>
-    <span class="c1"># ssl_certificate_key /etc/ssl/private/nginx.key;</span>
+<span class="w">    </span><span class="c1"># # if you uncomment this block, make sure you remove the two directives above</span>
+<span class="w">    </span><span class="c1"># # also consider uncommenting the server block above for port 80 redirects to 443</span>
+<span class="w">    </span><span class="c1"># # alternatively, you could use port 8443 instead of 443, as this port is also</span>
+<span class="w">    </span><span class="c1"># # checked by default by the mccli client software.</span>
+<span class="w">    </span><span class="c1"># listen 443 ssl;</span>
+<span class="w">    </span><span class="c1"># listen [::]:443 ssl;</span>
+<span class="w">    </span><span class="c1"># ssl_certificate /etc/ssl/private/nginx.pem;</span>
+<span class="w">    </span><span class="c1"># ssl_certificate_key /etc/ssl/private/nginx.key;</span>
 
-    server_name _<span class="p">;</span>
-    location / <span class="o">{</span>
-        proxy_set_header X-Forwarded-For <span class="nv">$proxy_add_x_forwarded_for</span><span class="p">;</span>
-        proxy_set_header X-Forwarded-Proto <span class="nv">$scheme</span><span class="p">;</span>
-        proxy_set_header Host <span class="nv">$http_host</span><span class="p">;</span>
-        <span class="c1"># we don&#39;t want nginx trying to do something clever with</span>
-        <span class="c1"># redirects, we set the Host: header above already.</span>
-        proxy_redirect off<span class="p">;</span>
-        proxy_pass http://unix:/run/motley_cue/motley-cue.sock<span class="p">;</span>
-    <span class="o">}</span>
+<span class="w">    </span>server_name<span class="w"> </span>_<span class="p">;</span>
+<span class="w">    </span>location<span class="w"> </span>/<span class="w"> </span><span class="o">{</span>
+<span class="w">        </span>proxy_set_header<span class="w"> </span>X-Forwarded-For<span class="w"> </span><span class="nv">$proxy_add_x_forwarded_for</span><span class="p">;</span>
+<span class="w">        </span>proxy_set_header<span class="w"> </span>X-Forwarded-Proto<span class="w"> </span><span class="nv">$scheme</span><span class="p">;</span>
+<span class="w">        </span>proxy_set_header<span class="w"> </span>Host<span class="w"> </span><span class="nv">$http_host</span><span class="p">;</span>
+<span class="w">        </span><span class="c1"># we don&#39;t want nginx trying to do something clever with</span>
+<span class="w">        </span><span class="c1"># redirects, we set the Host: header above already.</span>
+<span class="w">        </span>proxy_redirect<span class="w"> </span>off<span class="p">;</span>
+<span class="w">        </span>proxy_pass<span class="w"> </span>http://unix:/run/motley_cue/motley-cue.sock<span class="p">;</span>
+<span class="w">    </span><span class="o">}</span>
 <span class="o">}</span>
 </pre></div>
 </div>

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -13,14 +12,11 @@
     <link rel="stylesheet" type="text/css" href="_static/css/fonts.css" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/clipboard.min.js"></script>
     <script src="_static/copybutton.js"></script>
-    <link rel="shortcut icon" href="_static/motley-cue.ico"/>
+    <link rel="icon" href="_static/motley-cue.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="For developers" href="development.html" />
@@ -122,9 +118,9 @@
 <h2>PAM<a class="headerlink" href="#pam" title="Permalink to this heading">¶</a></h2>
 <p>You’ll need <a class="reference external" href="https://git.man.poznan.pl/stash/scm/pracelab/pam.git">this</a> PAM module that supports OIDC authentication by prompting the user for a token instead of a password.</p>
 <p>You can also install it from the <a class="reference external" href="http://repo.data.kit.edu/">http://repo.data.kit.edu/</a> repo:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt-get install pam-ssh-oidc
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt-get<span class="w"> </span>install<span class="w"> </span>pam-ssh-oidc
 or
-yum install pam-ssh-oidc
+yum<span class="w"> </span>install<span class="w"> </span>pam-ssh-oidc
 </pre></div>
 </div>
 <p>Check out the documentation for how to configure it, and make sure you set SSH to use the PAM module.</p>
@@ -134,9 +130,9 @@ yum install pam-ssh-oidc
 </pre></div>
 </div>
 <p>and configure the verification endpoint to your motley_cue instance in <code class="docutils literal notranslate"><span class="pre">/etc/pam.d/config.ini</span></code>:</p>
-<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[user_verification]</span><span class="w"></span>
-<span class="na">local</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">false</span><span class="w"></span>
-<span class="na">verify_endpoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">$MOTLEY_CUE_ENDPOINT/verify_user</span><span class="w"></span>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[user_verification]</span>
+<span class="na">local</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">false</span>
+<span class="na">verify_endpoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">$MOTLEY_CUE_ENDPOINT/verify_user</span>
 </pre></div>
 </div>
 <p>where MOTLEY_CUE_ENDPOINT=&lt;<a class="reference external" href="http://localhost:8080">http://localhost:8080</a>&gt; with a default installation.</p>

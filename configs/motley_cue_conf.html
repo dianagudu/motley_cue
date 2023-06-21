@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -13,14 +12,11 @@
     <link rel="stylesheet" type="text/css" href="../_static/css/fonts.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
-    <link rel="shortcut icon" href="../_static/motley-cue.ico"/>
+    <link rel="icon" href="../_static/motley-cue.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="feudal_adapter.conf" href="feudal_adapter_conf.html" />
@@ -125,283 +121,283 @@
             
   <section id="motley-cue-conf">
 <span id="id1"></span><h1>motley_cue.conf<a class="headerlink" href="#motley-cue-conf" title="Permalink to this heading">¶</a></h1>
-<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1">## Configuration for motley_cue</span><span class="w"></span>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1">## Configuration for motley_cue</span>
 
-<span class="c1">########</span><span class="w"></span>
-<span class="k">[mapper]</span><span class="w"></span>
-<span class="c1">########</span><span class="w"></span>
-<span class="c1">## various service-specific settings</span><span class="w"></span>
-<span class="c1">##</span><span class="w"></span>
-<span class="c1">## log_level -- default: WARNING</span><span class="w"></span>
-<span class="na">log_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">WARNING</span><span class="w"></span>
-<span class="c1">## log_file -- default: /dev/stderr</span><span class="w"></span>
-<span class="c1"># log_file = /var/log/motley_cue/mapper.log</span><span class="w"></span>
-<span class="c1">##</span><span class="w"></span>
-<span class="c1">## enable swagger documentation -- default: False</span><span class="w"></span>
-<span class="c1"># enable_docs = False</span><span class="w"></span>
-<span class="c1">## location of swagger docs -- default: /docs</span><span class="w"></span>
-<span class="c1"># docs_url = /docs</span><span class="w"></span>
+<span class="c1">########</span>
+<span class="k">[mapper]</span>
+<span class="c1">########</span>
+<span class="c1">## various service-specific settings</span>
+<span class="c1">##</span>
+<span class="c1">## log_level -- default: WARNING</span>
+<span class="na">log_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">WARNING</span>
+<span class="c1">## log_file -- default: /dev/stderr</span>
+<span class="c1"># log_file = /var/log/motley_cue/mapper.log</span>
+<span class="c1">##</span>
+<span class="c1">## enable swagger documentation -- default: False</span>
+<span class="c1"># enable_docs = False</span>
+<span class="c1">## location of swagger docs -- default: /docs</span>
+<span class="c1"># docs_url = /docs</span>
 
-<span class="c1">############</span><span class="w"></span>
-<span class="k">[mapper.otp]</span><span class="w"></span>
-<span class="c1">############</span><span class="w"></span>
-<span class="c1">## use one-time passwords (OTP) instead of tokens as ssh password -- default: True</span><span class="w"></span>
-<span class="c1">## this can be used when access tokens are too long to be used as passwords (&gt;1k)</span><span class="w"></span>
-<span class="c1"># use_otp = True</span><span class="w"></span>
-<span class="c1">##</span><span class="w"></span>
-<span class="c1">## backend for storing the OTP-AT mapping -- default: memory</span><span class="w"></span>
-<span class="c1">## supported backends: memory, sqlite, sqlitedict</span><span class="w"></span>
-<span class="c1">## memory: stores the mapping in memory, will be lost on restart; cannot be used in</span><span class="w"></span>
-<span class="c1">##         a multi-process environment, e.g. with gunicorn</span><span class="w"></span>
-<span class="c1">## sqlite: stores the mapping in a sqlite database</span><span class="w"></span>
-<span class="c1">## sqlitedict: stores the mapping in a sqlite database, but uses a python dict</span><span class="w"></span>
-<span class="c1">##             as cache, so that the database is only accessed on changes</span><span class="w"></span>
-<span class="c1"># backend = memory</span><span class="w"></span>
-<span class="c1">##</span><span class="w"></span>
-<span class="c1">## location for storing token database -- default: /tmp/tokenmap.db</span><span class="w"></span>
-<span class="c1">## only used when backend is sqlite or sqlitedict</span><span class="w"></span>
-<span class="c1">## a prefix of ${backend}_ is added to the filename to avoid conflicts</span><span class="w"></span>
-<span class="c1"># db_location = /tmp/tokenmap.db</span><span class="w"></span>
-<span class="c1">## path to file containing key for encrypting token db -- default: /tmp/motley_cue.key</span><span class="w"></span>
-<span class="c1">## key must be a URL-safe base64-encoded 32-byte key, and it will be created if it doesn&#39;t exist</span><span class="w"></span>
-<span class="c1"># keyfile = /tmp/motley_cue.key</span><span class="w"></span>
-
-
-<span class="c1">#########</span><span class="w"></span>
-<span class="k">[privacy]</span><span class="w"></span>
-<span class="c1">#########</span><span class="w"></span>
-<span class="c1">## configuration related to privacy policy</span><span class="w"></span>
-<span class="c1">##</span><span class="w"></span>
-<span class="c1">## contact information for service operator to be included in privacy policy -- default: NOT CONFIGURED</span><span class="w"></span>
-<span class="c1">## this is an email address and MUST be filled in</span><span class="w"></span>
-<span class="c1"># privacy_contact = NOT CONFIGURED</span><span class="w"></span>
-<span class="c1">##</span><span class="w"></span>
-<span class="c1">## privacy policy location (markdown file) -- default: /etc/motley_cue/privacystatement.md</span><span class="w"></span>
-<span class="c1"># privacy_file = /etc/motley_cue/privacystatement.md</span><span class="w"></span>
+<span class="c1">############</span>
+<span class="k">[mapper.otp]</span>
+<span class="c1">############</span>
+<span class="c1">## use one-time passwords (OTP) instead of tokens as ssh password -- default: True</span>
+<span class="c1">## this can be used when access tokens are too long to be used as passwords (&gt;1k)</span>
+<span class="c1"># use_otp = True</span>
+<span class="c1">##</span>
+<span class="c1">## backend for storing the OTP-AT mapping -- default: memory</span>
+<span class="c1">## supported backends: memory, sqlite, sqlitedict</span>
+<span class="c1">## memory: stores the mapping in memory, will be lost on restart; cannot be used in</span>
+<span class="c1">##         a multi-process environment, e.g. with gunicorn</span>
+<span class="c1">## sqlite: stores the mapping in a sqlite database</span>
+<span class="c1">## sqlitedict: stores the mapping in a sqlite database, but uses a python dict</span>
+<span class="c1">##             as cache, so that the database is only accessed on changes</span>
+<span class="c1"># backend = memory</span>
+<span class="c1">##</span>
+<span class="c1">## location for storing token database -- default: /tmp/tokenmap.db</span>
+<span class="c1">## only used when backend is sqlite or sqlitedict</span>
+<span class="c1">## a prefix of ${backend}_ is added to the filename to avoid conflicts</span>
+<span class="c1"># db_location = /tmp/tokenmap.db</span>
+<span class="c1">## path to file containing key for encrypting token db -- default: /tmp/motley_cue.key</span>
+<span class="c1">## key must be a URL-safe base64-encoded 32-byte key, and it will be created if it doesn&#39;t exist</span>
+<span class="c1"># keyfile = /tmp/motley_cue.key</span>
 
 
-<span class="c1">#########</span><span class="w"></span>
-<span class="k">[DEFAULT]</span><span class="w"></span>
-<span class="c1">#########</span><span class="w"></span>
-<span class="c1">## Magic section that provides default values for all sections below.</span><span class="w"></span>
-<span class="c1">## These values are overwritten by values in each section, if specified.</span><span class="w"></span>
-<span class="c1">## DO NOT CHANGE this section unless you really want to apply the changes to ALL OPs.</span><span class="w"></span>
-<span class="c1">##</span><span class="w"></span>
-<span class="c1">## this is the only key without a default value, must be specified for each section</span><span class="w"></span>
-<span class="c1"># op_url =</span><span class="w"></span>
-<span class="c1">##</span><span class="w"></span>
-<span class="c1">## scopes required from the OP to access the service -- default: [&quot;openid&quot;, &quot;profile&quot;, &quot;email&quot;, &quot;eduperson_entitlement&quot;]</span><span class="w"></span>
-<span class="c1">## sane defaults for each OP are provided in the examples below</span><span class="w"></span>
-<span class="na">scopes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[&quot;openid&quot;, &quot;profile&quot;, &quot;email&quot;, &quot;eduperson_entitlement&quot;]</span><span class="w"></span>
-<span class="c1">##</span><span class="w"></span>
-<span class="c1">######################</span><span class="w"></span>
-<span class="c1">## USER AUTHORISATION</span><span class="w"></span>
-<span class="c1">######################</span><span class="w"></span>
-<span class="c1">## authorise all users from trusted OP, defaults to False if not specified</span><span class="w"></span>
-<span class="na">authorise_all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">False</span><span class="w"></span>
-<span class="c1">## list of VOs whose users are authorised to use the service</span><span class="w"></span>
-<span class="na">authorised_vos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[]</span><span class="w"></span>
-<span class="c1">## the OIDC claim containing the VOs specified above</span><span class="w"></span>
-<span class="na">vo_claim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">eduperson_entitlement</span><span class="w"></span>
-<span class="c1">## how many VOs need to be matched from the list, valid options: all, one, or an int</span><span class="w"></span>
-<span class="c1">## defaults to one if not specified</span><span class="w"></span>
-<span class="na">vo_match</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">one</span><span class="w"></span>
-<span class="c1">## list of individual users authorised to use the service</span><span class="w"></span>
-<span class="c1">## specified through OIDC &#39;sub&#39;, relative to the section&#39;s OP (&#39;iss&#39;)</span><span class="w"></span>
-<span class="c1">## defaults to empy list if not specified</span><span class="w"></span>
-<span class="na">authorised_users</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[]</span><span class="w"></span>
-<span class="c1">##</span><span class="w"></span>
-<span class="c1">## audience claim specific to this service (OPTIONAL); it can be a string or a list of strings</span><span class="w"></span>
-<span class="c1">## if empty or not specified, audience checking will not be used for authorisation</span><span class="w"></span>
-<span class="c1">## !! be aware that many OPs do not support this feature, in which case it will be ignored for authorisation</span><span class="w"></span>
-<span class="c1"># audience = ssh_localhost</span><span class="w"></span>
-<span class="c1">##</span><span class="w"></span>
-<span class="c1">## You can find out your &#39;sub&#39; and VOs you are a member of by using flaat:</span><span class="w"></span>
-<span class="c1">##      $ pip install flaat</span><span class="w"></span>
-<span class="c1">##      $ flaat-userinfo $TOKEN</span><span class="w"></span>
-<span class="c1">## where $TOKEN contains an Access Token from the OP you are interested it.</span><span class="w"></span>
-<span class="c1">## A commandline tool to retrieve access tokens is:</span><span class="w"></span>
-<span class="c1">##      oidc-agent [https://github.com/indigo-dc/oidc-agent]</span><span class="w"></span>
-<span class="c1">##</span><span class="w"></span>
-<span class="c1">#################################################################################</span><span class="w"></span>
-<span class="c1">## ADMIN AUTHORISATION</span><span class="w"></span>
-<span class="c1">##</span><span class="w"></span>
-<span class="c1">## Each OP includes authorisation for the /admin endpoint,</span><span class="w"></span>
-<span class="c1">## which allows suspending and resuming access for given users.</span><span class="w"></span>
-<span class="c1">##</span><span class="w"></span>
-<span class="c1">## Currently, only individual admins can be authorised (by &#39;sub&#39; claim).</span><span class="w"></span>
-<span class="c1">## This is meant for infrastructure security contacts.</span><span class="w"></span>
-<span class="c1">## In the future, we plan to support this feature for VO managers too, to suspend</span><span class="w"></span>
-<span class="c1">## members of their own VO (by using VO roles encoded in AARC-G002 entitlements).</span><span class="w"></span>
-<span class="c1">##################################################################################</span><span class="w"></span>
-<span class="c1">## list of authorised admins</span><span class="w"></span>
-<span class="na">authorised_admins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[]</span><span class="w"></span>
-<span class="c1">## allow admins to suspend users from any OP</span><span class="w"></span>
-<span class="c1">## defaults to False, which means an admin can only suspend users from their own OP</span><span class="w"></span>
-<span class="c1"># authorise_admins_for_all_ops = False</span><span class="w"></span>
+<span class="c1">#########</span>
+<span class="k">[privacy]</span>
+<span class="c1">#########</span>
+<span class="c1">## configuration related to privacy policy</span>
+<span class="c1">##</span>
+<span class="c1">## contact information for service operator to be included in privacy policy -- default: NOT CONFIGURED</span>
+<span class="c1">## this is an email address and MUST be filled in</span>
+<span class="c1"># privacy_contact = NOT CONFIGURED</span>
+<span class="c1">##</span>
+<span class="c1">## privacy policy location (markdown file) -- default: /etc/motley_cue/privacystatement.md</span>
+<span class="c1"># privacy_file = /etc/motley_cue/privacystatement.md</span>
+
+
+<span class="c1">#########</span>
+<span class="k">[DEFAULT]</span>
+<span class="c1">#########</span>
+<span class="c1">## Magic section that provides default values for all sections below.</span>
+<span class="c1">## These values are overwritten by values in each section, if specified.</span>
+<span class="c1">## DO NOT CHANGE this section unless you really want to apply the changes to ALL OPs.</span>
+<span class="c1">##</span>
+<span class="c1">## this is the only key without a default value, must be specified for each section</span>
+<span class="c1"># op_url =</span>
+<span class="c1">##</span>
+<span class="c1">## scopes required from the OP to access the service -- default: [&quot;openid&quot;, &quot;profile&quot;, &quot;email&quot;, &quot;eduperson_entitlement&quot;]</span>
+<span class="c1">## sane defaults for each OP are provided in the examples below</span>
+<span class="na">scopes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[&quot;openid&quot;, &quot;profile&quot;, &quot;email&quot;, &quot;eduperson_entitlement&quot;]</span>
+<span class="c1">##</span>
+<span class="c1">######################</span>
+<span class="c1">## USER AUTHORISATION</span>
+<span class="c1">######################</span>
+<span class="c1">## authorise all users from trusted OP, defaults to False if not specified</span>
+<span class="na">authorise_all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">False</span>
+<span class="c1">## list of VOs whose users are authorised to use the service</span>
+<span class="na">authorised_vos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[]</span>
+<span class="c1">## the OIDC claim containing the VOs specified above</span>
+<span class="na">vo_claim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">eduperson_entitlement</span>
+<span class="c1">## how many VOs need to be matched from the list, valid options: all, one, or an int</span>
+<span class="c1">## defaults to one if not specified</span>
+<span class="na">vo_match</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">one</span>
+<span class="c1">## list of individual users authorised to use the service</span>
+<span class="c1">## specified through OIDC &#39;sub&#39;, relative to the section&#39;s OP (&#39;iss&#39;)</span>
+<span class="c1">## defaults to empy list if not specified</span>
+<span class="na">authorised_users</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[]</span>
+<span class="c1">##</span>
+<span class="c1">## audience claim specific to this service (OPTIONAL); it can be a string or a list of strings</span>
+<span class="c1">## if empty or not specified, audience checking will not be used for authorisation</span>
+<span class="c1">## !! be aware that many OPs do not support this feature, in which case it will be ignored for authorisation</span>
+<span class="c1"># audience = ssh_localhost</span>
+<span class="c1">##</span>
+<span class="c1">## You can find out your &#39;sub&#39; and VOs you are a member of by using flaat:</span>
+<span class="c1">##      $ pip install flaat</span>
+<span class="c1">##      $ flaat-userinfo $TOKEN</span>
+<span class="c1">## where $TOKEN contains an Access Token from the OP you are interested it.</span>
+<span class="c1">## A commandline tool to retrieve access tokens is:</span>
+<span class="c1">##      oidc-agent [https://github.com/indigo-dc/oidc-agent]</span>
+<span class="c1">##</span>
+<span class="c1">#################################################################################</span>
+<span class="c1">## ADMIN AUTHORISATION</span>
+<span class="c1">##</span>
+<span class="c1">## Each OP includes authorisation for the /admin endpoint,</span>
+<span class="c1">## which allows suspending and resuming access for given users.</span>
+<span class="c1">##</span>
+<span class="c1">## Currently, only individual admins can be authorised (by &#39;sub&#39; claim).</span>
+<span class="c1">## This is meant for infrastructure security contacts.</span>
+<span class="c1">## In the future, we plan to support this feature for VO managers too, to suspend</span>
+<span class="c1">## members of their own VO (by using VO roles encoded in AARC-G002 entitlements).</span>
+<span class="c1">##################################################################################</span>
+<span class="c1">## list of authorised admins</span>
+<span class="na">authorised_admins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[]</span>
+<span class="c1">## allow admins to suspend users from any OP</span>
+<span class="c1">## defaults to False, which means an admin can only suspend users from their own OP</span>
+<span class="c1"># authorise_admins_for_all_ops = False</span>
 
 
 
 
-<span class="c1">#########################################################################################</span><span class="w"></span>
-<span class="c1">## AUTHORISATION PER OIDC PROVIDER</span><span class="w"></span>
-<span class="c1">##</span><span class="w"></span>
-<span class="c1">## The following sections are used to configure auhtorisation of users from multiple OPs.</span><span class="w"></span>
-<span class="c1">## Any section named [authorisation.*] configures the authorisation for a single OP.</span><span class="w"></span>
-<span class="c1">##</span><span class="w"></span>
-<span class="c1">## Feel free to add more sections to support your desired OPs.</span><span class="w"></span>
-<span class="c1">## You can overwrite any of the default values by simply specifying a new value.</span><span class="w"></span>
-<span class="c1">## Take a look at the examples in the comments to help get you started.</span><span class="w"></span>
-<span class="c1">#########################################################################################</span><span class="w"></span>
+<span class="c1">#########################################################################################</span>
+<span class="c1">## AUTHORISATION PER OIDC PROVIDER</span>
+<span class="c1">##</span>
+<span class="c1">## The following sections are used to configure auhtorisation of users from multiple OPs.</span>
+<span class="c1">## Any section named [authorisation.*] configures the authorisation for a single OP.</span>
+<span class="c1">##</span>
+<span class="c1">## Feel free to add more sections to support your desired OPs.</span>
+<span class="c1">## You can overwrite any of the default values by simply specifying a new value.</span>
+<span class="c1">## Take a look at the examples in the comments to help get you started.</span>
+<span class="c1">#########################################################################################</span>
 
-<span class="c1">###################</span><span class="w"></span>
-<span class="k">[authorisation.egi]</span><span class="w"></span>
-<span class="c1">###################</span><span class="w"></span>
-<span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://aai.egi.eu/auth/realms/egi</span><span class="w"></span>
+<span class="c1">###################</span>
+<span class="k">[authorisation.egi]</span>
+<span class="c1">###################</span>
+<span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://aai.egi.eu/auth/realms/egi</span>
 
-<span class="c1">## USER AUTHORISATION</span><span class="w"></span>
-<span class="c1">## In this example, there is one VO whose members can use the service.</span><span class="w"></span>
-<span class="c1">## In addition, individual users are authorised by &#39;sub&#39; claim.</span><span class="w"></span>
-<span class="c1">## These users don&#39;t have to be members of the authorised VOs.</span><span class="w"></span>
-<span class="c1"># authorised_vos = [</span><span class="w"></span>
-<span class="c1">#         &quot;urn:mace:egi.eu:group:eosc-synergy.eu:role=member&quot;</span><span class="w"></span>
-<span class="c1">#     ]</span><span class="w"></span>
-<span class="c1"># authorised_users = [</span><span class="w"></span>
-<span class="c1">#         &quot;c2370093c19496aeb46103cce3ccdc7b183f54ac9ba9c859dea94dfba23aacd5@egi.eu&quot;</span><span class="w"></span>
-<span class="c1">#     ]</span><span class="w"></span>
+<span class="c1">## USER AUTHORISATION</span>
+<span class="c1">## In this example, there is one VO whose members can use the service.</span>
+<span class="c1">## In addition, individual users are authorised by &#39;sub&#39; claim.</span>
+<span class="c1">## These users don&#39;t have to be members of the authorised VOs.</span>
+<span class="c1"># authorised_vos = [</span>
+<span class="c1">#         &quot;urn:mace:egi.eu:group:eosc-synergy.eu:role=member&quot;</span>
+<span class="c1">#     ]</span>
+<span class="c1"># authorised_users = [</span>
+<span class="c1">#         &quot;c2370093c19496aeb46103cce3ccdc7b183f54ac9ba9c859dea94dfba23aacd5@egi.eu&quot;</span>
+<span class="c1">#     ]</span>
 
-<span class="c1">## ADMIN AUTHORISATION</span><span class="w"></span>
-<span class="c1">## In this example, the three admins specified below can suspend any user on this service.</span><span class="w"></span>
-<span class="c1"># authorised_admins = [</span><span class="w"></span>
-<span class="c1">#         &quot;d7a53cbe3e966c53ac64fde7355956560282158ecac8f3d2c770b474862f4756@egi.eu&quot;,</span><span class="w"></span>
-<span class="c1">#         &quot;7ca006d6b7e61023cec493a74e57849ae9145815@eduteams.org&quot;,</span><span class="w"></span>
-<span class="c1">#         &quot;c2370093c19496aeb46103cce3ccdc7b183f54ac9ba9c859dea94dfba23aacd5@egi.eu&quot;</span><span class="w"></span>
-<span class="c1">#     ]</span><span class="w"></span>
-<span class="c1"># authorise_admins_for_all_ops = True</span><span class="w"></span>
+<span class="c1">## ADMIN AUTHORISATION</span>
+<span class="c1">## In this example, the three admins specified below can suspend any user on this service.</span>
+<span class="c1"># authorised_admins = [</span>
+<span class="c1">#         &quot;d7a53cbe3e966c53ac64fde7355956560282158ecac8f3d2c770b474862f4756@egi.eu&quot;,</span>
+<span class="c1">#         &quot;7ca006d6b7e61023cec493a74e57849ae9145815@eduteams.org&quot;,</span>
+<span class="c1">#         &quot;c2370093c19496aeb46103cce3ccdc7b183f54ac9ba9c859dea94dfba23aacd5@egi.eu&quot;</span>
+<span class="c1">#     ]</span>
+<span class="c1"># authorise_admins_for_all_ops = True</span>
 
-<span class="c1">###################</span><span class="w"></span>
-<span class="k">[authorisation.egi-dev]</span><span class="w"></span>
-<span class="c1">###################</span><span class="w"></span>
-<span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://aai-dev.egi.eu/auth/realms/egi</span><span class="w"></span>
-
-
-<span class="c1">###################</span><span class="w"></span>
-<span class="k">[authorisation.wlcg]</span><span class="w"></span>
-<span class="c1">###################</span><span class="w"></span>
-<span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="s">https://wlcg.cloud.cnaf.infn.it/</span><span class="w"></span>
-
-<span class="c1">## if you plan to use oidc-agent forwarding for delegation and need more scopes, add them too.</span><span class="w"></span>
-<span class="c1">## e.g. for wlcg: storage.read:/ storage.create:/ compute.read compute.modify compute.create compute.cancel storage.modify:/ storage.stage:/</span><span class="w"></span>
-<span class="na">scopes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[&quot;openid&quot;, &quot;profile&quot;, &quot;email&quot;, &quot;wlcg&quot;, &quot;wlcg.groups&quot;, &quot;eduperson_entitlement&quot;]</span><span class="w"></span>
-
-<span class="c1">## USER AUTHORISATION</span><span class="w"></span>
-<span class="c1">## In this example, there is one VO whose members can use the service,</span><span class="w"></span>
-<span class="c1">## found in the &#39;wlcg.groups&#39; claim</span><span class="w"></span>
-<span class="c1"># authorised_vos = [</span><span class="w"></span>
-<span class="c1">#         &quot;/wlcg&quot;</span><span class="w"></span>
-<span class="c1">#     ]</span><span class="w"></span>
-<span class="c1"># vo_claim = wlcg.groups</span><span class="w"></span>
-<span class="c1">## you can set different audience values per OP, e.g.</span><span class="w"></span>
-<span class="c1"># audience = ssh_localhost_wlcg</span><span class="w"></span>
-
-<span class="c1">## ADMIN AUTHORISATION</span><span class="w"></span>
-<span class="c1">## no admin users allowed from this OP</span><span class="w"></span>
+<span class="c1">###################</span>
+<span class="k">[authorisation.egi-dev]</span>
+<span class="c1">###################</span>
+<span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://aai-dev.egi.eu/auth/realms/egi</span>
 
 
-<span class="c1">#############################</span><span class="w"></span>
-<span class="k">[authorisation.helmholtz-dev]</span><span class="w"></span>
-<span class="c1">#############################</span><span class="w"></span>
-<span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://login-dev.helmholtz.de/oauth2</span><span class="w"></span>
+<span class="c1">###################</span>
+<span class="k">[authorisation.wlcg]</span>
+<span class="c1">###################</span>
+<span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="s">https://wlcg.cloud.cnaf.infn.it/</span>
 
-<span class="c1">## USER AUTHORISATION</span><span class="w"></span>
-<span class="c1">## In this example, the user has to be a member of all the specified VOs.</span><span class="w"></span>
-<span class="c1"># authorised_vos = [</span><span class="w"></span>
-<span class="c1">#         &quot;urn:geant:helmholtz.de:group:KIT#login-dev.helmholtz.de&quot;,</span><span class="w"></span>
-<span class="c1">#         &quot;urn:geant:helmholtz.de:group:Helmholtz-member#login-dev.helmholtz.de&quot;</span><span class="w"></span>
-<span class="c1">#     ]</span><span class="w"></span>
-<span class="c1"># vo_match = all</span><span class="w"></span>
+<span class="c1">## if you plan to use oidc-agent forwarding for delegation and need more scopes, add them too.</span>
+<span class="c1">## e.g. for wlcg: storage.read:/ storage.create:/ compute.read compute.modify compute.create compute.cancel storage.modify:/ storage.stage:/</span>
+<span class="na">scopes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[&quot;openid&quot;, &quot;profile&quot;, &quot;email&quot;, &quot;wlcg&quot;, &quot;wlcg.groups&quot;, &quot;eduperson_entitlement&quot;]</span>
 
-<span class="c1">## ADMIN AUTHORISATION</span><span class="w"></span>
-<span class="c1">## no admin users allowed from this OP</span><span class="w"></span>
+<span class="c1">## USER AUTHORISATION</span>
+<span class="c1">## In this example, there is one VO whose members can use the service,</span>
+<span class="c1">## found in the &#39;wlcg.groups&#39; claim</span>
+<span class="c1"># authorised_vos = [</span>
+<span class="c1">#         &quot;/wlcg&quot;</span>
+<span class="c1">#     ]</span>
+<span class="c1"># vo_claim = wlcg.groups</span>
+<span class="c1">## you can set different audience values per OP, e.g.</span>
+<span class="c1"># audience = ssh_localhost_wlcg</span>
 
-
-<span class="c1">###################</span><span class="w"></span>
-<span class="k">[authorisation.kit]</span><span class="w"></span>
-<span class="c1">###################</span><span class="w"></span>
-<span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://oidc.scc.kit.edu/auth/realms/kit</span><span class="w"></span>
-
-<span class="c1">## KIT supports scope &#39;entitlements&#39; instead of &#39;eduperson_entitlement&#39;</span><span class="w"></span>
-<span class="na">scopes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[&quot;openid&quot;, &quot;profile&quot;, &quot;email&quot;, &quot;entitlements&quot;]</span><span class="w"></span>
-
-<span class="c1">## USER AUTHORISATION</span><span class="w"></span>
-<span class="c1">## In this example, any KIT user can access the service.</span><span class="w"></span>
-<span class="c1"># authorise_all = True</span><span class="w"></span>
-
-<span class="c1">## ADMIN AUTHORISATION</span><span class="w"></span>
-<span class="c1">## In this example, two admins are authorised to suspend / resume accounts</span><span class="w"></span>
-<span class="c1">## of KIT users on this service.</span><span class="w"></span>
-<span class="c1"># authorised_admins = [</span><span class="w"></span>
-<span class="c1">#         &quot;4cbcd471-1f51-4e54-97b8-2dd5177e25ec&quot;,</span><span class="w"></span>
-<span class="c1">#         &quot;d0c5d6f7-ca8b-4430-954f-37289ab38913&quot;</span><span class="w"></span>
-<span class="c1">#     ]</span><span class="w"></span>
+<span class="c1">## ADMIN AUTHORISATION</span>
+<span class="c1">## no admin users allowed from this OP</span>
 
 
-<span class="c1">####################</span><span class="w"></span>
-<span class="k">[authorisation.deep]</span><span class="w"></span>
-<span class="c1">####################</span><span class="w"></span>
-<span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://iam.deep-hybrid-datacloud.eu</span><span class="w"></span>
+<span class="c1">#############################</span>
+<span class="k">[authorisation.helmholtz-dev]</span>
+<span class="c1">#############################</span>
+<span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://login-dev.helmholtz.de/oauth2</span>
 
-<span class="c1">## USER AUTHORISATION</span><span class="w"></span>
-<span class="c1">## example for supported VOs with a different claim</span><span class="w"></span>
-<span class="c1"># authorised_vos = [</span><span class="w"></span>
-<span class="c1">#         &quot;KIT-Cloud&quot;</span><span class="w"></span>
-<span class="c1">#     ]</span><span class="w"></span>
-<span class="c1"># vo_claim = groups</span><span class="w"></span>
+<span class="c1">## USER AUTHORISATION</span>
+<span class="c1">## In this example, the user has to be a member of all the specified VOs.</span>
+<span class="c1"># authorised_vos = [</span>
+<span class="c1">#         &quot;urn:geant:helmholtz.de:group:KIT#login-dev.helmholtz.de&quot;,</span>
+<span class="c1">#         &quot;urn:geant:helmholtz.de:group:Helmholtz-member#login-dev.helmholtz.de&quot;</span>
+<span class="c1">#     ]</span>
+<span class="c1"># vo_match = all</span>
 
-<span class="c1">## ADMIN AUTHORISATION</span><span class="w"></span>
-<span class="c1">## no admin users allowed from this OP</span><span class="w"></span>
-
-
-<span class="c1">#########################</span><span class="w"></span>
-<span class="k">[authorisation.helmholtz]</span><span class="w"></span>
-<span class="c1">#########################</span><span class="w"></span>
-<span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://login.helmholtz.de/oauth2/</span><span class="w"></span>
-
-<span class="c1">## USER AUTHORISATION</span><span class="w"></span>
-<span class="c1">## In this example, when no additional authorisation is specified besides the OP URL,</span><span class="w"></span>
-<span class="c1">## no users from this OP are in fact authorised on the service.</span><span class="w"></span>
-
-<span class="c1">## ADMIN AUTHORISATION</span><span class="w"></span>
-<span class="c1">## In this example, even though Helmholtz users are not authorised on this service,</span><span class="w"></span>
-<span class="c1">## the admin specified can suspend users from other OPs.</span><span class="w"></span>
-<span class="c1">## Note that the admin is NOT authorised to USE the service.</span><span class="w"></span>
-<span class="c1"># authorised_admins = [</span><span class="w"></span>
-<span class="c1">#         &quot;6c611e2a-2c1c-487f-9948-c058a36c8f0e&quot;</span><span class="w"></span>
-<span class="c1">#     ]</span><span class="w"></span>
-<span class="c1"># authorise_admins_for_all_ops = True</span><span class="w"></span>
+<span class="c1">## ADMIN AUTHORISATION</span>
+<span class="c1">## no admin users allowed from this OP</span>
 
 
-<span class="c1">######################</span><span class="w"></span>
-<span class="k">[authorisation.google]</span><span class="w"></span>
-<span class="c1">######################</span><span class="w"></span>
-<span class="c1">## OPs like google have opaque tokens instead of JWT. Furthermore, there is little</span><span class="w"></span>
-<span class="c1">## information that can be retrieved about a user and used for authN &amp; authZ.</span><span class="w"></span>
-<span class="c1">## As such, only the &#39;sub&#39; claim can reliably be used for authorisation below.</span><span class="w"></span>
-<span class="c1">## Keep in mind that the assurance of google accounts is probably not sufficient</span><span class="w"></span>
-<span class="c1">## You can configure allowed assurance profiles in feudal_adapter.conf</span><span class="w"></span>
-<span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://accounts.google.com/</span><span class="w"></span>
+<span class="c1">###################</span>
+<span class="k">[authorisation.kit]</span>
+<span class="c1">###################</span>
+<span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://oidc.scc.kit.edu/auth/realms/kit</span>
 
-<span class="c1">## google does not support the eduperson_entitlement scope</span><span class="w"></span>
-<span class="na">scopes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[&quot;openid&quot;, &quot;profile&quot;]</span><span class="w"></span>
+<span class="c1">## KIT supports scope &#39;entitlements&#39; instead of &#39;eduperson_entitlement&#39;</span>
+<span class="na">scopes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[&quot;openid&quot;, &quot;profile&quot;, &quot;email&quot;, &quot;entitlements&quot;]</span>
 
-<span class="c1">## USER AUTHORISATION</span><span class="w"></span>
-<span class="c1">## In this example, individual users are authorised by &#39;sub&#39; claim.</span><span class="w"></span>
-<span class="c1"># authorised_users = [</span><span class="w"></span>
-<span class="c1">#         &quot;THIS-IS-A-SUB-CLAIM&quot;</span><span class="w"></span>
-<span class="c1">#     ]</span><span class="w"></span>
+<span class="c1">## USER AUTHORISATION</span>
+<span class="c1">## In this example, any KIT user can access the service.</span>
+<span class="c1"># authorise_all = True</span>
 
-<span class="c1">## ADMIN AUTHORISATION</span><span class="w"></span>
-<span class="c1">## no admin users allowed from this OP</span><span class="w"></span>
+<span class="c1">## ADMIN AUTHORISATION</span>
+<span class="c1">## In this example, two admins are authorised to suspend / resume accounts</span>
+<span class="c1">## of KIT users on this service.</span>
+<span class="c1"># authorised_admins = [</span>
+<span class="c1">#         &quot;4cbcd471-1f51-4e54-97b8-2dd5177e25ec&quot;,</span>
+<span class="c1">#         &quot;d0c5d6f7-ca8b-4430-954f-37289ab38913&quot;</span>
+<span class="c1">#     ]</span>
+
+
+<span class="c1">####################</span>
+<span class="k">[authorisation.deep]</span>
+<span class="c1">####################</span>
+<span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://iam.deep-hybrid-datacloud.eu</span>
+
+<span class="c1">## USER AUTHORISATION</span>
+<span class="c1">## example for supported VOs with a different claim</span>
+<span class="c1"># authorised_vos = [</span>
+<span class="c1">#         &quot;KIT-Cloud&quot;</span>
+<span class="c1">#     ]</span>
+<span class="c1"># vo_claim = groups</span>
+
+<span class="c1">## ADMIN AUTHORISATION</span>
+<span class="c1">## no admin users allowed from this OP</span>
+
+
+<span class="c1">#########################</span>
+<span class="k">[authorisation.helmholtz]</span>
+<span class="c1">#########################</span>
+<span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://login.helmholtz.de/oauth2/</span>
+
+<span class="c1">## USER AUTHORISATION</span>
+<span class="c1">## In this example, when no additional authorisation is specified besides the OP URL,</span>
+<span class="c1">## no users from this OP are in fact authorised on the service.</span>
+
+<span class="c1">## ADMIN AUTHORISATION</span>
+<span class="c1">## In this example, even though Helmholtz users are not authorised on this service,</span>
+<span class="c1">## the admin specified can suspend users from other OPs.</span>
+<span class="c1">## Note that the admin is NOT authorised to USE the service.</span>
+<span class="c1"># authorised_admins = [</span>
+<span class="c1">#         &quot;6c611e2a-2c1c-487f-9948-c058a36c8f0e&quot;</span>
+<span class="c1">#     ]</span>
+<span class="c1"># authorise_admins_for_all_ops = True</span>
+
+
+<span class="c1">######################</span>
+<span class="k">[authorisation.google]</span>
+<span class="c1">######################</span>
+<span class="c1">## OPs like google have opaque tokens instead of JWT. Furthermore, there is little</span>
+<span class="c1">## information that can be retrieved about a user and used for authN &amp; authZ.</span>
+<span class="c1">## As such, only the &#39;sub&#39; claim can reliably be used for authorisation below.</span>
+<span class="c1">## Keep in mind that the assurance of google accounts is probably not sufficient</span>
+<span class="c1">## You can configure allowed assurance profiles in feudal_adapter.conf</span>
+<span class="na">op_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://accounts.google.com/</span>
+
+<span class="c1">## google does not support the eduperson_entitlement scope</span>
+<span class="na">scopes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[&quot;openid&quot;, &quot;profile&quot;]</span>
+
+<span class="c1">## USER AUTHORISATION</span>
+<span class="c1">## In this example, individual users are authorised by &#39;sub&#39; claim.</span>
+<span class="c1"># authorised_users = [</span>
+<span class="c1">#         &quot;THIS-IS-A-SUB-CLAIM&quot;</span>
+<span class="c1">#     ]</span>
+
+<span class="c1">## ADMIN AUTHORISATION</span>
+<span class="c1">## no admin users allowed from this OP</span>
 </pre></div>
 </div>
 </section>

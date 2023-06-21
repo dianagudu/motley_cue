@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -13,14 +12,11 @@
     <link rel="stylesheet" type="text/css" href="../_static/css/fonts.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
-    <link rel="shortcut icon" href="../_static/motley-cue.ico"/>
+    <link rel="icon" href="../_static/motley-cue.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="motley_cue.env" href="motley_cue_env.html" />
@@ -125,366 +121,366 @@
             
   <section id="feudal-adapter-conf">
 <span id="id1"></span><h1>feudal_adapter.conf<a class="headerlink" href="#feudal-adapter-conf" title="Permalink to this heading">¶</a></h1>
-<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1"># Configuration for the feudalAdapter (formally known as ldf_adapter)</span><span class="w"></span>
-
-<span class="k">[ldf_adapter]</span><span class="w"></span>
-
-<span class="c1">### backend -- default: local_unix</span><span class="w"></span>
-<span class="c1"># The Backend to use. Currently supported:</span><span class="w"></span>
-<span class="c1">#  - local_unix</span><span class="w"></span>
-<span class="c1">#  - bwidm</span><span class="w"></span>
-<span class="c1">#  - ldap</span><span class="w"></span>
-<span class="na">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">local_unix</span><span class="w"></span>
-
-<span class="c1">### backend_supports_preferring_existing_user -- default: False</span><span class="w"></span>
-<span class="c1"># In case the backend can detect a username issued to a federated</span><span class="w"></span>
-<span class="c1"># identifier, setting this to &quot;True&quot; will overwrite the incoming</span><span class="w"></span>
-<span class="c1"># preferred_username. </span><span class="w"></span>
-<span class="c1">#backend_supports_preferring_existing_user = False</span><span class="w"></span>
-
-<span class="c1">### primary_grup</span><span class="w"></span>
-<span class="c1"># Specify a primary group. If unset the user may be prompted to choose</span><span class="w"></span>
-<span class="c1"># one, in case more than one are available</span><span class="w"></span>
-<span class="c1">#</span><span class="w"></span>
-<span class="c1">#primary_group = mytestcollab</span><span class="w"></span>
-
-<span class="c1">### fallback_group</span><span class="w"></span>
-<span class="c1"># Specify a group that is chosen, if the user does not come in without any</span><span class="w"></span>
-<span class="c1"># group.</span><span class="w"></span>
-<span class="c1"># NOTE: This may not be intended, because groups usually reflect the</span><span class="w"></span>
-<span class="c1"># authorisation!</span><span class="w"></span>
-<span class="na">fallback_group</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">nogroup</span><span class="w"></span>
-
-<span class="c1">### additional_groups</span><span class="w"></span>
-<span class="c1"># Specify additional groups for the users to be added to.</span><span class="w"></span>
-<span class="c1"># Multiple groups can be provided as a space-separated list.</span><span class="w"></span>
-<span class="c1"># If the groups do not exist, they will be created by the backend.</span><span class="w"></span>
-<span class="c1">#additional_groups =</span><span class="w"></span>
-
-<span class="c1">### interactive  --  default: false</span><span class="w"></span>
-<span class="c1"># If true, user may be asked to choose a primary group or to</span><span class="w"></span>
-<span class="c1"># specify a different username.</span><span class="w"></span>
-<span class="c1"># If false, and not primary_group is specified in the config, the first</span><span class="w"></span>
-<span class="c1"># available group will be chosen.</span><span class="w"></span>
-<span class="c1">#</span><span class="w"></span>
-<span class="c1">#interactive = false</span><span class="w"></span>
-
-<span class="k">[messages]</span><span class="w"></span>
-<span class="c1">####################</span><span class="w"></span>
-<span class="c1">### Messages section</span><span class="w"></span>
-<span class="c1"># Here we select which information will be logged</span><span class="w"></span>
-
-<span class="c1">### log_file -- default: /var/log/feudal/adapter.log</span><span class="w"></span>
-<span class="na">log_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/var/log/motley_cue/feudal.log</span><span class="w"></span>
-
-<span class="c1">### log_level -- default: WARNING</span><span class="w"></span>
-<span class="c1"># INFO will show a few lines inidicating changes to users and groups</span><span class="w"></span>
-<span class="na">log_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">INFO</span><span class="w"></span>
-
-<span class="c1">### log_to_console -- default: only when environment variable $LOG is set</span><span class="w"></span>
-<span class="c1"># If set to False: don&#39;t log to console, even if $LOG is set.</span><span class="w"></span>
-<span class="c1"># If set to True: log to console, regardless of $LOG.</span><span class="w"></span>
-<span class="c1">#log_to_console = True</span><span class="w"></span>
-
-<span class="c1">### log_name_changes  --  default: yes</span><span class="w"></span>
-<span class="c1"># names (of users, groups, issuers, ...) will be changed to conform to</span><span class="w"></span>
-<span class="c1"># requirements we found with BWIDM. This is basically standard unix and</span><span class="w"></span>
-<span class="c1"># string requirements.</span><span class="w"></span>
-<span class="c1"># If set to yes, the name changes will be logged as warnings</span><span class="w"></span>
-<span class="na">log_name_changes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">no</span><span class="w"></span>
-
-<span class="c1">### log_primary_group_definition -- default: yes</span><span class="w"></span>
-<span class="c1"># If no primary_group configured, and if the user has more than one group,</span><span class="w"></span>
-<span class="c1"># we have to pick one group as the primary one. We currently cannot even</span><span class="w"></span>
-<span class="c1"># guarantee this will be the same for each deployment</span><span class="w"></span>
-<span class="na">log_primary_group_definition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">no</span><span class="w"></span>
-
-<span class="c1">### log_username_creation -- default: no</span><span class="w"></span>
-<span class="c1"># When the preferred_username cannot be used, feudalAdapter will try a</span><span class="w"></span>
-<span class="c1"># couple of names. If set to yes, we will log all the names that will be</span><span class="w"></span>
-<span class="c1"># tried</span><span class="w"></span>
-<span class="na">log_username_creation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">no</span><span class="w"></span>
-
-<span class="k">[approval]</span><span class="w"></span>
-<span class="c1">#####################</span><span class="w"></span>
-<span class="c1">### Approval Section</span><span class="w"></span>
-<span class="c1"># Here we configure the approval workflow for deploying local accounts</span><span class="w"></span>
-
-<span class="c1">### enabled --  default: False</span><span class="w"></span>
-<span class="c1"># whether approval is required from local admin to deploy local accounts</span><span class="w"></span>
-<span class="c1"># enabled = False</span><span class="w"></span>
-
-<span class="c1">### user db location -- default: /var/lib/feudal/pending_users.db</span><span class="w"></span>
-<span class="c1"># currently, only sqlite is used as db for pending requests.</span><span class="w"></span>
-<span class="na">user_db_location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/var/lib/motley_cue/pending_users.db</span><span class="w"></span>
-
-<span class="c1">### notifier -- default: email</span><span class="w"></span>
-<span class="c1"># how to notify admins of incoming deployment requests; supported: email</span><span class="w"></span>
-<span class="c1"># to test that the configuration works, try `feudal-adapter --test`</span><span class="w"></span>
-<span class="na">notifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">email</span><span class="w"></span>
-
-<span class="c1">### [notifier.*] configurations specific to each notifier</span><span class="w"></span>
-
-<span class="k">[notifier.email]</span><span class="w"></span>
-<span class="c1">################</span><span class="w"></span>
-<span class="c1">### configure email notifier (via SMTP)</span><span class="w"></span>
-
-<span class="c1">## smtp server for sending emails -- default: localhost</span><span class="w"></span>
-<span class="c1">## examples: smarthost.kit.edu, smtp.gmail.com</span><span class="w"></span>
-<span class="c1"># smtp_server = localhost</span><span class="w"></span>
-
-<span class="c1">## port smtp server listens on --  default: 25</span><span class="w"></span>
-<span class="c1">## gmail SSL port: 465</span><span class="w"></span>
-<span class="c1"># smtp_port = 25</span><span class="w"></span>
-
-<span class="c1">## use ssl -- default: False</span><span class="w"></span>
-<span class="c1"># use_ssl = False</span><span class="w"></span>
-
-<span class="c1">## email address to send the notification emails from -- default: admin@localhost</span><span class="w"></span>
-<span class="c1">## can use a test gmail address</span><span class="w"></span>
-<span class="c1"># sent_from = admin@localhost</span><span class="w"></span>
-
-<span class="c1">## password of email the notification emails are sent from -- default: None (no login needed)</span><span class="w"></span>
-<span class="c1"># required with test gmail address: create app password</span><span class="w"></span>
-<span class="c1"># sent_from_password = </span><span class="w"></span>
-
-<span class="c1">## email address of admin in charge of approving deployment requests -- default: admin@localhost</span><span class="w"></span>
-<span class="c1"># admin_email = admin@localhost</span><span class="w"></span>
-
-<span class="c1">## directory containing templates for notification emails -- default: /etc/feudal/templates</span><span class="w"></span>
-<span class="na">templates_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/etc/motley_cue/templates</span><span class="w"></span>
-
-<span class="c1"># [notifier.courier]</span><span class="w"></span>
-<span class="c1">################</span><span class="w"></span>
-<span class="c1">### configure Courier notifier</span><span class="w"></span>
-
-<span class="c1">## api key</span><span class="w"></span>
-<span class="c1"># api_key = </span><span class="w"></span>
-
-
-<span class="k">[assurance]</span><span class="w"></span>
-<span class="c1">#####################</span><span class="w"></span>
-<span class="c1">### Assurance Section </span><span class="w"></span>
-<span class="c1"># here we configure the assurance requirements that users must fulfill</span><span class="w"></span>
-
-<span class="c1">### prefix </span><span class="w"></span>
-<span class="c1"># The common prefix of the assurance claims used.</span><span class="w"></span>
-<span class="c1"># This is prepended to every value that does not start with &#39;http[s]://&#39;</span><span class="w"></span>
-<span class="c1">#</span><span class="w"></span>
-<span class="na">prefix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://refeds.org/assurance/</span><span class="w"></span>
-
-<span class="c1">### require</span><span class="w"></span>
-<span class="c1"># Specify the required assurance of a user to be let into the system.</span><span class="w"></span>
-<span class="c1"># This can be an arbitrarly complex boolean expression of claims that need to be</span><span class="w"></span>
-<span class="c1"># satisfied.</span><span class="w"></span>
-<span class="c1"># Supported operatiors are:</span><span class="w"></span>
-<span class="c1"># - &#39;&amp;&#39; logical and</span><span class="w"></span>
-<span class="c1"># - &#39;|&#39; logical or</span><span class="w"></span>
-<span class="c1"># - &#39;(&#39; and &#39;)&#39; for parenthesis.</span><span class="w"></span>
-<span class="c1"># Each terminal is a string(-suffix), which might be contained in the users</span><span class="w"></span>
-<span class="c1"># eduperson_assurance.</span><span class="w"></span>
-<span class="c1"># Special terminals are:</span><span class="w"></span>
-<span class="c1"># - &#39;+&#39; any claim</span><span class="w"></span>
-<span class="c1"># - &#39;*&#39; always satisfied.</span><span class="w"></span>
-<span class="c1">#</span><span class="w"></span>
-<span class="c1"># Examples for the REFEDS Assurance Framework: (for reference and details see https://refeds.org/assurance)</span><span class="w"></span>
-<span class="c1"># require = profile/espresso   -&gt; Require that all users have the espresso profile</span><span class="w"></span>
-<span class="c1"># require = *                  -&gt; Allow any user, regargdless of their assurance</span><span class="w"></span>
-<span class="c1"># require = +                  -&gt; Allow any user, as long as they have an assurance claim</span><span class="w"></span>
-<span class="c1"># require = profile/espresso |                   -&gt; Photo-ID was verified against an up-to-date goverment database</span><span class="w"></span>
-<span class="c1">#    IAP/medium &amp;                               -&gt; Photo-ID was verified by a trained professional</span><span class="w"></span>
-<span class="c1">#           ID/eppn-unique-no-reassign |           AND the eppn is unique and won&#39;t be reassigned</span><span class="w"></span>
-<span class="c1">#    IAP/low                                    -&gt; User has an account at a university</span><span class="w"></span>
-<span class="c1">#           ID/eppn-unique-no-reassign |           AND the eppn is unique and won&#39;t be reassigned</span><span class="w"></span>
-<span class="c1">#    https://aai.egi.eu/LoA#Substantial |       -&gt; Photo-ID was verified by a trained professional</span><span class="w"></span>
-<span class="c1">#    profile/cappuccino                         -&gt; Photo-ID was verified by a trained professional</span><span class="w"></span>
-<span class="c1">#                                                  AND the eppn is unique and won&#39;t be reassigned</span><span class="w"></span>
-<span class="na">require</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">profile/espresso |</span><span class="w"></span>
-<span class="w">    </span><span class="na">IAP/medium &amp; ID/eppn-unique-no-reassign |</span><span class="w"></span>
-<span class="w">    </span><span class="na">IAP/low &amp; ID/eppn-unique-no-reassign |</span><span class="w"></span>
-<span class="w">    </span><span class="na">https://aai.egi.eu/LoA#Substantial |</span><span class="w"></span>
-<span class="w">    </span><span class="na">profile/cappuccino</span><span class="w"></span>
-
-<span class="c1">### verified_undeploy  --  default: false</span><span class="w"></span>
-<span class="c1"># Block undeployment for disallowed users. Useful to forbid a user removing an</span><span class="w"></span>
-<span class="c1"># account after he lost authorisation for the service</span><span class="w"></span>
-<span class="c1">#verified_undeploy = False</span><span class="w"></span>
-
-<span class="c1">### skip  --  default: no</span><span class="w"></span>
-<span class="c1"># Skip assurance checking and assume assurance is sufficient.</span><span class="w"></span>
-<span class="c1"># USE WITH CARE AND ONLY IF YOU KNOW WHAT YOU ARE DOING!!!</span><span class="w"></span>
-<span class="na">skip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Yes, do as I say!</span><span class="w"></span>
-
-<span class="c1">###################################</span><span class="w"></span>
-<span class="c1">### Username Generator</span><span class="w"></span>
-<span class="c1">#</span><span class="w"></span>
-<span class="c1"># The Username Generator is only used when ldf_adapter.interactive is</span><span class="w"></span>
-<span class="c1"># false.  This is because with ldf_adapter.interactive users can specify</span><span class="w"></span>
-<span class="c1"># their own username.</span><span class="w"></span>
-<span class="c1">#</span><span class="w"></span>
-<span class="c1"># Username Generateor configures the way in which usernames are generated</span><span class="w"></span>
-<span class="c1"># The name generator has different modes, each of which may require</span><span class="w"></span>
-<span class="c1"># Additional configuration</span><span class="w"></span>
-
-<span class="k">[username_generator]</span><span class="w"></span>
-
-<span class="c1">### mode  --  default: friendly</span><span class="w"></span>
-<span class="c1"># These modes are currently available: </span><span class="w"></span>
-
-<span class="c1"># - friendly: Friendly implements a list of strategies that are tried one</span><span class="w"></span>
-<span class="c1">#             after another. The input is based on different claims of the</span><span class="w"></span>
-<span class="c1">#             incoming userinfo object:</span><span class="w"></span>
-<span class="c1">#             - preferred_username claim (if present)</span><span class="w"></span>
-<span class="c1">#             - combine a varying number of letters of given_name + family_name</span><span class="w"></span>
-<span class="c1">#             - email-address if all else fails</span><span class="w"></span>
-<span class="c1"># - pooled:   Pooled implements the pool-account behaviour known from &quot;the grid&quot;</span><span class="w"></span>
-<span class="c1">#             I.e. we use the primary group name and append the digits, in the</span><span class="w"></span>
-<span class="c1">#             order of incoming users.</span><span class="w"></span>
-<span class="c1">#             Unfortunately, with OIDC group names may be much longer.</span><span class="w"></span>
-<span class="c1">#             Therefore, a specific prefix may be configured.</span><span class="w"></span>
-<span class="c1">#</span><span class="w"></span>
-<span class="c1">#mode = friendly</span><span class="w"></span>
-<span class="na">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">pooled</span><span class="w"></span>
-
-<span class="c1">### pool_prefx  --  default: primary group name of the user</span><span class="w"></span>
-<span class="c1">#pool_prefix = pool</span><span class="w"></span>
-
-<span class="c1">### pool_digits  --  default: 3</span><span class="w"></span>
-<span class="c1"># The number of digits to use</span><span class="w"></span>
-<span class="c1">#pool_digits = 2</span><span class="w"></span>
-
-<span class="c1">### strip_sub_groups  --  default: no</span><span class="w"></span>
-<span class="c1"># Federated group names may be unique, which can make them very long,</span><span class="w"></span>
-<span class="c1"># while POSIX only allows 32 characters. We are truncating groups. </span><span class="w"></span>
-<span class="c1"># Example:</span><span class="w"></span>
-<span class="c1">#   This entitlement: urn:mace:egi.eu:group:eosc-synergy.eu:admins:role=member#aai.egi.eu</span><span class="w"></span>
-<span class="c1">#      is mapped to : egi-eu_..-eosc-synergy-eu_admins</span><span class="w"></span>
-<span class="c1"># As you can see, subgroups are used to form the POSIX group name.</span><span class="w"></span>
-<span class="c1"># The strip_sub_groups can help, but you will loose the information about</span><span class="w"></span>
-<span class="c1"># the subgroups.</span><span class="w"></span>
-<span class="c1"># Use with care</span><span class="w"></span>
-<span class="c1">#strip_sub_groups = no</span><span class="w"></span>
-
-<span class="k">[login_info]</span><span class="w"></span>
-<span class="c1"># Static information displayed to the user when deployed to a service.</span><span class="w"></span>
-<span class="c1"># Each key and value field will be shown to the user in the &quot;Credentials&quot;</span><span class="w"></span>
-<span class="c1"># screen.</span><span class="w"></span>
-<span class="c1"># ssh_host defaults to &quot;localhost&quot; when missing</span><span class="w"></span>
-<span class="c1"># ssh_user is usually filled by the backend</span><span class="w"></span>
-<span class="c1"># all other information is optional and can be extended with any desired information</span><span class="w"></span>
-<span class="c1">#</span><span class="w"></span>
-<span class="na">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Local SSH Test Service</span><span class="w"></span>
-<span class="na">login_help</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Login via `mccli ssh {ssh_host}`.</span><span class="w"></span>
-<span class="na">ssh_host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">test-host</span><span class="w"></span>
-
-<span class="c1">###################################</span><span class="w"></span>
-<span class="c1">### Backend specific configuration.</span><span class="w"></span>
-<span class="c1"># You can find available backends in the</span><span class="w"></span>
-<span class="c1"># feudalAdapter/ldf_adapter/backends folder.</span><span class="w"></span>
-<span class="c1">#</span><span class="w"></span>
-<span class="c1"># Each backend may have multiple sections.</span><span class="w"></span>
-
-<span class="k">[backend.local_unix]</span><span class="w"></span>
-<span class="c1"># Configuration for the local_unix backend</span><span class="w"></span>
-
-<span class="c1">### shell  --  default: /bin/sh</span><span class="w"></span>
-<span class="c1"># The unix shell to use</span><span class="w"></span>
-<span class="na">shell</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/bin/bash</span><span class="w"></span>
-
-<span class="c1">### home_base -- default: /home</span><span class="w"></span>
-<span class="c1"># The base directory for users&#39; home directories</span><span class="w"></span>
-<span class="c1"># home_base = /home</span><span class="w"></span>
-
-<span class="c1"># deploy_user_ssh_keys -- default: yes</span><span class="w"></span>
-<span class="c1"># Allows using ssh keys, when they are found in the deployment request</span><span class="w"></span>
-<span class="na">deploy_user_ssh_keys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">no</span><span class="w"></span>
-
-<span class="c1"># punch4nfdi -- default: no</span><span class="w"></span>
-<span class="c1"># If set to yes, we will use the punch4nfdi-specific method to translate group names</span><span class="w"></span>
-<span class="c1"># punch4nfdi = no</span><span class="w"></span>
-
-<span class="k">[backend.bwidm]</span><span class="w"></span>
-<span class="c1"># Configuration for the bwidm backend</span><span class="w"></span>
-
-<span class="c1">### url</span><span class="w"></span>
-<span class="c1"># The base URL of the bwidm API</span><span class="w"></span>
-<span class="na">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://bwidm-test.scc.kit.edu/rest</span><span class="w"></span>
-
-<span class="c1">### org_id</span><span class="w"></span>
-<span class="c1"># The ID for bwidm. This is used for prefixing user- and group names</span><span class="w"></span>
-<span class="na">org_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">fdl</span><span class="w"></span>
-
-<span class="c1">### log_outgoing_http_requests -- default: false</span><span class="w"></span>
-<span class="c1">#log_outgoing_http_requests = false</span><span class="w"></span>
-
-<span class="c1"># HTTP basic auth to connect to BWIDM API</span><span class="w"></span>
-<span class="na">http_user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">foo</span><span class="w"></span>
-<span class="na">http_pass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">bar</span><span class="w"></span>
-
-<span class="c1"># The name of the service the user should be added to on BWIDM:</span><span class="w"></span>
-<span class="na">service_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">sshtest</span><span class="w"></span>
-
-<span class="k">[backend.ldap]</span><span class="w"></span>
-<span class="c1"># Configuration for the ldap backend</span><span class="w"></span>
-
-<span class="c1"># The ldap backend can function in 3 different modes:</span><span class="w"></span>
-<span class="c1"># - read_only (default): there is read only access to the LDAP, therefore the local accounts</span><span class="w"></span>
-<span class="c1">#       need to already be created in the LDAP and mapped to the federated accounts;</span><span class="w"></span>
-<span class="c1">#       read the docs for more on how to map local &lt;-&gt; federated accounts.</span><span class="w"></span>
-<span class="c1"># - pre_created: the local accounts already exist in the LDAP, but they are not mapped;</span><span class="w"></span>
-<span class="c1">#       the feudal adapter should have write access to the LDAP to modify entries in</span><span class="w"></span>
-<span class="c1">#       order to add the mapping to the federated OIDC account.</span><span class="w"></span>
-<span class="c1"># - full_access: the feudal adapter has full access to the LDAP and can add/delete/update</span><span class="w"></span>
-<span class="c1">#       entries contianing local accounts and mappings.</span><span class="w"></span>
-<span class="na">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">read_only</span><span class="w"></span>
-
-<span class="c1"># host where ldap server is running, default: localhost</span><span class="w"></span>
-<span class="na">host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ldap_server</span><span class="w"></span>
-
-<span class="c1"># port where server is listening, default: 1389 or 636 if TLS is enabled</span><span class="w"></span>
-<span class="c1"># port = 1389</span><span class="w"></span>
-
-<span class="c1"># OPTIONAL: admin credentials to authenticate to the ldap</span><span class="w"></span>
-<span class="c1"># NEEDED for modifying the LDAP</span><span class="w"></span>
-<span class="c1"># when not provided, anonymous bind is used</span><span class="w"></span>
-<span class="c1"># admin user should be fully qualified</span><span class="w"></span>
-<span class="c1"># admin_user = cn=admin,dc=cesga,dc=es</span><span class="w"></span>
-<span class="c1"># admin_password = adminpassword</span><span class="w"></span>
-
-<span class="c1"># set to true if tls is enabled; default: False</span><span class="w"></span>
-<span class="c1"># not supported yet</span><span class="w"></span>
-<span class="c1"># tls = False</span><span class="w"></span>
-
-<span class="c1"># ldap base for user namespace; default: ou=users,dc=example</span><span class="w"></span>
-<span class="c1"># can include any number of ou / o / dc entries separated by commas</span><span class="w"></span>
-<span class="c1"># user_base = ou=users,dc=example</span><span class="w"></span>
-
-<span class="c1"># user entry attributes containing uids for mapping a user; defaults: gecos &amp; uid</span><span class="w"></span>
-<span class="c1"># users have to be have (at least) the following objectClass: inetOrgPerson, posixAccount</span><span class="w"></span>
-<span class="c1"># attribute_oidc_uid = gecos</span><span class="w"></span>
-<span class="c1"># attribute_local_uid = uid</span><span class="w"></span>
-
-<span class="c1"># ldap base for group namespace; default: ou=groups,dc=example</span><span class="w"></span>
-<span class="c1"># can include any number of ou / o / dc entries separated by commas</span><span class="w"></span>
-<span class="c1"># group_base = ou=groups,dc=example</span><span class="w"></span>
-
-
-<span class="c1">#### Options only needed for full_access mode when accounts need to be created</span><span class="w"></span>
-
-<span class="c1">## shell  --  default: /bin/sh</span><span class="w"></span>
-<span class="c1">## The unix shell to use</span><span class="w"></span>
-<span class="c1"># shell = /bin/bash</span><span class="w"></span>
-
-<span class="c1">## base directory for home directories -- default /home</span><span class="w"></span>
-<span class="c1"># home_base = /home/curso/</span><span class="w"></span>
-
-<span class="c1">## UID range -- default 1000 -&gt; 60000</span><span class="w"></span>
-<span class="c1"># uid_min = 1000</span><span class="w"></span>
-<span class="c1"># uid_max = 60000</span><span class="w"></span>
-
-<span class="c1">## GID range -- default 1000 -&gt; 60000</span><span class="w"></span>
-<span class="c1"># gid_min = 1000</span><span class="w"></span>
-<span class="c1"># gid_max = 60000</span><span class="w"></span>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1"># Configuration for the feudalAdapter (formally known as ldf_adapter)</span>
+
+<span class="k">[ldf_adapter]</span>
+
+<span class="c1">### backend -- default: local_unix</span>
+<span class="c1"># The Backend to use. Currently supported:</span>
+<span class="c1">#  - local_unix</span>
+<span class="c1">#  - bwidm</span>
+<span class="c1">#  - ldap</span>
+<span class="na">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">local_unix</span>
+
+<span class="c1">### backend_supports_preferring_existing_user -- default: False</span>
+<span class="c1"># In case the backend can detect a username issued to a federated</span>
+<span class="c1"># identifier, setting this to &quot;True&quot; will overwrite the incoming</span>
+<span class="c1"># preferred_username. </span>
+<span class="c1">#backend_supports_preferring_existing_user = False</span>
+
+<span class="c1">### primary_grup</span>
+<span class="c1"># Specify a primary group. If unset the user may be prompted to choose</span>
+<span class="c1"># one, in case more than one are available</span>
+<span class="c1">#</span>
+<span class="c1">#primary_group = mytestcollab</span>
+
+<span class="c1">### fallback_group</span>
+<span class="c1"># Specify a group that is chosen, if the user does not come in without any</span>
+<span class="c1"># group.</span>
+<span class="c1"># NOTE: This may not be intended, because groups usually reflect the</span>
+<span class="c1"># authorisation!</span>
+<span class="na">fallback_group</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">nogroup</span>
+
+<span class="c1">### additional_groups</span>
+<span class="c1"># Specify additional groups for the users to be added to.</span>
+<span class="c1"># Multiple groups can be provided as a space-separated list.</span>
+<span class="c1"># If the groups do not exist, they will be created by the backend.</span>
+<span class="c1">#additional_groups =</span>
+
+<span class="c1">### interactive  --  default: false</span>
+<span class="c1"># If true, user may be asked to choose a primary group or to</span>
+<span class="c1"># specify a different username.</span>
+<span class="c1"># If false, and not primary_group is specified in the config, the first</span>
+<span class="c1"># available group will be chosen.</span>
+<span class="c1">#</span>
+<span class="c1">#interactive = false</span>
+
+<span class="k">[messages]</span>
+<span class="c1">####################</span>
+<span class="c1">### Messages section</span>
+<span class="c1"># Here we select which information will be logged</span>
+
+<span class="c1">### log_file -- default: /var/log/feudal/adapter.log</span>
+<span class="na">log_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/var/log/motley_cue/feudal.log</span>
+
+<span class="c1">### log_level -- default: WARNING</span>
+<span class="c1"># INFO will show a few lines inidicating changes to users and groups</span>
+<span class="na">log_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">INFO</span>
+
+<span class="c1">### log_to_console -- default: only when environment variable $LOG is set</span>
+<span class="c1"># If set to False: don&#39;t log to console, even if $LOG is set.</span>
+<span class="c1"># If set to True: log to console, regardless of $LOG.</span>
+<span class="c1">#log_to_console = True</span>
+
+<span class="c1">### log_name_changes  --  default: yes</span>
+<span class="c1"># names (of users, groups, issuers, ...) will be changed to conform to</span>
+<span class="c1"># requirements we found with BWIDM. This is basically standard unix and</span>
+<span class="c1"># string requirements.</span>
+<span class="c1"># If set to yes, the name changes will be logged as warnings</span>
+<span class="na">log_name_changes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">no</span>
+
+<span class="c1">### log_primary_group_definition -- default: yes</span>
+<span class="c1"># If no primary_group configured, and if the user has more than one group,</span>
+<span class="c1"># we have to pick one group as the primary one. We currently cannot even</span>
+<span class="c1"># guarantee this will be the same for each deployment</span>
+<span class="na">log_primary_group_definition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">no</span>
+
+<span class="c1">### log_username_creation -- default: no</span>
+<span class="c1"># When the preferred_username cannot be used, feudalAdapter will try a</span>
+<span class="c1"># couple of names. If set to yes, we will log all the names that will be</span>
+<span class="c1"># tried</span>
+<span class="na">log_username_creation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">no</span>
+
+<span class="k">[approval]</span>
+<span class="c1">#####################</span>
+<span class="c1">### Approval Section</span>
+<span class="c1"># Here we configure the approval workflow for deploying local accounts</span>
+
+<span class="c1">### enabled --  default: False</span>
+<span class="c1"># whether approval is required from local admin to deploy local accounts</span>
+<span class="c1"># enabled = False</span>
+
+<span class="c1">### user db location -- default: /var/lib/feudal/pending_users.db</span>
+<span class="c1"># currently, only sqlite is used as db for pending requests.</span>
+<span class="na">user_db_location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/var/lib/motley_cue/pending_users.db</span>
+
+<span class="c1">### notifier -- default: email</span>
+<span class="c1"># how to notify admins of incoming deployment requests; supported: email</span>
+<span class="c1"># to test that the configuration works, try `feudal-adapter --test`</span>
+<span class="na">notifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">email</span>
+
+<span class="c1">### [notifier.*] configurations specific to each notifier</span>
+
+<span class="k">[notifier.email]</span>
+<span class="c1">################</span>
+<span class="c1">### configure email notifier (via SMTP)</span>
+
+<span class="c1">## smtp server for sending emails -- default: localhost</span>
+<span class="c1">## examples: smarthost.kit.edu, smtp.gmail.com</span>
+<span class="c1"># smtp_server = localhost</span>
+
+<span class="c1">## port smtp server listens on --  default: 25</span>
+<span class="c1">## gmail SSL port: 465</span>
+<span class="c1"># smtp_port = 25</span>
+
+<span class="c1">## use ssl -- default: False</span>
+<span class="c1"># use_ssl = False</span>
+
+<span class="c1">## email address to send the notification emails from -- default: admin@localhost</span>
+<span class="c1">## can use a test gmail address</span>
+<span class="c1"># sent_from = admin@localhost</span>
+
+<span class="c1">## password of email the notification emails are sent from -- default: None (no login needed)</span>
+<span class="c1"># required with test gmail address: create app password</span>
+<span class="c1"># sent_from_password = </span>
+
+<span class="c1">## email address of admin in charge of approving deployment requests -- default: admin@localhost</span>
+<span class="c1"># admin_email = admin@localhost</span>
+
+<span class="c1">## directory containing templates for notification emails -- default: /etc/feudal/templates</span>
+<span class="na">templates_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/etc/motley_cue/templates</span>
+
+<span class="c1"># [notifier.courier]</span>
+<span class="c1">################</span>
+<span class="c1">### configure Courier notifier</span>
+
+<span class="c1">## api key</span>
+<span class="c1"># api_key = </span>
+
+
+<span class="k">[assurance]</span>
+<span class="c1">#####################</span>
+<span class="c1">### Assurance Section </span>
+<span class="c1"># here we configure the assurance requirements that users must fulfill</span>
+
+<span class="c1">### prefix </span>
+<span class="c1"># The common prefix of the assurance claims used.</span>
+<span class="c1"># This is prepended to every value that does not start with &#39;http[s]://&#39;</span>
+<span class="c1">#</span>
+<span class="na">prefix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://refeds.org/assurance/</span>
+
+<span class="c1">### require</span>
+<span class="c1"># Specify the required assurance of a user to be let into the system.</span>
+<span class="c1"># This can be an arbitrarly complex boolean expression of claims that need to be</span>
+<span class="c1"># satisfied.</span>
+<span class="c1"># Supported operatiors are:</span>
+<span class="c1"># - &#39;&amp;&#39; logical and</span>
+<span class="c1"># - &#39;|&#39; logical or</span>
+<span class="c1"># - &#39;(&#39; and &#39;)&#39; for parenthesis.</span>
+<span class="c1"># Each terminal is a string(-suffix), which might be contained in the users</span>
+<span class="c1"># eduperson_assurance.</span>
+<span class="c1"># Special terminals are:</span>
+<span class="c1"># - &#39;+&#39; any claim</span>
+<span class="c1"># - &#39;*&#39; always satisfied.</span>
+<span class="c1">#</span>
+<span class="c1"># Examples for the REFEDS Assurance Framework: (for reference and details see https://refeds.org/assurance)</span>
+<span class="c1"># require = profile/espresso   -&gt; Require that all users have the espresso profile</span>
+<span class="c1"># require = *                  -&gt; Allow any user, regargdless of their assurance</span>
+<span class="c1"># require = +                  -&gt; Allow any user, as long as they have an assurance claim</span>
+<span class="c1"># require = profile/espresso |                   -&gt; Photo-ID was verified against an up-to-date goverment database</span>
+<span class="c1">#    IAP/medium &amp;                               -&gt; Photo-ID was verified by a trained professional</span>
+<span class="c1">#           ID/eppn-unique-no-reassign |           AND the eppn is unique and won&#39;t be reassigned</span>
+<span class="c1">#    IAP/low                                    -&gt; User has an account at a university</span>
+<span class="c1">#           ID/eppn-unique-no-reassign |           AND the eppn is unique and won&#39;t be reassigned</span>
+<span class="c1">#    https://aai.egi.eu/LoA#Substantial |       -&gt; Photo-ID was verified by a trained professional</span>
+<span class="c1">#    profile/cappuccino                         -&gt; Photo-ID was verified by a trained professional</span>
+<span class="c1">#                                                  AND the eppn is unique and won&#39;t be reassigned</span>
+<span class="na">require</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">profile/espresso |</span>
+<span class="w">    </span><span class="na">IAP/medium &amp; ID/eppn-unique-no-reassign |</span>
+<span class="w">    </span><span class="na">IAP/low &amp; ID/eppn-unique-no-reassign |</span>
+<span class="w">    </span><span class="na">https</span><span class="o">:</span><span class="s">//aai.egi.eu/LoA</span><span class="c1">#Substantial |</span>
+<span class="w">    </span><span class="na">profile/cappuccino</span>
+
+<span class="c1">### verified_undeploy  --  default: false</span>
+<span class="c1"># Block undeployment for disallowed users. Useful to forbid a user removing an</span>
+<span class="c1"># account after he lost authorisation for the service</span>
+<span class="c1">#verified_undeploy = False</span>
+
+<span class="c1">### skip  --  default: no</span>
+<span class="c1"># Skip assurance checking and assume assurance is sufficient.</span>
+<span class="c1"># USE WITH CARE AND ONLY IF YOU KNOW WHAT YOU ARE DOING!!!</span>
+<span class="na">skip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Yes, do as I say!</span>
+
+<span class="c1">###################################</span>
+<span class="c1">### Username Generator</span>
+<span class="c1">#</span>
+<span class="c1"># The Username Generator is only used when ldf_adapter.interactive is</span>
+<span class="c1"># false.  This is because with ldf_adapter.interactive users can specify</span>
+<span class="c1"># their own username.</span>
+<span class="c1">#</span>
+<span class="c1"># Username Generateor configures the way in which usernames are generated</span>
+<span class="c1"># The name generator has different modes, each of which may require</span>
+<span class="c1"># Additional configuration</span>
+
+<span class="k">[username_generator]</span>
+
+<span class="c1">### mode  --  default: friendly</span>
+<span class="c1"># These modes are currently available: </span>
+
+<span class="c1"># - friendly: Friendly implements a list of strategies that are tried one</span>
+<span class="c1">#             after another. The input is based on different claims of the</span>
+<span class="c1">#             incoming userinfo object:</span>
+<span class="c1">#             - preferred_username claim (if present)</span>
+<span class="c1">#             - combine a varying number of letters of given_name + family_name</span>
+<span class="c1">#             - email-address if all else fails</span>
+<span class="c1"># - pooled:   Pooled implements the pool-account behaviour known from &quot;the grid&quot;</span>
+<span class="c1">#             I.e. we use the primary group name and append the digits, in the</span>
+<span class="c1">#             order of incoming users.</span>
+<span class="c1">#             Unfortunately, with OIDC group names may be much longer.</span>
+<span class="c1">#             Therefore, a specific prefix may be configured.</span>
+<span class="c1">#</span>
+<span class="c1">#mode = friendly</span>
+<span class="na">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">pooled</span>
+
+<span class="c1">### pool_prefx  --  default: primary group name of the user</span>
+<span class="c1">#pool_prefix = pool</span>
+
+<span class="c1">### pool_digits  --  default: 3</span>
+<span class="c1"># The number of digits to use</span>
+<span class="c1">#pool_digits = 2</span>
+
+<span class="c1">### strip_sub_groups  --  default: no</span>
+<span class="c1"># Federated group names may be unique, which can make them very long,</span>
+<span class="c1"># while POSIX only allows 32 characters. We are truncating groups. </span>
+<span class="c1"># Example:</span>
+<span class="c1">#   This entitlement: urn:mace:egi.eu:group:eosc-synergy.eu:admins:role=member#aai.egi.eu</span>
+<span class="c1">#      is mapped to : egi-eu_..-eosc-synergy-eu_admins</span>
+<span class="c1"># As you can see, subgroups are used to form the POSIX group name.</span>
+<span class="c1"># The strip_sub_groups can help, but you will loose the information about</span>
+<span class="c1"># the subgroups.</span>
+<span class="c1"># Use with care</span>
+<span class="c1">#strip_sub_groups = no</span>
+
+<span class="k">[login_info]</span>
+<span class="c1"># Static information displayed to the user when deployed to a service.</span>
+<span class="c1"># Each key and value field will be shown to the user in the &quot;Credentials&quot;</span>
+<span class="c1"># screen.</span>
+<span class="c1"># ssh_host defaults to &quot;localhost&quot; when missing</span>
+<span class="c1"># ssh_user is usually filled by the backend</span>
+<span class="c1"># all other information is optional and can be extended with any desired information</span>
+<span class="c1">#</span>
+<span class="na">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Local SSH Test Service</span>
+<span class="na">login_help</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Login via `mccli ssh {ssh_host}`.</span>
+<span class="na">ssh_host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">test-host</span>
+
+<span class="c1">###################################</span>
+<span class="c1">### Backend specific configuration.</span>
+<span class="c1"># You can find available backends in the</span>
+<span class="c1"># feudalAdapter/ldf_adapter/backends folder.</span>
+<span class="c1">#</span>
+<span class="c1"># Each backend may have multiple sections.</span>
+
+<span class="k">[backend.local_unix]</span>
+<span class="c1"># Configuration for the local_unix backend</span>
+
+<span class="c1">### shell  --  default: /bin/sh</span>
+<span class="c1"># The unix shell to use</span>
+<span class="na">shell</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/bin/bash</span>
+
+<span class="c1">### home_base -- default: /home</span>
+<span class="c1"># The base directory for users&#39; home directories</span>
+<span class="c1"># home_base = /home</span>
+
+<span class="c1"># deploy_user_ssh_keys -- default: yes</span>
+<span class="c1"># Allows using ssh keys, when they are found in the deployment request</span>
+<span class="na">deploy_user_ssh_keys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">no</span>
+
+<span class="c1"># punch4nfdi -- default: no</span>
+<span class="c1"># If set to yes, we will use the punch4nfdi-specific method to translate group names</span>
+<span class="c1"># punch4nfdi = no</span>
+
+<span class="k">[backend.bwidm]</span>
+<span class="c1"># Configuration for the bwidm backend</span>
+
+<span class="c1">### url</span>
+<span class="c1"># The base URL of the bwidm API</span>
+<span class="na">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://bwidm-test.scc.kit.edu/rest</span>
+
+<span class="c1">### org_id</span>
+<span class="c1"># The ID for bwidm. This is used for prefixing user- and group names</span>
+<span class="na">org_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">fdl</span>
+
+<span class="c1">### log_outgoing_http_requests -- default: false</span>
+<span class="c1">#log_outgoing_http_requests = false</span>
+
+<span class="c1"># HTTP basic auth to connect to BWIDM API</span>
+<span class="na">http_user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">foo</span>
+<span class="na">http_pass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">bar</span>
+
+<span class="c1"># The name of the service the user should be added to on BWIDM:</span>
+<span class="na">service_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">sshtest</span>
+
+<span class="k">[backend.ldap]</span>
+<span class="c1"># Configuration for the ldap backend</span>
+
+<span class="c1"># The ldap backend can function in 3 different modes:</span>
+<span class="c1"># - read_only (default): there is read only access to the LDAP, therefore the local accounts</span>
+<span class="c1">#       need to already be created in the LDAP and mapped to the federated accounts;</span>
+<span class="c1">#       read the docs for more on how to map local &lt;-&gt; federated accounts.</span>
+<span class="c1"># - pre_created: the local accounts already exist in the LDAP, but they are not mapped;</span>
+<span class="c1">#       the feudal adapter should have write access to the LDAP to modify entries in</span>
+<span class="c1">#       order to add the mapping to the federated OIDC account.</span>
+<span class="c1"># - full_access: the feudal adapter has full access to the LDAP and can add/delete/update</span>
+<span class="c1">#       entries contianing local accounts and mappings.</span>
+<span class="na">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">read_only</span>
+
+<span class="c1"># host where ldap server is running, default: localhost</span>
+<span class="na">host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ldap_server</span>
+
+<span class="c1"># port where server is listening, default: 1389 or 636 if TLS is enabled</span>
+<span class="c1"># port = 1389</span>
+
+<span class="c1"># OPTIONAL: admin credentials to authenticate to the ldap</span>
+<span class="c1"># NEEDED for modifying the LDAP</span>
+<span class="c1"># when not provided, anonymous bind is used</span>
+<span class="c1"># admin user should be fully qualified</span>
+<span class="c1"># admin_user = cn=admin,dc=cesga,dc=es</span>
+<span class="c1"># admin_password = adminpassword</span>
+
+<span class="c1"># set to true if tls is enabled; default: False</span>
+<span class="c1"># not supported yet</span>
+<span class="c1"># tls = False</span>
+
+<span class="c1"># ldap base for user namespace; default: ou=users,dc=example</span>
+<span class="c1"># can include any number of ou / o / dc entries separated by commas</span>
+<span class="c1"># user_base = ou=users,dc=example</span>
+
+<span class="c1"># user entry attributes containing uids for mapping a user; defaults: gecos &amp; uid</span>
+<span class="c1"># users have to be have (at least) the following objectClass: inetOrgPerson, posixAccount</span>
+<span class="c1"># attribute_oidc_uid = gecos</span>
+<span class="c1"># attribute_local_uid = uid</span>
+
+<span class="c1"># ldap base for group namespace; default: ou=groups,dc=example</span>
+<span class="c1"># can include any number of ou / o / dc entries separated by commas</span>
+<span class="c1"># group_base = ou=groups,dc=example</span>
+
+
+<span class="c1">#### Options only needed for full_access mode when accounts need to be created</span>
+
+<span class="c1">## shell  --  default: /bin/sh</span>
+<span class="c1">## The unix shell to use</span>
+<span class="c1"># shell = /bin/bash</span>
+
+<span class="c1">## base directory for home directories -- default /home</span>
+<span class="c1"># home_base = /home/curso/</span>
+
+<span class="c1">## UID range -- default 1000 -&gt; 60000</span>
+<span class="c1"># uid_min = 1000</span>
+<span class="c1"># uid_max = 60000</span>
+
+<span class="c1">## GID range -- default 1000 -&gt; 60000</span>
+<span class="c1"># gid_min = 1000</span>
+<span class="c1"># gid_max = 60000</span>
 </pre></div>
 </div>
 </section>

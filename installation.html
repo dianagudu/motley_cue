@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -13,14 +12,11 @@
     <link rel="stylesheet" type="text/css" href="_static/css/fonts.css" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/clipboard.min.js"></script>
     <script src="_static/copybutton.js"></script>
-    <link rel="shortcut icon" href="_static/motley-cue.ico"/>
+    <link rel="icon" href="_static/motley-cue.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Configuration" href="configuration.html" />
@@ -128,9 +124,9 @@
 </ul>
 <p>We strive to support all LTS releases of the above distributions, as well as the latest stable release. Please check the repository at <a class="reference external" href="http://repo.data.kit.edu">http://repo.data.kit.edu</a> for all supported distributions and versions.</p>
 <p>Follow the instructions there to support the repository on your system. Then install <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> with your favourite package manager:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt install motley-cue     <span class="c1"># on debian-based systems</span>
-yum install motley-cue     <span class="c1"># on centos/rocky linux</span>
-zypper install motley-cue  <span class="c1"># on opensuse</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt<span class="w"> </span>install<span class="w"> </span>motley-cue<span class="w">     </span><span class="c1"># on debian-based systems</span>
+yum<span class="w"> </span>install<span class="w"> </span>motley-cue<span class="w">     </span><span class="c1"># on centos/rocky linux</span>
+zypper<span class="w"> </span>install<span class="w"> </span>motley-cue<span class="w">  </span><span class="c1"># on opensuse</span>
 </pre></div>
 </div>
 <p>This will ensure that all the dependencies are installed as well, and <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> is up and running as a systemd service.</p>
@@ -141,14 +137,14 @@ zypper install motley-cue  <span class="c1"># on opensuse</span>
 <li><p>Extra Packages for Enterprise Linux (EPEL): for <code class="docutils literal notranslate"><span class="pre">nginx</span></code></p></li>
 <li><p>Software Collections (SCL): for <code class="docutils literal notranslate"><span class="pre">rh-python38</span></code></p></li>
 </ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>yum install epel-release centos-release-scl
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>yum<span class="w"> </span>install<span class="w"> </span>epel-release<span class="w"> </span>centos-release-scl
 </pre></div>
 </div>
 </div>
 <section id="installation-from-pypi">
 <h2>Installation from pypi<a class="headerlink" href="#installation-from-pypi" title="Permalink to this heading">¶</a></h2>
 <p>It is also possible to install <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code> with <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install motley_cue
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>motley_cue
 </pre></div>
 </div>
 <p>This will fetch the stable version from pip. You will need to set-up and run the service manually (see <a class="reference internal" href="running.html#production"><span class="std std-ref">running motley_cue in production</span></a>).</p>
@@ -159,9 +155,9 @@ zypper install motley-cue  <span class="c1"># on opensuse</span>
 of the <a class="reference external" href="https://github.com/dianagudu/motley_cue">GitHub motley_cue repository</a> and
 can be installed as follows (note the <code class="docutils literal notranslate"><span class="pre">-e</span></code> switch to install it in editable
 or “develop mode”):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/dianagudu/motley_cue
-<span class="nb">cd</span> motley_cue
-pip install -e .
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/dianagudu/motley_cue
+<span class="nb">cd</span><span class="w"> </span>motley_cue
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
 </pre></div>
 </div>
 </section>
