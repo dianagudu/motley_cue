@@ -21,9 +21,11 @@ where ``<name>`` can be one of:
 - ``dockerised_deb_ubuntu_focal``
 - ``dockerised_rpm_centos7``
 - ``dockerised_rpm_centos8``
-- ``dockerised_rpm_opensuse15.2``
+- ``dockerised_rpm_centos_stream``
 - ``dockerised_rpm_opensuse15.3``
 - ``dockerised_rpm_opensuse_tumbleweed``
+- ``dockerised_rpm_rocky8``
+- ``dockerised_rpm_rocky8.5``
 - ``dockerised_all_packages`` (to build all of the above)
 
 The resulting files are copied out of the build container to the ``../results`` folder.
