@@ -50,3 +50,5 @@ build-ubuntu-bionic:
 integration-tests:
   extends:
     - .trigger-integration-tests-ssh-oidc
+
+

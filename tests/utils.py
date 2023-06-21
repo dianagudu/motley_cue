@@ -39,7 +39,7 @@ class Endpoint:
 
 Info = Endpoint(
     url="/info",
-    valid_response={"login_info": "", "supported_OPs": []},
+    valid_response={"login_info": "", "supported_OPs": [], "ops_info": {}},
     mapper_method="info",
 )
 
@@ -113,7 +113,9 @@ Root = Endpoint(
 )
 
 
-def getListOfEndpoints(endpoint: Endpoint, condition: Callable[[Endpoint], bool]) -> List[Endpoint]:
+def getListOfEndpoints(
+    endpoint: Endpoint, condition: Callable[[Endpoint], bool]
+) -> List[Endpoint]:
     """Returns a list of endpoints that satisfy a given condition,
     from the subtree starting at the given endpoint"""
     endpoints = []

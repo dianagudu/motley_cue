@@ -364,8 +364,8 @@ deb: cleanapi create_obj_dir_structure preparedeb
 
 # RPM Packaging
 
-.PHONY: srctar
-srctar: virtualenv
+.PHONY: rpmsource
+rpmsource: virtualenv
 	(cd ..; tar czf $(SRC_TAR) --exclude-from=$(PKG_NAME_UNDERSCORES)/.gitignore --exclude-vcs --exclude-caches-all \
 		$(PKG_NAME_UNDERSCORES) --transform='s^${PKG_NAME_UNDERSCORES}^${PKG_NAME}-$(RPM_VERSION)^')
 	mkdir -p rpm/rpmbuild/SOURCES
@@ -381,6 +381,7 @@ virtualenv:
 		echo ${PATH}; \
 		pip --version; \
 		pip install -I -r requirements.txt build; \
+		grep -q "CentOS Linux release 7" /etc/redhat-release && pip install --force-reinstall -v "urllib3==1.26.16"; \
 		pip freeze > venv/all_versions.txt; \
 	)
 
@@ -388,13 +389,13 @@ virtualenv:
 rpms: srpm rpm 
 
 .PHONY: rpm
-rpm: srctar
+rpm: rpmsource
 	echo ${PATH}
 	pip --version
 	rpmbuild --define "_basedir ${PWD}" --define "_topdir ${PWD}/rpm/rpmbuild" --define "_build_id_links none" -bb  rpm/${PKG_NAME}.spec
 
 .PHONY: srpm
-srpm: srctar
+srpm: rpmsource
 	rpmbuild --define "_basedir ${PWD}" --define "_topdir ${PWD}/rpm/rpmbuild" -bs  rpm/${PKG_NAME}.spec
 
 .PHONY: install # called from specfile

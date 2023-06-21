@@ -4,6 +4,7 @@ doc/build
 */*.egg-info
 .eggs
 .tox
+.vscode
 __pycache__
 */__pycache__
 */*/__pycache__
@@ -21,3 +22,6 @@ debian/*substvars
 docker*log
 *.sqlite
 .coverage
+.tool-versions
+coverage.lcov
+coverage.svg

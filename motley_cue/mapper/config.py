@@ -336,11 +336,13 @@ class ConfigOPAuthZ(ConfigSection):
 
     def get_info(self) -> dict:
         """Returns a dict with the info for this OP"""
-        return {
+        op_info = {
             "op_url": self.op_url,
             "scopes": self.scopes,
-            "audience": self.audience,
         }
+        if self.audience and self.audience != "":
+            op_info["audience"] = self.audience
+        return op_info
 
     # methods used in conjunction with flaat
     def get_user_requirement(self) -> Requirement:
@@ -430,10 +432,10 @@ class ConfigAuthorisation:
 class Configuration:
     """All configuration settings for motley_cue."""
 
-    mapper: ConfigMapper = ConfigMapper()
-    otp: ConfigOTP = ConfigOTP()
-    privacy: ConfigPrivacy = ConfigPrivacy()
-    authorisation: ConfigAuthorisation = ConfigAuthorisation()
+    mapper: ConfigMapper = field(default_factory=ConfigMapper)
+    otp: ConfigOTP = field(default_factory=ConfigOTP)
+    privacy: ConfigPrivacy = field(default_factory=ConfigPrivacy)
+    authorisation: ConfigAuthorisation = field(default_factory=ConfigAuthorisation)
 
     @classmethod
     def load(cls, config: ConfigParser):

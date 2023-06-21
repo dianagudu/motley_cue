@@ -307,10 +307,10 @@ class SQLiteDictTokenDB(TokenDB):
         )
 
     def _encrypted_encode(self, obj):
-        return self.encryption.encrypt(json.dumps(obj))
+        return sqlite3.Binary(self.encryption.encrypt(json.dumps(obj)).encode("utf-8"))
 
     def _encrypted_decode(self, obj):
-        return json.loads(self.encryption.decrypt(obj))
+        return json.loads(self.encryption.decrypt(obj.decode("utf-8")))
 
     def pop(self, otp: str) -> Optional[str]:
         token = None
