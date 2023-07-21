@@ -31,7 +31,7 @@ BuildRequires: python311 >= 3.11, python311-devel >= 3.11
 BuildRequires: python311-pip, python311-setuptools
 BuildRequires: python3-policycoreutils >= 3.0
 %endif
-%if 0%{?suse_version} <= 1540
+%if 0%{?suse_version} && 0%{?suse_version} <= 1540
 BuildRequires: python39 >= 3.9, python39-devel >= 3.9
 BuildRequires: python39-pip, python39-setuptools
 BuildRequires: python3-policycoreutils >= 3.0
