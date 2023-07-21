@@ -89,10 +89,10 @@ centos7_install_dependencies() {
 }
 opensuse15_install_dependencies() {
     zypper -n install libcurl-devel pam-devel zypper audit-devel git \
-        python39 python39-devel python39-pip python39-setuptools
+        python311 python311-devel python311-pip python311-setuptools
     zypper -n install policycoreutils
     zypper -n install python3-policycoreutils
-    pip3.9 install -U pip
+    pip3.11 install -U pip
     pip3 install virtualenv || {
         /usr/local/bin/pip3 install virtualenv
     }
