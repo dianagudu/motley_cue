@@ -6,3 +6,5 @@ gunicorn==20.*
 sqlitedict==2.*
 cryptography>=38.0.3
 markdown==3.*
+pydantic-settings==2.*
+pydantic==2.*
