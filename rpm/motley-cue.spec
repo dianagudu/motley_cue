@@ -26,11 +26,17 @@ BuildRequires: policycoreutils, policycoreutils-python
 BuildRequires: python39 >= 3.9, python39-devel >= 3.9
 BuildRequires: python3-policycoreutils >= 2.9
 %endif
-%if 0%{?suse_version}
+%if 0%{?suse_version} > 1540
 BuildRequires: python311 >= 3.11, python311-devel >= 3.11
 BuildRequires: python311-pip, python311-setuptools
 BuildRequires: python3-policycoreutils >= 3.0
 %endif
+%if 0%{?suse_version} <= 1540
+BuildRequires: python39 >= 3.9, python39-devel >= 3.9
+BuildRequires: python39-pip, python39-setuptools
+BuildRequires: python3-policycoreutils >= 3.0
+%endif
+
 
 BuildRoot:	%{_tmppath}/%{name}
 %if 0%{?centos} == 7
@@ -40,8 +46,11 @@ Requires: rh-python38 >= 2.0
 # valid for centos stream and rocky linux
 Requires: python39 >= 3.9
 %endif
-%if 0%{?suse_version}
+%if 0%{?suse_version} > 1540
 Requires: python311 >= 3.11
+%endif
+%if 0%{?suse_version} <= 1540
+Requires: python39 >= 3.9
 %endif
 Requires: nginx >= 1.16.1
 
