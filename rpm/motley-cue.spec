@@ -39,7 +39,6 @@ BuildRequires: python39-pip, python39-setuptools
 BuildRequires: python3-policycoreutils >= 3.0
 %endif
 
-
 BuildRoot:	%{_tmppath}/%{name}
 %if 0%{?centos} == 7
 Requires: rh-python38 >= 2.0
