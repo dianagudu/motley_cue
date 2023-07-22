@@ -26,12 +26,14 @@ BuildRequires: policycoreutils, policycoreutils-python
 BuildRequires: python39 >= 3.9, python39-devel >= 3.9
 BuildRequires: python3-policycoreutils >= 2.9
 %endif
-%if 0%{?suse_version} > 1540
+%if 0%{?sle_version} == 150500 && 0%{?is_opensuse} || 0%{?suse_version} >= 1600
+# valid for opensuse leap 15.5 and suse tumbleweed
 BuildRequires: python311 >= 3.11, python311-devel >= 3.11
 BuildRequires: python311-pip, python311-setuptools
 BuildRequires: python3-policycoreutils >= 3.0
 %endif
-%if 0%{?suse_version} && 0%{?suse_version} <= 1540
+%if 0%{?sle_version} == 150400 && 0%{?is_opensuse}
+# valid for opensuse leap 15.4
 BuildRequires: python39 >= 3.9, python39-devel >= 3.9
 BuildRequires: python39-pip, python39-setuptools
 BuildRequires: python3-policycoreutils >= 3.0
@@ -46,10 +48,12 @@ Requires: rh-python38 >= 2.0
 # valid for centos stream and rocky linux
 Requires: python39 >= 3.9
 %endif
-%if 0%{?suse_version} > 1540
+%if 0%{?sle_version} == 150500 && 0%{?is_opensuse} || 0%{?suse_version} >= 1600
+# valid for opensuse leap 15.5 and suse tumbleweed
 Requires: python311 >= 3.11
 %endif
-%if 0%{?suse_version} <= 1540
+%if 0%{?sle_version} == 150400 && 0%{?is_opensuse}
+# valid for opensuse leap 15.4
 Requires: python39 >= 3.9
 %endif
 Requires: nginx >= 1.16.1
