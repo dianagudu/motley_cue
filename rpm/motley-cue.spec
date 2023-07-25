@@ -27,7 +27,7 @@ BuildRequires: python39 >= 3.9, python39-devel >= 3.9
 BuildRequires: python3-policycoreutils >= 2.9
 %endif
 %if 0%{?sle_version} == 150500 && 0%{?is_opensuse} || 0%{?suse_version} >= 1600
-# valid for opensuse leap 15.5 and suse tumbleweed
+# valid for opensuse leap 15.5 and opensuse tumbleweed
 BuildRequires: python311 >= 3.11, python311-devel >= 3.11
 BuildRequires: python311-pip, python311-setuptools
 BuildRequires: python3-policycoreutils >= 3.0
@@ -48,7 +48,7 @@ Requires: rh-python38 >= 2.0
 Requires: python39 >= 3.9
 %endif
 %if 0%{?sle_version} == 150500 && 0%{?is_opensuse} || 0%{?suse_version} >= 1600
-# valid for opensuse leap 15.5 and suse tumbleweed
+# valid for opensuse leap 15.5 and opensuse tumbleweed
 Requires: python311 >= 3.11
 %endif
 %if 0%{?sle_version} == 150400 && 0%{?is_opensuse}
