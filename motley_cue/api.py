@@ -2,7 +2,7 @@
 This module contains the definition of motley_cue's REST API.
 """
 from fastapi import FastAPI, Depends, Request, Query, Header
-from fastapi.exceptions import RequestValidationError
+from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from fastapi.responses import HTMLResponse
 from pydantic import ValidationError
 
@@ -28,6 +28,7 @@ api.include_router(user.api, tags=["user"])
 api.include_router(admin.api, tags=["admin"])
 api.add_exception_handler(RequestValidationError, request_validation_exception_handler)
 api.add_exception_handler(ValidationError, validation_exception_handler)
+api.add_exception_handler(ResponseValidationError, validation_exception_handler)
 
 
 @api.get("/")

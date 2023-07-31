@@ -102,7 +102,8 @@ dockerised_all_packages: dockerised_deb_debian_buster\
 	dockerised_rpm_centos_stream\
 	dockerised_rpm_rocky8.5\
 	dockerised_rpm_rocky8\
-	dockerised_rpm_opensuse15.3\
+	dockerised_rpm_opensuse15.4\
+	dockerised_rpm_opensuse15.5\
 	dockerised_rpm_opensuse_tumbleweed
 
 .PHONY: docker_images
@@ -116,7 +117,8 @@ docker_images: docker_rocky8.5\
 	docker_debian_bookworm\
 	docker_ubuntu_bionic\
 	docker_ubuntu_focal\
-	docker_opensuse15.3\
+	docker_opensuse15.4\
+	docker_opensuse15.5\
 	docker_opensuse_tumbleweed
 
 .PHONY: docker_debian_buster
@@ -212,13 +214,20 @@ docker_rocky8:
 	"RUN yum install -y make rpm-build\n" \
 	"RUN dnf -y group install \"Development Tools\"\n" | \
 	docker build --tag rocky8 -f -  .  >> docker.log
-.PHONY: docker_opensuse15.3
-docker_opensuse15.3:
-	@echo -e "\nopensuse-15.3"
-	@echo -e "FROM registry.opensuse.org/opensuse/leap:15.3\n"\
+.PHONY: docker_opensuse15.4
+docker_opensuse15.4:
+	@echo -e "\nopensuse-15.4"
+	@echo -e "FROM registry.opensuse.org/opensuse/leap:15.4\n"\
 	"RUN zypper -n install make rpm-build\n" \
 	"RUN zypper -n install -t pattern devel_C_C++" | \
-	docker build --tag opensuse15.3 -f -  .  >> docker.log
+	docker build --tag opensuse15.4 -f -  .  >> docker.log
+.PHONY: docker_opensuse15.5
+docker_opensuse15.5:
+	@echo -e "\nopensuse-15.5"
+	@echo -e "FROM registry.opensuse.org/opensuse/leap:15.5\n"\
+	"RUN zypper -n install make rpm-build\n" \
+	"RUN zypper -n install -t pattern devel_C_C++" | \
+	docker build --tag opensuse15.5 -f -  .  >> docker.log
 .PHONY: docker_opensuse_tumbleweed
 docker_opensuse_tumbleweed:
 	@echo -e "\nopensuse_tumbleweed"
@@ -238,7 +247,8 @@ docker_sle15:
 docker_clean:
 	docker image rm sle15 || true
 	docker image rm	opensuse_tumbleweed || true
-	docker image rm	opensuse15.3 || true
+	docker image rm	opensuse15.4 || true
+	docker image rm	opensuse15.5 || true
 	docker image rm rocky8.5 || true
 	docker image rm rocky8 || true
 	docker image rm	centos7 || true
@@ -310,11 +320,17 @@ dockerised_rpm_rocky8: docker_rocky8
 	@docker run --tty --rm -v ${DOCKER_BASE}:/home/build rocky8 \
 		/home/build/${PACKAGE}/build.sh ${PACKAGE} rocky8 ${PKG_NAME} > $@.log
 
-.PHONY: dockerised_rpm_opensuse15.3
-dockerised_rpm_opensuse15.3: docker_opensuse15.3
+.PHONY: dockerised_rpm_opensuse15.4
+dockerised_rpm_opensuse15.4: docker_opensuse15.4
 	@echo "Writing build log to $@.log"
-	@docker run --tty --rm -v ${DOCKER_BASE}:/home/build opensuse15.3 \
-		/home/build/${PACKAGE}/build.sh ${PACKAGE} opensuse15.3 ${PKG_NAME} > $@.log
+	@docker run --tty --rm -v ${DOCKER_BASE}:/home/build opensuse15.4 \
+		/home/build/${PACKAGE}/build.sh ${PACKAGE} opensuse15.4 ${PKG_NAME} > $@.log
+
+.PHONY: dockerised_rpm_opensuse15.5
+dockerised_rpm_opensuse15.5: docker_opensuse15.5
+	@echo "Writing build log to $@.log"
+	@docker run --tty --rm -v ${DOCKER_BASE}:/home/build opensuse15.5 \
+		/home/build/${PACKAGE}/build.sh ${PACKAGE} opensuse15.5 ${PKG_NAME} > $@.log
 
 .PHONY: dockerised_rpm_opensuse_tumbleweed
 dockerised_rpm_opensuse_tumbleweed: docker_opensuse_tumbleweed
@@ -341,7 +357,8 @@ publish-to-repo:
 	@scp ../results/debian_bookworm/* build@repo.data.kit.edu:/var/www/debian/bookworm
 	@scp ../results/ubuntu_bionic/* build@repo.data.kit.edu:/var/www/ubuntu/bionic 
 	@scp ../results/ubuntu_focal/* build@repo.data.kit.edu:/var/www/ubuntu/focal
-	@scp ../results/opensuse15.3/* build@repo.data.kit.edu:/var/www/suse/opensuse-leap-15.3
+	@scp ../results/opensuse15.4/* build@repo.data.kit.edu:/var/www/suse/opensuse-leap-15.4
+	@scp ../results/opensuse15.5/* build@repo.data.kit.edu:/var/www/suse/opensuse-leap-15.5
 	@scp ../results/opensuse_tumbleweed/* build@repo.data.kit.edu:/var/www/suse/opensuse-tumbleweed
 	#@scp ../results/sle15/* build@repo.data.kit.edu:/var/www/suse/sle15
 

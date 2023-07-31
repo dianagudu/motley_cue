@@ -89,6 +89,17 @@ centos7_install_dependencies() {
 }
 opensuse15_install_dependencies() {
     zypper -n install libcurl-devel pam-devel zypper audit-devel git \
+        python311 python311-devel python311-pip python311-setuptools
+    zypper -n install policycoreutils
+    zypper -n install python3-policycoreutils
+    pip3.11 install -U pip
+    pip3 install virtualenv || {
+        /usr/local/bin/pip3 install virtualenv
+    }
+    git config --global --add safe.directory /tmp/build/$PACKAGE
+}
+opensuse154_install_dependencies() {
+    zypper -n install libcurl-devel pam-devel zypper audit-devel git \
         python39 python39-devel python39-pip python39-setuptools
     zypper -n install policycoreutils
     zypper -n install python3-policycoreutils
@@ -146,8 +157,13 @@ case "$DIST" in
         rpm_build_package
         rpm_copy_output
     ;;
-    opensuse15*|opensuse_tumbleweed|sle*)
+    opensuse15.5|opensuse_tumbleweed|sle*)
         opensuse15_install_dependencies
+        rpm_build_package
+        rpm_copy_output
+    ;;
+    opensuse15.4)
+        opensuse154_install_dependencies
         rpm_build_package
         rpm_copy_output
     ;;
