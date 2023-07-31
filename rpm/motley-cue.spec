@@ -47,11 +47,11 @@ Requires: rh-python38 >= 2.0
 # valid for centos stream and rocky linux
 Requires: python39 >= 3.9
 %endif
-%if 0%{?sle_version} == 150500 && 0%{?is_opensuse} || 0%{?suse_version} >= 1600
+%if 0%{?sle_version} == 150500 || 0%{?suse_version} >= 1600
 # valid for opensuse leap 15.5 and opensuse tumbleweed
 Requires: python311 >= 3.11
 %endif
-%if 0%{?sle_version} == 150400 && 0%{?is_opensuse}
+%if 0%{?sle_version} == 150400
 # valid for opensuse leap 15.4
 Requires: python39 >= 3.9
 %endif
