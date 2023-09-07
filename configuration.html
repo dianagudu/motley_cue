@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Configuration &#8212; motley_cue</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=623475cf" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/css/fonts.css?v=09a796e2" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=8fd29722" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
-    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=7af948fa"></script>
     <link rel="icon" href="_static/motley-cue.ico"/>
@@ -116,14 +116,14 @@
           <div class="body" role="main">
             
   <section id="configuration">
-<span id="id1"></span><h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading">¶</a></h1>
+<span id="id1"></span><h1>Configuration<a class="headerlink" href="#configuration" title="Link to this heading">¶</a></h1>
 <p>Two configuration files are required:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">motley_cue.conf</span></code>: contains configuration options relating to <a class="reference internal" href="#authorisation">authorisation</a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">feudal_adapter.conf</span></code>: contains configuration options relating to the <a class="reference internal" href="#account-creation">account creation</a>.</p></li>
 </ul>
 <section id="configuration-templates">
-<h2>Configuration templates<a class="headerlink" href="#configuration-templates" title="Permalink to this heading">¶</a></h2>
+<h2>Configuration templates<a class="headerlink" href="#configuration-templates" title="Link to this heading">¶</a></h2>
 <p>Example config files explaining the options are included with <code class="docutils literal notranslate"><span class="pre">motley_cue</span></code>. If you installed it via package manager, they will be located at <code class="docutils literal notranslate"><span class="pre">/etc/motley_cue</span></code>.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="configs/motley_cue_conf.html#motley-cue-conf"><span class="std std-ref">motley_cue.conf</span></a></p></li>
@@ -135,7 +135,7 @@
 </div>
 </section>
 <section id="config-files-search-paths">
-<h2>Config files search paths<a class="headerlink" href="#config-files-search-paths" title="Permalink to this heading">¶</a></h2>
+<h2>Config files search paths<a class="headerlink" href="#config-files-search-paths" title="Link to this heading">¶</a></h2>
 <p>The config files will be searched in several places. Once one is found no further config files will be considered.</p>
 <ul class="simple">
 <li><p><strong>motley_cue.conf</strong></p>
@@ -158,7 +158,7 @@
 </ul>
 </section>
 <section id="authorisation-configuration">
-<span id="authorisation"></span><h2>Authorisation configuration<a class="headerlink" href="#authorisation-configuration" title="Permalink to this heading">¶</a></h2>
+<span id="authorisation"></span><h2>Authorisation configuration<a class="headerlink" href="#authorisation-configuration" title="Link to this heading">¶</a></h2>
 <p>You can configure who is allowed to use your service in <code class="docutils literal notranslate"><span class="pre">motley_cue.conf</span></code>.</p>
 <p>You can support multiple OPs and configure authorisation for each OP separately. There are three options to authorise users from the supported OPs:</p>
 <ul class="simple">
@@ -209,7 +209,7 @@
 </div>
 </section>
 <section id="account-creation-configuration">
-<span id="account-creation"></span><h2>Account creation configuration<a class="headerlink" href="#account-creation-configuration" title="Permalink to this heading">¶</a></h2>
+<span id="account-creation"></span><h2>Account creation configuration<a class="headerlink" href="#account-creation-configuration" title="Link to this heading">¶</a></h2>
 <p>This is handled by the feudal adapter in <code class="docutils literal notranslate"><span class="pre">feudal_adapter.conf</span></code> (see the <a class="reference external" href="https://git.scc.kit.edu/feudal/feudalAdapterLdf">documentation</a> for details).</p>
 <p>Pay close attention to the following configurations:</p>
 <ul class="simple">
@@ -220,7 +220,7 @@
 <p>An <a class="reference external" href="https://git.scc.kit.edu/feudal/feudalAdapterLdf/-/tree/master#approval-workflow">approval workflow</a> is supported as well, where local admins can approve or reject account creation requests. The notification system supported so far is email.</p>
 </section>
 <section id="additional-configurations">
-<span id="id2"></span><h2>Additional configurations<a class="headerlink" href="#additional-configurations" title="Permalink to this heading">¶</a></h2>
+<span id="id2"></span><h2>Additional configurations<a class="headerlink" href="#additional-configurations" title="Link to this heading">¶</a></h2>
 <p class="rubric">One-time tokens</p>
 <p>To enable SSH support for large access tokens (longer than 1k), you can enable the use of one-time tokens in the <code class="docutils literal notranslate"><span class="pre">[mapper.otp]</span></code> section in <code class="docutils literal notranslate"><span class="pre">motley_cue.conf</span></code>.</p>
 <p>Calling the <code class="docutils literal notranslate"><span class="pre">/user/generate_otp</span></code> endpoint will generate a shorter, one-time token and store it in a local, encrypted database. This token can then be used as an SSH password instead of the access token, and the <code class="docutils literal notranslate"><span class="pre">/verify_user</span></code> will be able to verify the username with this one-time token by retrieving the corresponding access token from the database.</p>
@@ -255,7 +255,7 @@
 <a class="reference internal image-reference" href="_images/swagger_docs.png"><img alt="Swagger docs" class="align-center" src="_images/swagger_docs.png" style="width: 80%;" /></a>
 </section>
 <section id="privacy-policy">
-<h2>Privacy policy<a class="headerlink" href="#privacy-policy" title="Permalink to this heading">¶</a></h2>
+<h2>Privacy policy<a class="headerlink" href="#privacy-policy" title="Link to this heading">¶</a></h2>
 <p>We provide a default privacy statement that you can use when running motley-cue.</p>
 <p>When installing from Linux packages, the privacy statement is installed in:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/etc/motley_cue/privacystatement.md

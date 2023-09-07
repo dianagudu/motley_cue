@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>feudal_adapter.conf &#8212; motley_cue</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=623475cf" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/fonts.css?v=09a796e2" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8fd29722" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=7af948fa"></script>
     <link rel="icon" href="../_static/motley-cue.ico"/>
@@ -120,7 +120,7 @@
           <div class="body" role="main">
             
   <section id="feudal-adapter-conf">
-<span id="id1"></span><h1>feudal_adapter.conf<a class="headerlink" href="#feudal-adapter-conf" title="Permalink to this heading">¶</a></h1>
+<span id="id1"></span><h1>feudal_adapter.conf<a class="headerlink" href="#feudal-adapter-conf" title="Link to this heading">¶</a></h1>
 <div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1"># Configuration for the feudalAdapter (formally known as ldf_adapter)</span>
 
 <span class="k">[ldf_adapter]</span>
@@ -361,6 +361,76 @@
 <span class="c1"># Use with care</span>
 <span class="c1">#strip_sub_groups = no</span>
 
+<span class="c1">##########</span>
+<span class="c1">### GROUPS</span>
+<span class="c1"># Define strategies for group creation</span>
+
+<span class="k">[groups]</span>
+
+<span class="c1">### policy -- default: all</span>
+<span class="c1"># The policy defines which (or how many) groups are created.</span>
+<span class="c1"># These policies are currently supported</span>
+<span class="c1"># - all:        Create all available groups in user&#39;s metadata,</span>
+<span class="c1">#               automatically mapped to a unix-name</span>
+<span class="c1"># - listed:     Create only those groups that are specified in the</span>
+<span class="c1">#               config-variable &quot;supported_entitlements&quot;</span>
+<span class="c1">#</span>
+<span class="na">policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">all</span>
+
+<span class="c1">### supported_entitlements</span>
+<span class="c1"># A list of the subset of entitlements that will actually be created. The </span>
+<span class="c1"># entitlements will be mapped to groups, depending on the &quot;method&quot; and </span>
+<span class="c1"># &quot;map&quot; parameters (see below).</span>
+<span class="c1"># Regular expressions are supported.</span>
+<span class="c1">#</span>
+<span class="c1"># supported_entitlements =</span>
+<span class="c1">#     urn:mace:egi.eu:group:eosc-synergy.eu.*</span>
+<span class="c1"># supported_entitlements =</span>
+<span class="c1">#     urn:mace:egi.eu:group:eosc-synergy.eu.*</span>
+<span class="c1">#     urn:mace:egi.eu::.*kit.edu.* # includes group and res entitlements!</span>
+<span class="c1">#     urn:mace:egi.eu:group:mswss.ui.savba.sk:admins:role=owner</span>
+
+<span class="c1">### supported_groups</span>
+<span class="c1"># A list of the subset of (incoming) groups that will actually be created.</span>
+<span class="c1"># supported_groups = users</span>
+<span class="c1">#     Developers</span>
+<span class="c1">#     test.vo.*</span>
+<span class="c1">#     .*Example.*</span>
+<span class="c1">#     Helmholtz-member</span>
+<span class="c1">#     wlcg-test</span>
+
+<span class="c1">### method -- default: classic</span>
+<span class="c1"># The method used for mapping entitlement names to group names</span>
+<span class="c1"># - classic: The default way until version v1 (Aug 2023)</span>
+<span class="c1"># - regex:  Define a list of regular expressions to map entitlements to </span>
+<span class="c1">#           group names using the configuration variable &quot;mapping&quot;</span>
+<span class="c1">#           - Comments are stripped before matching</span>
+<span class="c1">#           - regular expressions are supported (but may yield unexpected</span>
+<span class="c1">#             results.</span>
+<span class="c1">#           - CAUTION order matters: the regular expressions are applied</span>
+<span class="c1">#             one after another!</span>
+<span class="c1">#           - Additional replacements for making group names unix</span>
+<span class="c1">#             compatible are applied afterwards.</span>
+<span class="c1"># </span>
+<span class="na">method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">classic</span>
+<span class="c1"># method = regex</span>
+<span class="c1"># mapping =</span>
+<span class="c1">#     # ^.* -&gt; group # map all entitlements to group &quot;group&quot;</span>
+<span class="c1">#     :role=(owner|member) -&gt; # remove all role=member and role=owner entries</span>
+<span class="c1">#     :role=v.* -&gt; :vmop # All groups starting with v map to vmop (for the sake of example)</span>
+<span class="c1">#     :role= -&gt; : # all other roles: map to :</span>
+<span class="c1">#     # :vm_operator -&gt; :vmop</span>
+<span class="c1">#     :admins -&gt; :adm</span>
+<span class="c1">#     urn:mace:egi.eu:group:eosc-synergy.eu -&gt; synergy</span>
+<span class="c1">#     urn:mace:egi.eu:group: -&gt; egi_</span>
+<span class="c1">#     data.kit.edu: -&gt; kit:</span>
+<span class="c1">#     eosc-synergy.eu: -&gt; synergy:</span>
+<span class="c1">#     instruct-eric.eu: -&gt; instruct:</span>
+<span class="c1">#     perfmon.m.d.k.e:adm -&gt; perfmon:</span>
+<span class="c1">#     [\.:] -&gt; - # convert . and : to - (for general unix compatibility)</span>
+<span class="c1">#     EOS -&gt; eos # and to avoid warnings</span>
+
+
 <span class="k">[login_info]</span>
 <span class="c1"># Static information displayed to the user when deployed to a service.</span>
 <span class="c1"># Each key and value field will be shown to the user in the &quot;Credentials&quot;</span>
@@ -405,6 +475,20 @@
 <span class="c1"># and will be run with root privileges</span>
 <span class="c1"># the script will be called with the username as the first and only argument</span>
 <span class="c1"># post_create_script = /path/to/script.sh</span>
+
+<span class="c1">## shadow_compatibility_function -- default: default</span>
+<span class="c1"># The methos used, to ensure user and group names are compatible with the</span>
+<span class="c1"># /etc/shadow mechanism.</span>
+<span class="c1"># WARNING: Changing this on an installation with existing users and groups</span>
+<span class="c1">#          will create new users according the new code, and re-create all</span>
+<span class="c1">#          groups with the new code. Moving existing users to the new</span>
+<span class="c1">#          groups needs to be done manually</span>
+<span class="c1"># Possible values:</span>
+<span class="c1"># - default: should work in all cases</span>
+<span class="c1"># - v044: compatibility with older (0.44) releases. Use this if you</span>
+<span class="c1">#         installed before July 7 2022</span>
+<span class="c1"># - punch: implemented for the PUNCH4NFDI project</span>
+<span class="c1"># shadow_compatibility_function = default</span>
 
 <span class="k">[backend.bwidm]</span>
 <span class="c1"># Configuration for the bwidm backend</span>

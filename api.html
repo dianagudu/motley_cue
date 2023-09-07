@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>API &#8212; motley_cue</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=623475cf" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/css/fonts.css?v=09a796e2" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=8fd29722" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
-    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=7af948fa"></script>
     <link rel="icon" href="_static/motley-cue.ico"/>
@@ -106,10 +106,10 @@
           <div class="body" role="main">
             
   <section id="api">
-<span id="id1"></span><h1>API<a class="headerlink" href="#api" title="Permalink to this heading">¶</a></h1>
+<span id="id1"></span><h1>API<a class="headerlink" href="#api" title="Link to this heading">¶</a></h1>
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user</span></span><a class="headerlink" href="#get--user" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user</span></span><a class="headerlink" href="#get--user" title="Link to this definition">¶</a></dt>
 <dd><p><strong>Read Root</strong></p>
 <p>Retrieve user API information:</p>
 <ul class="simple">
@@ -128,7 +128,7 @@
 
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user-get_status">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/get_status</span></span><a class="headerlink" href="#get--user-get_status" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/get_status</span></span><a class="headerlink" href="#get--user-get_status" title="Link to this definition">¶</a></dt>
 <dd><p><strong>Get Status</strong></p>
 <p>Get information about your local account:</p>
 <ul class="simple">
@@ -157,7 +157,7 @@
 
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user-deploy">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/deploy</span></span><a class="headerlink" href="#get--user-deploy" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/deploy</span></span><a class="headerlink" href="#get--user-deploy" title="Link to this definition">¶</a></dt>
 <dd><p><strong>Deploy</strong></p>
 <p>Provision a local account.</p>
 <p>Requires an authorised user.</p>
@@ -182,7 +182,7 @@
 
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user-suspend">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/suspend</span></span><a class="headerlink" href="#get--user-suspend" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/suspend</span></span><a class="headerlink" href="#get--user-suspend" title="Link to this definition">¶</a></dt>
 <dd><p><strong>Suspend</strong></p>
 <p>Suspends a local account.</p>
 <p>Requires an authorised user.</p>
@@ -207,7 +207,7 @@
 
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user-generate_otp">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/generate_otp</span></span><a class="headerlink" href="#get--user-generate_otp" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/generate_otp</span></span><a class="headerlink" href="#get--user-generate_otp" title="Link to this definition">¶</a></dt>
 <dd><p><strong>Generate Otp</strong></p>
 <p>Generates and stores a new one-time password, using token as shared secret.</p>
 <p>Requires an authorised user.</p>
@@ -232,7 +232,7 @@
 
 <dl class="http get">
 <dt class="sig sig-object http" id="get--admin">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/admin</span></span><a class="headerlink" href="#get--admin" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/admin</span></span><a class="headerlink" href="#get--admin" title="Link to this definition">¶</a></dt>
 <dd><p><strong>Read Root</strong></p>
 <p>Retrieve admin API information:</p>
 <ul class="simple">
@@ -251,7 +251,7 @@
 
 <dl class="http get">
 <dt class="sig sig-object http" id="get--admin-suspend">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/admin/suspend</span></span><a class="headerlink" href="#get--admin-suspend" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/admin/suspend</span></span><a class="headerlink" href="#get--admin-suspend" title="Link to this definition">¶</a></dt>
 <dd><p><strong>Suspend</strong></p>
 <p>Suspends a local account mapped to given OIDC account – uniquely
 identified by issuer and subject claims.</p>
@@ -285,7 +285,7 @@ identified by issuer and subject claims.</p>
 
 <dl class="http get">
 <dt class="sig sig-object http" id="get--admin-resume">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/admin/resume</span></span><a class="headerlink" href="#get--admin-resume" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/admin/resume</span></span><a class="headerlink" href="#get--admin-resume" title="Link to this definition">¶</a></dt>
 <dd><p><strong>Resume</strong></p>
 <p>Resumes a suspended local account mapped to given OIDC account – uniquely
 identified by issuer and subject claims.</p>
@@ -319,7 +319,7 @@ identified by issuer and subject claims.</p>
 
 <dl class="http get">
 <dt class="sig sig-object http" id="get--">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/</span></span><a class="headerlink" href="#get--" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/</span></span><a class="headerlink" href="#get--" title="Link to this definition">¶</a></dt>
 <dd><p><strong>Read Root</strong></p>
 <p>Retrieve general API information:</p>
 <ul class="simple">
@@ -338,7 +338,7 @@ identified by issuer and subject claims.</p>
 
 <dl class="http get">
 <dt class="sig sig-object http" id="get--info">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/info</span></span><a class="headerlink" href="#get--info" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/info</span></span><a class="headerlink" href="#get--info" title="Link to this definition">¶</a></dt>
 <dd><p><strong>Info</strong></p>
 <p>Retrieve service-specific information:</p>
 <ul class="simple">
@@ -357,7 +357,7 @@ identified by issuer and subject claims.</p>
 
 <dl class="http get">
 <dt class="sig sig-object http" id="get--info-authorisation">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/info/authorisation</span></span><a class="headerlink" href="#get--info-authorisation" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/info/authorisation</span></span><a class="headerlink" href="#get--info-authorisation" title="Link to this definition">¶</a></dt>
 <dd><p><strong>Info Authorisation</strong></p>
 <p>Retrieve authorisation information for specific OP.</p>
 <p>Requires:</p>
@@ -386,7 +386,7 @@ identified by issuer and subject claims.</p>
 
 <dl class="http get">
 <dt class="sig sig-object http" id="get--info-op">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/info/op</span></span><a class="headerlink" href="#get--info-op" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/info/op</span></span><a class="headerlink" href="#get--info-op" title="Link to this definition">¶</a></dt>
 <dd><p><strong>Info Op</strong></p>
 <p>Retrieve additional information for specific OP, such as required scopes.</p>
 <dl class="field-list simple">
@@ -410,7 +410,7 @@ identified by issuer and subject claims.</p>
 
 <dl class="http get">
 <dt class="sig sig-object http" id="get--verify_user">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/verify_user</span></span><a class="headerlink" href="#get--verify_user" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/verify_user</span></span><a class="headerlink" href="#get--verify_user" title="Link to this definition">¶</a></dt>
 <dd><p><strong>Verify User</strong></p>
 <p>Verify that the authenticated user has a local account with the given <strong>username</strong>.</p>
 <p>Requires the user to be authorised on the service.</p>
@@ -441,7 +441,7 @@ identified by issuer and subject claims.</p>
 
 <dl class="http get">
 <dt class="sig sig-object http" id="get--privacy">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/privacy</span></span><a class="headerlink" href="#get--privacy" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/privacy</span></span><a class="headerlink" href="#get--privacy" title="Link to this definition">¶</a></dt>
 <dd><p><strong>Privacy</strong></p>
 <dl class="field-list simple">
 <dt class="field-odd">Status Codes<span class="colon">:</span></dt>
