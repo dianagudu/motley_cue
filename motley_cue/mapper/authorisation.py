@@ -206,6 +206,11 @@ class Authorisation(Flaat):
                 if not op_authz.authorise_admins_for_all_ops and canonical_url(
                     op_authz.op_url
                 ) != canonical_url(user_iss):
+                    logger.info(
+                        "Admin from issuer %s is not authorised to manage users of issuer '%s'",
+                        op_authz.op_url,
+                        user_iss,
+                    )
                     return CheckResult(
                         False,
                         f"Admin from issuer {op_authz.op_url} is not authorised to manage "
