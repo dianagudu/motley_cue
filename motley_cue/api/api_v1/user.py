@@ -1,17 +1,17 @@
 """
 This module contains the definition of motley_cue's user API.
 """
-from fastapi import APIRouter, Request, Depends, Header
+from fastapi import Request, Depends, Header
 
 from motley_cue.dependencies import mapper
 from motley_cue.models import FeudalResponse, OTPResponse, responses
+from motley_cue.api.utils import APIRouter
 
 
-api = APIRouter(prefix="/user")
+api = APIRouter(prefix="/user", redirect_slashes=True)
 
 
 @api.get("")
-@api.get("/", include_in_schema=False)
 async def read_root():
     """Retrieve user API information:
 
