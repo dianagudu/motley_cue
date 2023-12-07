@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     openapi_url: str = "/openapi.json"
     docs_url: Optional[str] = None
     redoc_url: Optional[str] = None
+    API_V1_STR: str = "/v1"
+    API_LATEST_STR: str = "/latest"
 
     @field_validator("openapi_url")
     @classmethod

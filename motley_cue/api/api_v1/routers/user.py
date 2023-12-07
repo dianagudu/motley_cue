@@ -3,8 +3,8 @@ This module contains the definition of motley_cue's user API.
 """
 from fastapi import APIRouter, Request, Depends, Header
 
-from ..dependencies import mapper
-from ..models import FeudalResponse, OTPResponse, responses
+from motley_cue.dependencies import mapper
+from motley_cue.models import FeudalResponse, OTPResponse, responses
 
 
 api = APIRouter(prefix="/user")
