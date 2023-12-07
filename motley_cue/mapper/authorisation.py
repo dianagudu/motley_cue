@@ -13,8 +13,8 @@ from flaat.requirements import CheckResult, Requirement
 from flaat.user_infos import UserInfos
 from flaat.exceptions import FlaatException
 
-from .config import Config, ConfigAuthorisation, canonical_url
-from .exceptions import Unauthorised
+from motley_cue.mapper.config import Config, ConfigAuthorisation, canonical_url
+from motley_cue.mapper.exceptions import Unauthorised
 
 
 logger = logging.getLogger(__name__)

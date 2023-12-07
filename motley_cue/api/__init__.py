@@ -2,9 +2,9 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from pydantic import ValidationError
 
-from .api_v1.api import api_router as api_router_v1
-from ..dependencies import mapper, Settings
-from ..mapper.exceptions import (
+from motley_cue.api.api_v1.api import api_router as api_router_v1
+from motley_cue.dependencies import mapper, Settings
+from motley_cue.mapper.exceptions import (
     validation_exception_handler,
     request_validation_exception_handler,
 )

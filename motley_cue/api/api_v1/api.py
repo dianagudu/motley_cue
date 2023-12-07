@@ -1,5 +1,5 @@
 from motley_cue.api.utils import APIRouter
-from . import endpoints
+from motley_cue.api.api_v1 import endpoints
 
 
 api_router = APIRouter()

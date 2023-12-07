@@ -17,7 +17,7 @@ from flaat.requirements import (
     get_audience_requirement,
 )
 
-from .exceptions import InternalException
+from motley_cue.mapper.exceptions import InternalException
 
 
 class Config:

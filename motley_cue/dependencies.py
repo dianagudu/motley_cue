@@ -3,8 +3,8 @@
 from typing import Optional
 from pydantic import field_validator
 
-from ._version import __version__
-from .mapper import Mapper, Config
+from motley_cue._version import __version__
+from motley_cue.mapper import Mapper, Config
 from pydantic_settings import BaseSettings
 
 
