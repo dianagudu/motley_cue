@@ -1,3 +1,4 @@
+import logging
 import os
 import pkgutil
 import importlib
@@ -11,6 +12,8 @@ from motley_cue.mapper.exceptions import (
     validation_exception_handler,
     request_validation_exception_handler,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def create_app():
@@ -42,9 +45,28 @@ def create_app():
     api_routers = {}
     for version_submodule in pkgutil.iter_modules([os.path.dirname(__file__)]):
         if version_submodule.name.startswith("v"):
-            api_routers[version_submodule.name] = importlib.import_module(
-                f"motley_cue.api.{version_submodule.name}"
-            ).router
+            try:
+                api_routers[version_submodule.name] = importlib.import_module(
+                    f"motley_cue.api.{version_submodule.name}"
+                ).router
+            except AttributeError as exc:
+                logger.error(
+                    "API version %s does not have a router",
+                    version_submodule.name,
+                    exc_info=exc,
+                )
+                raise InternalException(
+                    f"API version {version_submodule.name} does not have a router."
+                ) from exc
+            except Exception as exc:
+                logger.error(
+                    "Could not import API version %s",
+                    version_submodule.name,
+                    exc_info=exc,
+                )
+                raise InternalException(
+                    f"Could not import API version {version_submodule.name}"
+                ) from exc
 
     try:
         current_api_router = api_routers[settings.api_version]
