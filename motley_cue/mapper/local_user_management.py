@@ -11,7 +11,7 @@ from ldf_adapter.config import CONFIG as LDF_ADAPTER_CONFIG
 from ldf_adapter.results import ExceptionalResult, Rejection
 from ldf_adapter import User
 
-from .exceptions import Unauthorised, InternalServerError
+from motley_cue.mapper.exceptions import Unauthorised, InternalServerError
 
 
 class States(Enum):

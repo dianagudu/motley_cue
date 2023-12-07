@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 
 from motley_cue.api.utils import APIRouter
 from motley_cue.dependencies import mapper
-from .routers import user, admin
+from motley_cue.api.api_v1.routers import user, admin
 from motley_cue.models import Info, InfoAuthorisation, InfoOp, VerifyUser, responses
 
 router = APIRouter()

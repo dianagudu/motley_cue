@@ -14,8 +14,8 @@ import sqlitedict
 from cryptography.fernet import Fernet
 from pathlib import Path
 
-from .config import ConfigOTP
-from .exceptions import InternalException
+from motley_cue.mapper.config import ConfigOTP
+from motley_cue.mapper.exceptions import InternalException
 
 logger = logging.getLogger(__name__)
 
