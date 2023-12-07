@@ -1,6 +1,7 @@
 """Module for loading and describing motley_cue configuration.
 """
 from configparser import ConfigParser
+import re
 from typing import List, Optional, Dict
 import logging
 import os
@@ -77,6 +78,11 @@ class Config:
     def docs_url(self):
         """return url to be used as location for swagger docs"""
         return self.CONFIG.mapper.docs_url if self.CONFIG.mapper.enable_docs else None
+
+    @property
+    def redoc_url(self):
+        """return url to be used as location for redoc docs"""
+        return self.CONFIG.mapper.redoc_url if self.CONFIG.mapper.enable_docs else None
 
     @property
     def otp(self):
@@ -285,6 +291,7 @@ class ConfigMapper(ConfigSection):
     log_file: Optional[str] = None  # equivalent to /dev/stderr
     enable_docs: bool = False
     docs_url: str = "/docs"
+    redoc_url: str = "/redoc"
 
     @classmethod
     def __section__name__(cls):

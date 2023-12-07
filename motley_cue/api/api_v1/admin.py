@@ -1,17 +1,17 @@
 """
 This module contains the definition of motley_cue's admin API.
 """
-from fastapi import APIRouter, Request, Depends, Query, Header
+from fastapi import Request, Depends, Query, Header
 
 from motley_cue.dependencies import mapper
 from motley_cue.models import FeudalResponse, responses
+from motley_cue.api.utils import APIRouter
 
 
 api = APIRouter(prefix="/admin")
 
 
 @api.get("")
-@api.get("/", include_in_schema=False)
 async def read_root():
     """Retrieve admin API information:
 

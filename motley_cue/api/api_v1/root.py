@@ -6,12 +6,13 @@ from fastapi.responses import HTMLResponse
 
 from motley_cue.api.utils import APIRouter
 from motley_cue.dependencies import mapper
-from motley_cue.api.api_v1.routers import user, admin
 from motley_cue.models import Info, InfoAuthorisation, InfoOp, VerifyUser, responses
+from motley_cue.api.api_v1 import user, admin
 
 router = APIRouter()
-router.include_router(user.api, tags=["user"])
-router.include_router(admin.api, tags=["admin"])
+
+router.include_router(user.api)
+router.include_router(admin.api)
 
 
 @router.get("/")
@@ -26,20 +27,20 @@ async def read_root():
         "description": "This is the user API for mapping remote identities to local identities.",
         "usage": "All endpoints are available via a bearer token.",
         "endpoints": {
-            "/info": "Service-specific information.",
-            "/info/authorisation": (
+            f"{router.prefix}/info": "Service-specific information.",
+            f"{router.prefix}/info/authorisation": (
                 "Authorisation information for specific OP; "
                 "requires valid access token from a supported OP."
             ),
-            "/info/op": (
+            f"{router.prefix}/info/op": (
                 "Information about a specific OP specified via a query parameter 'url'; "
                 "does not require an access token."
             ),
-            "/user": "User API; requires valid access token of an authorised user.",
-            "/admin": (
+            f"{router.prefix}/user": "User API; requires valid access token of an authorised user.",
+            f"{router.prefix}/admin": (
                 "Admin API; requires valid access token of an authorised user with admin role."
             ),
-            "/verify_user": (
+            f"{router.prefix}/verify_user": (
                 "Verifies if a given token belongs to a given local account via 'username'."
             ),
         },
