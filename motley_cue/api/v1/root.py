@@ -7,16 +7,13 @@ from fastapi.responses import HTMLResponse
 from motley_cue.api.utils import APIRouter
 from motley_cue.dependencies import mapper
 from motley_cue.models import Info, InfoAuthorisation, InfoOp, VerifyUser, responses
-from motley_cue.api.api_v1 import user, admin
+
 
 router = APIRouter()
 
-router.include_router(user.api)
-router.include_router(admin.api)
 
-
-@router.get("/")
-async def read_root():
+@router.get("/", summary="API info")
+async def root_api():
     """Retrieve general API information:
 
     * description
@@ -47,7 +44,7 @@ async def read_root():
     }
 
 
-@router.get("/info", response_model=Info, response_model_exclude_unset=True)
+@router.get("/info", summary="Login info", response_model=Info, response_model_exclude_unset=True)
 async def info():
     """Retrieve service-specific information:
 
@@ -60,6 +57,7 @@ async def info():
 
 @router.get(
     "/info/authorisation",
+    summary="Authorisation info by OP",
     dependencies=[Depends(mapper.user_security)],
     response_model=InfoAuthorisation,
     response_model_exclude_unset=True,
@@ -82,6 +80,7 @@ async def info_authorisation(
 
 @router.get(
     "/info/op",
+    summary="OP info",
     response_model=InfoOp,
     response_model_exclude_unset=True,
     responses={**responses, 200: {"model": InfoOp}},
@@ -100,6 +99,7 @@ async def info_op(
 
 @router.get(
     "/verify_user",
+    summary="Verify user",
     dependencies=[Depends(mapper.user_security)],
     response_model=VerifyUser,
     responses={**responses, 200: {"model": VerifyUser}},
@@ -127,13 +127,7 @@ async def verify_user(
     return mapper.verify_user(request, username)
 
 
-@router.get("/privacy", response_class=HTMLResponse)
+@router.get("/privacy", summary="Privacy policy", response_class=HTMLResponse)
 async def privacy():
+    """Retrieve privacy policy."""
     return mapper.get_privacy_policy()
-
-
-# Logo for redoc (currently disabled).
-# This must be at the end after all the routes have been set!
-# router.openapi()["info"]["x-logo"] = {
-#     "url": "https://motley-cue.readthedocs.io/en/latest/_static/logos/motley-cue.png"
-# }

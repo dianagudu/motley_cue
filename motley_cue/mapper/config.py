@@ -2,6 +2,7 @@
 """
 from configparser import ConfigParser
 import re
+from sys import api_version
 from typing import List, Optional, Dict
 import logging
 import os
@@ -83,6 +84,11 @@ class Config:
     def redoc_url(self):
         """return url to be used as location for redoc docs"""
         return self.CONFIG.mapper.redoc_url if self.CONFIG.mapper.enable_docs else None
+
+    @property
+    def api_version(self):
+        """return api version"""
+        return self.CONFIG.mapper.api_version
 
     @property
     def otp(self):
@@ -292,6 +298,7 @@ class ConfigMapper(ConfigSection):
     enable_docs: bool = False
     docs_url: str = "/docs"
     redoc_url: str = "/redoc"
+    api_version: str = "v1"
 
     @classmethod
     def __section__name__(cls):

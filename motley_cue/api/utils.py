@@ -5,6 +5,7 @@ from fastapi.types import DecoratedCallable
 
 class APIRouter(FastAPIRouter):
     """Overwrite APIRouter class from fastapi to remove trailing slashes from paths."""
+
     def api_route(
         self, path: str, *, include_in_schema: bool = True, **kwargs: t.Any
     ) -> t.Callable[[DecoratedCallable], DecoratedCallable]:
