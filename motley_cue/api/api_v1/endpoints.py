@@ -1,37 +1,20 @@
 """
-This module contains the definition of motley_cue's REST API.
+This module contains the definition of motley_cue's REST router.
 """
-from fastapi import FastAPI, Depends, Request, Query, Header
-from fastapi.exceptions import RequestValidationError, ResponseValidationError
+from fastapi import  Depends, Request, Query, Header
 from fastapi.responses import HTMLResponse
-from pydantic import ValidationError
 
-from .dependencies import mapper, Settings
+from motley_cue.api.utils import APIRouter
+from motley_cue.dependencies import mapper
 from .routers import user, admin
-from .models import Info, InfoAuthorisation, InfoOp, VerifyUser, responses, ClientError
-from .mapper.exceptions import (
-    validation_exception_handler,
-    request_validation_exception_handler,
-)
+from motley_cue.models import Info, InfoAuthorisation, InfoOp, VerifyUser, responses
 
-settings = Settings(docs_url=mapper.config.docs_url)
-api = FastAPI(
-    title=settings.title,
-    description=settings.description,
-    version=settings.version,
-    openapi_url=settings.openapi_url,
-    docs_url=settings.docs_url,
-    redoc_url=settings.redoc_url,
-)
-
-api.include_router(user.api, tags=["user"])
-api.include_router(admin.api, tags=["admin"])
-api.add_exception_handler(RequestValidationError, request_validation_exception_handler)
-api.add_exception_handler(ValidationError, validation_exception_handler)
-api.add_exception_handler(ResponseValidationError, validation_exception_handler)
+router = APIRouter()
+router.include_router(user.api, tags=["user"])
+router.include_router(admin.api, tags=["admin"])
 
 
-@api.get("/")
+@router.get("/")
 async def read_root():
     """Retrieve general API information:
 
@@ -63,7 +46,7 @@ async def read_root():
     }
 
 
-@api.get("/info", response_model=Info, response_model_exclude_unset=True)
+@router.get("/info", response_model=Info, response_model_exclude_unset=True)
 async def info():
     """Retrieve service-specific information:
 
@@ -74,7 +57,7 @@ async def info():
     return mapper.info()
 
 
-@api.get(
+@router.get(
     "/info/authorisation",
     dependencies=[Depends(mapper.user_security)],
     response_model=InfoAuthorisation,
@@ -96,7 +79,7 @@ async def info_authorisation(
     return mapper.info_authorisation(request)
 
 
-@api.get(
+@router.get(
     "/info/op",
     response_model=InfoOp,
     response_model_exclude_unset=True,
@@ -114,7 +97,7 @@ async def info_op(
     return mapper.info_op(url)
 
 
-@api.get(
+@router.get(
     "/verify_user",
     dependencies=[Depends(mapper.user_security)],
     response_model=VerifyUser,
@@ -143,13 +126,13 @@ async def verify_user(
     return mapper.verify_user(request, username)
 
 
-@api.get("/privacy", response_class=HTMLResponse)
+@router.get("/privacy", response_class=HTMLResponse)
 async def privacy():
     return mapper.get_privacy_policy()
 
 
 # Logo for redoc (currently disabled).
 # This must be at the end after all the routes have been set!
-# api.openapi()["info"]["x-logo"] = {
+# router.openapi()["info"]["x-logo"] = {
 #     "url": "https://motley-cue.readthedocs.io/en/latest/_static/logos/motley-cue.png"
 # }

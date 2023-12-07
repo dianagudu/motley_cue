@@ -3,8 +3,8 @@ This module contains the definition of motley_cue's admin API.
 """
 from fastapi import APIRouter, Request, Depends, Query, Header
 
-from ..dependencies import mapper
-from ..models import FeudalResponse, responses
+from motley_cue.dependencies import mapper
+from motley_cue.models import FeudalResponse, responses
 
 
 api = APIRouter(prefix="/admin")
