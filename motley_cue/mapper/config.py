@@ -1,8 +1,6 @@
 """Module for loading and describing motley_cue configuration.
 """
 from configparser import ConfigParser
-import re
-from sys import api_version
 from typing import List, Optional, Dict
 import logging
 import os

@@ -1,10 +1,10 @@
 """
 This module contains the definition of motley_cue's REST router.
 """
-from fastapi import  Depends, Request, Query, Header
+from fastapi import Depends, Request, Query, Header
 from fastapi.responses import HTMLResponse
 
-from motley_cue.api.utils import APIRouter
+from motley_cue.apis.utils import APIRouter
 from motley_cue.dependencies import mapper
 from motley_cue.models import Info, InfoAuthorisation, InfoOp, VerifyUser, responses
 
@@ -44,7 +44,12 @@ async def root_api():
     }
 
 
-@router.get("/info", summary="Login info", response_model=Info, response_model_exclude_unset=True)
+@router.get(
+    "/info",
+    summary="Login info",
+    response_model=Info,
+    response_model_exclude_unset=True,
+)
 async def info():
     """Retrieve service-specific information:
 

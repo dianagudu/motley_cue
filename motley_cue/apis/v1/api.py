@@ -1,5 +1,5 @@
-from motley_cue.api.utils import APIRouter
-from motley_cue.api.v1 import root, user, admin
+from motley_cue.apis.utils import APIRouter
+from motley_cue.apis.v1 import root, user, admin
 
 
 router = APIRouter()

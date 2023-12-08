@@ -5,7 +5,7 @@ from fastapi import Request, Depends, Header
 
 from motley_cue.dependencies import mapper
 from motley_cue.models import FeudalResponse, OTPResponse, responses
-from motley_cue.api.utils import APIRouter
+from motley_cue.apis.utils import APIRouter
 
 
 router = APIRouter(prefix="/user")

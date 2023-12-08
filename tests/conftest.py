@@ -35,8 +35,8 @@ def test_api(
         # import FastAPI object here to make sure its decorators are based on monkeypatched mapper
         from motley_cue.api import api
 
-        test_api = TestClient(api)
-        yield test_api
+        test_client = TestClient(api)
+        yield test_client
 
         # unload all motley_cue modules
         for m in [x for x in sys.modules if x.startswith("motley_cue")]:
