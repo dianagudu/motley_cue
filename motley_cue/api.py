@@ -12,6 +12,7 @@ from motley_cue.mapper.exceptions import (
     validation_exception_handler,
     request_validation_exception_handler,
 )
+import motley_cue.apis
 
 logger = logging.getLogger(__name__)
 
@@ -43,11 +44,11 @@ def create_app():
 
     # get routers for all api versions
     api_routers = {}
-    for version_submodule in pkgutil.iter_modules([os.path.dirname(__file__)]):
+    for version_submodule in pkgutil.iter_modules(motley_cue.apis.__path__):
         if version_submodule.name.startswith("v"):
             try:
                 api_routers[version_submodule.name] = importlib.import_module(
-                    f"motley_cue.api.{version_submodule.name}"
+                    f"motley_cue.apis.{version_submodule.name}.api"
                 ).router
             except AttributeError as exc:
                 logger.error(
