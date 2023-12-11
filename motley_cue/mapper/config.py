@@ -234,7 +234,7 @@ def canonical_url(url: str) -> str:
 @dataclass
 class ConfigSection:
     @classmethod
-    def __section__name__(cls):
+    def __section__name__(cls) -> str:
         return "DEFAULT"
 
     @classmethod
