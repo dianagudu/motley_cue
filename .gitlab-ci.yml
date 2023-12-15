@@ -51,6 +51,6 @@ build-ubuntu-bionic:
 
 ##########################################################################
 # Integration (These might to to a central job def)
-# integration-tests:
-#   extends:
-#     - .trigger-integration-tests-ssh-oidc
+integration-tests:
+  extends:
+    - .trigger-integration-tests-ssh-oidc
