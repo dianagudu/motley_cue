@@ -1,17 +1,19 @@
 ---
 include:
-  - 'https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/generic-ci.yml'
-  - 'https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/pipeline-jobs.yml'
-  - 'https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/pipeline-jobs-publish-to-repo.yml'
+  - "https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/generic-ci.yml"
+  - "https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/pipeline-jobs.yml"
+  - "https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/pipeline-jobs-publish-to-repo.yml"
+  - "https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/github-status/ci-include/github-status-sync.yml"
 
 default:
   tags:
     - linux
 
 variables:
-  STAGING_BRANCH_NAME: 'staging'
-  DOCKER_IMAGE_NAMESPACE: 'marcvs/build'
-  DOCKER_IMAGE_NAME: 'motley-cue'
+  STATUS_PROJECT: dianagudu/motley_cue
+  STAGING_BRANCH_NAME: "staging"
+  DOCKER_IMAGE_NAMESPACE: "marcvs/build"
+  DOCKER_IMAGE_NAME: "motley-cue"
   #PREREL_BRANCH_NAME: 'ci/adapt-to-pam-ssh-oidc'
   #TARGET_REPO: 'devel'
   # The following varialbes can be overwritten only in specific targets
@@ -73,4 +75,5 @@ trigger-integration-tests:
     # api token needs "read_api" privileges of developer
   extends:
     - .trigger-integration-tests-ssh-oidc
- 
+
+##########################################################################
