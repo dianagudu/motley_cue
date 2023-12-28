@@ -62,7 +62,7 @@ integration-tests:
   variables:
     STATUS_PROJECT: dianagudu/motley_cue
     STATUS_NAME: Codebase CI
-
+  image: debian:stable-slim
   script:
     # For complete details on the GitHub API please see:
     # https://developer.github.com/v3/repos/statuses
