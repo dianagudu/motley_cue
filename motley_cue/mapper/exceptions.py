@@ -1,9 +1,13 @@
 """exceptions definitions for motley_cue
 """
+from typing import Union
 from pydantic import ValidationError
-from fastapi import Request
-from fastapi.exceptions import HTTPException, RequestValidationError
-from starlette.responses import JSONResponse
+from fastapi.exceptions import (
+    HTTPException,
+    RequestValidationError,
+    ResponseValidationError,
+)
+from fastapi.responses import JSONResponse
 from starlette.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_401_UNAUTHORIZED,
@@ -60,35 +64,24 @@ class MissingParameter(JSONResponse):
         super().__init__(status_code=HTTP_400_BAD_REQUEST, content={"detail": message})
 
 
+class InvalidResponse(JSONResponse):
+    """Response for invalid response model.
+
+    Returns HTTP 500 Internal Server Error status code
+    and informative message.
+    """
+
+    def __init__(self, exc: Union[ResponseValidationError, ValidationError]):
+        message = "Could not validate response model."
+        _ = exc
+        super().__init__(
+            status_code=HTTP_500_INTERNAL_SERVER_ERROR, content={"detail": message}
+        )
+
+
 class InternalException(Exception):
     """Wrapper for internal errors"""
 
     def __init__(self, message) -> None:
         self.message = message
         super().__init__(message)
-
-
-async def validation_exception_handler(request: Request, exc: ValidationError):
-    """Replacement callback for handling RequestValidationError exceptions.
-
-    :param request: request object that caused the RequestValidationError
-    :param exc: RequestValidationError containing validation errors
-    """
-    _ = request
-    _ = exc
-    return JSONResponse(
-        status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"detail": "Could not validate response model."},
-    )
-
-
-async def request_validation_exception_handler(
-    request: Request, exc: RequestValidationError
-):
-    """Replacement callback for handling RequestValidationError exceptions.
-
-    :param request: request object that caused the RequestValidationError
-    :param exc: RequestValidationError containing validation errors
-    """
-    _ = request
-    return MissingParameter(exc)
