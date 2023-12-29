@@ -85,7 +85,7 @@ success:
   extends:
     - .report-status
 
-failed:
+failure:
   stage: .post
   extends:
     - .report-status
