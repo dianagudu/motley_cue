@@ -28,6 +28,9 @@ variables:
   # See generic-ci.yml -> .build-definition for the full list
   # DOCKER_IMAGE_VERSION
   # DOCKER_IMAGE_VERSION_WINDOWS
+  # These are needed to find the artifacts:
+  CI_UPSTREAM_JOB_ID: $CI_JOB_ID
+  CI_UPSTREAM_PROJECT_NAMESPACE: $CI_PROJECT_NAMESPACE
 
 build-centos-7:
   extends:
