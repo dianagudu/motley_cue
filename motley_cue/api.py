@@ -1,20 +1,29 @@
-"""
-This module contains the definition of motley_cue's REST API.
-"""
-from fastapi import FastAPI, Depends, Request, Query, Header
-from fastapi.exceptions import RequestValidationError, ResponseValidationError
-from fastapi.responses import HTMLResponse
+import logging
+import pkgutil
+import importlib
+from typing import Union
 from pydantic import ValidationError
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError, ResponseValidationError
 
-from .dependencies import mapper, Settings
-from .routers import user, admin
-from .models import Info, InfoAuthorisation, InfoOp, VerifyUser, responses, ClientError
-from .mapper.exceptions import (
-    validation_exception_handler,
-    request_validation_exception_handler,
+from motley_cue.dependencies import mapper, Settings
+from motley_cue.mapper.exceptions import (
+    InternalException,
+    InvalidResponse,
+    MissingParameter,
+)
+import motley_cue.apis
+
+logger = logging.getLogger(__name__)
+
+# API settings
+settings = Settings(
+    docs_url=mapper.config.docs_url,
+    redoc_url=mapper.config.redoc_url,
+    api_version=mapper.config.api_version,
 )
 
-settings = Settings(docs_url=mapper.config.docs_url)
+# create FastAPI app
 api = FastAPI(
     title=settings.title,
     description=settings.description,
@@ -24,132 +33,81 @@ api = FastAPI(
     redoc_url=settings.redoc_url,
 )
 
-api.include_router(user.api, tags=["user"])
-api.include_router(admin.api, tags=["admin"])
-api.add_exception_handler(RequestValidationError, request_validation_exception_handler)
-api.add_exception_handler(ValidationError, validation_exception_handler)
-api.add_exception_handler(ResponseValidationError, validation_exception_handler)
+# get routers for all api versions
+api_routers = {}
+for version_submodule in pkgutil.iter_modules(motley_cue.apis.__path__):
+    if version_submodule.name.startswith("v"):
+        try:
+            api_routers[version_submodule.name] = importlib.import_module(
+                f"motley_cue.apis.{version_submodule.name}.api"
+            ).router
+        except AttributeError as exc:
+            logger.error(
+                "API version %s does not have a router",
+                version_submodule.name,
+                exc_info=exc,
+            )
+            raise InternalException(
+                f"API version {version_submodule.name} does not have a router."
+            ) from exc
+        except Exception as exc:
+            logger.error(
+                "Could not import API version %s",
+                version_submodule.name,
+                exc_info=exc,
+            )
+            raise InternalException(
+                f"Could not import API version {version_submodule.name}"
+            ) from exc
+
+try:
+    current_api_router = api_routers[settings.api_version]
+except KeyError as exc:
+    raise InternalException(
+        f"API version {settings.api_version} does not exist."
+    ) from exc
+
+# current API version
+api.include_router(current_api_router, prefix="/api", tags=["API"])
+# for compatibility with old API, include all endpoints in the root
+api.include_router(current_api_router, prefix="", include_in_schema=False)
+
+# all API versions
+for api_version, api_router in api_routers.items():
+    api.include_router(
+        api_router, prefix=f"/api/{api_version}", tags=[f"API {api_version}"]
+    )
+
+# Logo for redoc. This must be at the end after all the routes have been set!
+api.openapi()["info"]["x-logo"] = {
+    "url": "https://motley-cue.readthedocs.io/en/latest/_static/logos/motley-cue.png"
+}
 
 
-@api.get("/")
-async def read_root():
-    """Retrieve general API information:
+# Exception handlers
+@api.exception_handler(ResponseValidationError)
+@api.exception_handler(ValidationError)
+async def validation_exception_handler(
+    request: Request, validation_exc: Union[ResponseValidationError, ValidationError]
+):
+    """Replacement callback for handling ResponseValidationError exceptions.
 
-    * description
-    * available endpoints
-    * security
+    :param request: request object that caused the ResponseValidationError
+    :param validation_exc: ResponseValidationError containing validation errors
     """
-    return {
-        "description": "This is the user API for mapping remote identities to local identities.",
-        "usage": "All endpoints are available via a bearer token.",
-        "endpoints": {
-            "/info": "Service-specific information.",
-            "/info/authorisation": (
-                "Authorisation information for specific OP; "
-                "requires valid access token from a supported OP."
-            ),
-            "/info/op": (
-                "Information about a specific OP specified via a query parameter 'url'; "
-                "does not require an access token."
-            ),
-            "/user": "User API; requires valid access token of an authorised user.",
-            "/admin": (
-                "Admin API; requires valid access token of an authorised user with admin role."
-            ),
-            "/verify_user": (
-                "Verifies if a given token belongs to a given local account via 'username'."
-            ),
-        },
-    }
+    _ = request
+    _ = validation_exc
+    return InvalidResponse(validation_exc)
 
 
-@api.get("/info", response_model=Info, response_model_exclude_unset=True)
-async def info():
-    """Retrieve service-specific information:
+@api.exception_handler(RequestValidationError)
+async def request_validation_exception_handler(
+    request: Request, validation_exc: RequestValidationError
+):
+    """Replacement callback for handling RequestValidationError exceptions.
 
-    * login info
-    * supported OPs
-    * ops_info per OP information, such as scopes, audience, etc.
+    :param request: request object that caused the RequestValidationError
+    :param validation_exc: RequestValidationError containing validation errors
     """
-    return mapper.info()
-
-
-@api.get(
-    "/info/authorisation",
-    dependencies=[Depends(mapper.user_security)],
-    response_model=InfoAuthorisation,
-    response_model_exclude_unset=True,
-    responses={**responses, 200: {"model": InfoAuthorisation}},
-)
-@mapper.authenticated_user_required
-async def info_authorisation(
-    request: Request,
-    header: str = Header(..., alias="Authorization", description="OIDC Access Token"),
-):  # pylint: disable=unused-argument
-    """Retrieve authorisation information for specific OP.
-
-    Requires:
-
-    * that the OP is supported
-    * authentication with this OP
-    """
-    return mapper.info_authorisation(request)
-
-
-@api.get(
-    "/info/op",
-    response_model=InfoOp,
-    response_model_exclude_unset=True,
-    responses={**responses, 200: {"model": InfoOp}},
-)
-async def info_op(
-    request: Request,
-    url: str = Query(..., description="OP URL"),
-):  # pylint: disable=unused-argument
-    """Retrieve additional information for specific OP, such as required scopes.
-
-    \f
-    :param url: OP URL
-    """
-    return mapper.info_op(url)
-
-
-@api.get(
-    "/verify_user",
-    dependencies=[Depends(mapper.user_security)],
-    response_model=VerifyUser,
-    responses={**responses, 200: {"model": VerifyUser}},
-)
-@mapper.inject_token
-@mapper.authorised_user_required
-async def verify_user(
-    request: Request,
-    username: str = Query(
-        ...,
-        description="username to compare to local username",
-    ),
-    header: str = Header(
-        ...,
-        alias="Authorization",
-        description="OIDC Access Token or valid one-time token",
-    ),
-):  # pylint: disable=unused-argument
-    """Verify that the authenticated user has a local account with the given **username**.
-
-    Requires the user to be authorised on the service.
-    \f
-    :param username: username to compare to local username
-    """
-    return mapper.verify_user(request, username)
-
-
-@api.get("/privacy", response_class=HTMLResponse)
-async def privacy():
-    return mapper.get_privacy_policy()
-
-
-# Logo for redoc (currently disabled).
-# This must be at the end after all the routes have been set!
-# api.openapi()["info"]["x-logo"] = {
-#     "url": "https://motley-cue.readthedocs.io/en/latest/_static/logos/motley-cue.png"
-# }
+    _ = request
+    return MissingParameter(validation_exc)

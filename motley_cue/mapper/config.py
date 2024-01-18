@@ -17,7 +17,7 @@ from flaat.requirements import (
     get_audience_requirement,
 )
 
-from .exceptions import InternalException
+from motley_cue.mapper.exceptions import InternalException
 
 
 class Config:
@@ -77,6 +77,16 @@ class Config:
     def docs_url(self):
         """return url to be used as location for swagger docs"""
         return self.CONFIG.mapper.docs_url if self.CONFIG.mapper.enable_docs else None
+
+    @property
+    def redoc_url(self):
+        """return url to be used as location for redoc docs"""
+        return self.CONFIG.mapper.redoc_url if self.CONFIG.mapper.enable_docs else None
+
+    @property
+    def api_version(self):
+        """return api version"""
+        return self.CONFIG.mapper.api_version
 
     @property
     def otp(self):
@@ -224,7 +234,7 @@ def canonical_url(url: str) -> str:
 @dataclass
 class ConfigSection:
     @classmethod
-    def __section__name__(cls):
+    def __section__name__(cls) -> str:
         return "DEFAULT"
 
     @classmethod
@@ -285,6 +295,8 @@ class ConfigMapper(ConfigSection):
     log_file: Optional[str] = None  # equivalent to /dev/stderr
     enable_docs: bool = False
     docs_url: str = "/docs"
+    redoc_url: str = "/redoc"
+    api_version: str = "v1"
 
     @classmethod
     def __section__name__(cls):

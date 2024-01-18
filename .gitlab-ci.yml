@@ -1,17 +1,19 @@
 ---
 include:
-  - 'https://git.scc.kit.edu/m-team/ci-voodoo/raw/master/ci-include/generic-ci.yml'
-  - 'https://git.scc.kit.edu/m-team/ci-voodoo/raw/master/ci-include/pipeline-jobs.yml'
-  - 'https://git.scc.kit.edu/m-team/ci-voodoo/raw/master/ci-include/pipeline-jobs-publish-to-repo.yml'
+  - "https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/generic-ci.yml"
+  - "https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/pipeline-jobs.yml"
+  - "https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/pipeline-jobs-publish-to-repo.yml"
+  - "https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/github-status-sync.yml"
 
 default:
   tags:
     - linux
 
 variables:
-  STAGING_BRANCH_NAME: 'staging'
-  DOCKER_IMAGE_NAMESPACE: 'marcvs/build'
-  DOCKER_IMAGE_NAME: 'motley-cue'
+  UPSTREAM_PROJECT: dianagudu/motley_cue
+  STAGING_BRANCH_NAME: "staging"
+  DOCKER_IMAGE_NAMESPACE: "marcvs/build"
+  DOCKER_IMAGE_NAME: "motley-cue"
   #PREREL_BRANCH_NAME: 'ci/adapt-to-pam-ssh-oidc'
   #TARGET_REPO: 'devel'
   # The following varialbes can be overwritten only in specific targets
@@ -54,5 +56,3 @@ build-ubuntu-bionic:
 integration-tests:
   extends:
     - .trigger-integration-tests-ssh-oidc
-
-

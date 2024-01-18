@@ -1,17 +1,17 @@
 """
 This module contains the definition of motley_cue's admin API.
 """
-from fastapi import APIRouter, Request, Depends, Query, Header
+from fastapi import Request, Depends, Query, Header
 
-from ..dependencies import mapper
-from ..models import FeudalResponse, responses
-
-
-api = APIRouter(prefix="/admin")
+from motley_cue.dependencies import mapper
+from motley_cue.models import FeudalResponse, responses
+from motley_cue.apis.utils import APIRouter
 
 
-@api.get("")
-@api.get("/", include_in_schema=False)
+router = APIRouter(prefix="/admin")
+
+
+@router.get("", summary="Admin: API info")
 async def read_root():
     """Retrieve admin API information:
 
@@ -24,14 +24,15 @@ async def read_root():
         "usage": "All endpoints are available using an OIDC Access Token as a bearer token and "
         "need subject and issuer of account to be modified, via 'sub' and 'iss' variables.",
         "endpoints": {
-            f"{api.prefix}/suspend": "Suspends a local account.",
-            f"{api.prefix}/resume": "Restores a suspended local account.",
+            f"{router.prefix}/suspend": "Suspends a local account.",
+            f"{router.prefix}/resume": "Restores a suspended local account.",
         },
     }
 
 
-@api.get(
+@router.get(
     "/suspend",
+    summary="Admin: suspend user",
     dependencies=[Depends(mapper.admin_security)],
     response_model=FeudalResponse,
     response_model_exclude_unset=True,
@@ -61,8 +62,9 @@ async def suspend(
     return mapper.admin_suspend(sub, iss)
 
 
-@api.get(
+@router.get(
     "/resume",
+    summary="Admin: resume user",
     dependencies=[Depends(mapper.admin_security)],
     response_model=FeudalResponse,
     response_model_exclude_unset=True,
