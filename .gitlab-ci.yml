@@ -33,7 +33,6 @@ variables:
 .build-debian-trixie: &build-debian-trixie
   extends:
     - .debian-build
-    # - .build-conditions-debian-trixie
   variables:
     RELEASE: 'trixie'
   image: "${DOCKER_IMAGE_NAMESPACE}_${DOCKER_IMAGE_NAME}_${DISTRO}-${RELEASE}:${DOCKER_IMAGE_VERSION}"
