@@ -63,6 +63,8 @@ build-ubuntu-bionic:
 trigger-integration-tests:
   variables:
     TRIGGER_TOKEN: ${TRIGGER_TOKEN_OIDC_SSH_MOTLEY_CUE}
+    API_TOKEN: ${API_TOKEN_OIDC_SSH_MOTLEY_CUE}
+    # api token needs "read_api" privileges of developer
   extends:
     - .trigger-integration-tests-ssh-oidc
  
