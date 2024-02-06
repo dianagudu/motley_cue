@@ -62,7 +62,7 @@ build-ubuntu-bionic:
 # Integration (These might to to a central job def)
 trigger-integration-tests:
   variables:
-    TRIGGER_TOKEN=${TRIGGER_TOKEN_OIDC_SSH_MOTLEY_CUE}
+    TRIGGER_TOKEN: ${TRIGGER_TOKEN_OIDC_SSH_MOTLEY_CUE}
   extends:
     - .trigger-integration-tests-ssh-oidc
  
