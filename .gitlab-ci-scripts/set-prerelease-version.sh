@@ -51,7 +51,6 @@ get_master_branch_of_mteam() {
         }
     done
 }
-
 MASTER_BRANCH=$(get_master_branch_of_mteam)
 PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
 
