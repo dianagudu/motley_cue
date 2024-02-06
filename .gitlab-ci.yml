@@ -31,7 +31,7 @@ variables:
 .build-debian-trixie: &build-debian-trixie
   extends:
     - .debian-build
-    - .build-conditions-debian-trixie
+    # - .build-conditions-debian-trixie
   variables:
     RELEASE: 'trixie'
   image: "${DOCKER_IMAGE_NAMESPACE}_${DOCKER_IMAGE_NAME}_${DISTRO}-${RELEASE}:${DOCKER_IMAGE_VERSION}"
@@ -60,7 +60,7 @@ build-ubuntu-bionic:
 
 ##########################################################################
 # Integration (These might to to a central job def)
-integration-tests:
+trigger-integration-tests:
   extends:
     - .trigger-integration-tests-ssh-oidc
  
