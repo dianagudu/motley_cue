@@ -1,8 +1,8 @@
 ---
 include:
   - 'https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/generic-ci.yml'
-  - 'https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/pipeline-jobs.yml'
-  - 'https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/pipeline-jobs-publish-to-repo.yml'
+  # - 'https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/pipeline-jobs.yml'
+  # - 'https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/pipeline-jobs-publish-to-repo.yml'
 
 default:
   tags:
@@ -26,6 +26,15 @@ variables:
   # See generic-ci.yml -> .build-definition for the full list
   # DOCKER_IMAGE_VERSION
   # DOCKER_IMAGE_VERSION_WINDOWS
+
+
+.build-debian-trixie: &build-debian-trixie
+  extends:
+    - .debian-build
+    - .build-conditions-debian-trixie
+  variables:
+    RELEASE: 'trixie'
+  image: "${DOCKER_IMAGE_NAMESPACE}_${DOCKER_IMAGE_NAME}_${DISTRO}-${RELEASE}:${DOCKER_IMAGE_VERSION}"
 
 build-centos-7:
   extends:
