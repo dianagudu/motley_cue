@@ -39,6 +39,7 @@ variables:
 build-centos-7:
   # extends:
   #   - .build-centos-7
+  image: marcvs/build_oidc-agent_centos-7
   script:
     - |
       # Force RPM's python-bytecompile script to use python3
