@@ -37,20 +37,20 @@ variables:
   image: "${DOCKER_IMAGE_NAMESPACE}_${DOCKER_IMAGE_NAME}_${DISTRO}-${RELEASE}:${DOCKER_IMAGE_VERSION}"
 
 build-centos-7:
-  # extends:
-  #   - .build-centos-7
-  image: marcvs/build_oidc-agent_centos-7
+  extends:
+    - .build-centos-7
+  # image: marcvs/build_oidc-agent_centos-7
   script:
     - |
       # Force RPM's python-bytecompile script to use python3
       sed "s@^default_python@default_python=python3\n#default_python@" -i /usr/lib/rpm/brp-python-bytecompile
       echo "typing-extensions" >> requirements.txt
-      mkdir -p results/centos/7
-      echo ${CI_JOB_ID} > results/centos/7/info.txt
-  artifacts:
-    paths:
-      - "results/*"
-    # - make rpms
+      # mkdir -p results/centos/7
+      # echo ${CI_JOB_ID} > results/centos/7/info.txt
+    - make rpms
+  # artifacts:
+  #   paths:
+  #     - "results/*"
 
 build-ubuntu-bionic:
   extends:
