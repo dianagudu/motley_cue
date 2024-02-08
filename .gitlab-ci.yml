@@ -45,8 +45,8 @@ build-centos-7:
       # Force RPM's python-bytecompile script to use python3
       sed "s@^default_python@default_python=python3\n#default_python@" -i /usr/lib/rpm/brp-python-bytecompile
       echo "typing-extensions" >> requirements.txt
-      mkdir results
-      echo ${CI_JOB_ID} > results/info.txt
+      mkdir -p results/centos/7
+      echo ${CI_JOB_ID} > results/centos/7/info.txt
   artifacts:
     paths:
       - "results/*"
@@ -73,4 +73,5 @@ trigger-integration-tests:
     # api token needs "read_api" privileges of developer
   extends:
     - .trigger-integration-tests-ssh-oidc
+ 
  
