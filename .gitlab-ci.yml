@@ -47,6 +47,9 @@ build-centos-7:
       echo "typing-extensions" >> requirements.txt
       mkdir results
       echo ${CI_JOB_ID} > results/info.txt
+  artifacts:
+    paths:
+      - "results/*"
     # - make rpms
 
 build-ubuntu-bionic:
