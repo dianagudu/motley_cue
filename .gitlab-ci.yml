@@ -1,7 +1,7 @@
 ---
 include:
   - 'https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/generic-ci.yml'
-  # - 'https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/pipeline-jobs.yml'
+  - 'https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/pipeline-jobs.yml'
   # - 'https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/pipeline-jobs-publish-to-repo.yml'
 
 default:
