@@ -37,7 +37,7 @@ build-centos-7:
       # Force RPM's python-bytecompile script to use python3
       sed "s@^default_python@default_python=python3\n#default_python@" -i /usr/lib/rpm/brp-python-bytecompile
       echo "typing-extensions" >> requirements.txt
-    - *rpm-build-script
+    - !reference [.rpm-build-script]
 
 ##########################################################################
 # Integration (These might to to a central job def)
