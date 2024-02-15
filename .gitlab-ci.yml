@@ -37,22 +37,14 @@ build-centos-7:
       # Force RPM's python-bytecompile script to use python3
       sed "s@^default_python@default_python=python3\n#default_python@" -i /usr/lib/rpm/brp-python-bytecompile
       echo "typing-extensions" >> requirements.txt
-    - make rpms
-
-build-ubuntu-bionic:
-  extends:
-    - .build-ubuntu-bionic
-  script:
-    - |
-      cat debian/rules \
-      | sed s/"dh_virtualenv --python python3"/"dh_virtualenv --python python3.8"/ \
-      > debian/new-rules
-      cat debian/new-rules > debian/rules
-      make debsource
-      dpkg-buildpackage -uc -us
+    - !reference [.rpm-build-script]
 
 ##########################################################################
 # Integration (These might to to a central job def)
-integration-tests:
+trigger-integration-tests:
+  variables:
+    TRIGGER_TOKEN: ${TRIGGER_TOKEN_OIDC_SSH_MOTLEY_CUE}
+    API_TOKEN: ${API_TOKEN_OIDC_SSH_MOTLEY_CUE}
+    # api token needs "read_api" privileges of developer
   extends:
     - .trigger-integration-tests-ssh-oidc

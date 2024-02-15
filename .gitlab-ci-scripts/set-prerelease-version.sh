@@ -29,9 +29,10 @@ done
 # Get master branch name:
 #   use origin if exists
 #   else use last found remote
+
 MASTER_BRANCH=""
 get_master_branch_of_mteam() {
-    git remote -vv | awk -F[\\t@:] '{ print $1 " " $3 }' | while read REMOTE HOST; do
+    git remote -vv | awk -F[\\t@:] '{ print $1 " " $3 }' | while read REMOTE HOST; do 
         # echo " $HOST -- $REMOTE"
         MASTER=$(git remote show "$REMOTE"  2>/dev/null \
             | sed -n '/HEAD branch/s/.*: //p')
@@ -50,7 +51,6 @@ get_master_branch_of_mteam() {
         }
     done
 }
-
 MASTER_BRANCH=$(get_master_branch_of_mteam)
 PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
 

@@ -85,4 +85,4 @@ Let's take as an example your federated identity at `EGI Check-inEGI AAI <https:
   }
   
 
-The following `document <https://git.scc.kit.edu/feudal/feudalAdapterLdf/-/blob/master/states.md>`_ gives a complete overview of the different states a local account can be in, as well as the actions that can be performed on a local account.
+The following `document <https://codebase.helmholtz.cloud/m-team/feudal/feudalAdapterLdf/-/blob/master/states.md>`_ gives a complete overview of the different states a local account can be in, as well as the actions that can be performed on a local account.
