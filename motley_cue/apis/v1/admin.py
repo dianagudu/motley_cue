@@ -1,6 +1,7 @@
 """
 This module contains the definition of motley_cue's admin API.
 """
+
 from fastapi import Request, Depends, Query, Header
 
 from motley_cue.dependencies import mapper

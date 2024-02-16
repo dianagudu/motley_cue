@@ -1,5 +1,6 @@
 """Definitions of API response models
 """
+
 from typing import Optional, Union, List, Dict
 from pydantic.dataclasses import dataclass
 from pydantic import Field

@@ -1,4 +1,5 @@
 """Map OIDC remote identity to local account"""
+
 # This code is distributed under the MIT License
 
 import sys

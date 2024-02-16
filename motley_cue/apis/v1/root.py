@@ -1,6 +1,7 @@
 """
 This module contains the definition of motley_cue's REST router.
 """
+
 from fastapi import Depends, Request, Query, Header
 from fastapi.responses import HTMLResponse
 

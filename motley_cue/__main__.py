@@ -1,5 +1,6 @@
 """Executable for running motley_cue in development.
 """
+
 import uvicorn
 
 

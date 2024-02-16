@@ -1,6 +1,7 @@
 """
 Module for managing one-time tokens and the (long) Access Tokens they are derived from.
 """
+
 from abc import abstractmethod
 import os
 from typing import Callable, Optional
@@ -457,9 +458,9 @@ class TokenManager:
                 if authz_header and authz_header.startswith("Bearer "):
                     new_headers = kwargs["request"].headers.mutablecopy()
                     new_headers["authorization"] = f"Bearer {token}"
-                    kwargs[
-                        "request"
-                    ]._headers = new_headers  # pylint: disable=protected-access
+                    kwargs["request"]._headers = (
+                        new_headers  # pylint: disable=protected-access
+                    )
                     kwargs["request"].scope.update(headers=new_headers.raw)
             return kwargs
 

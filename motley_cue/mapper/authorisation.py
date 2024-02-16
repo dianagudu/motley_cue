@@ -1,6 +1,7 @@
 """
 Authorisation module for motley_cue API.
 """
+
 from typing import Optional
 from enum import Enum
 import logging

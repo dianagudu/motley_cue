@@ -1,6 +1,7 @@
 """
 This module contains the definition of motley_cue's user API.
 """
+
 from fastapi import Request, Depends, Header
 
 from motley_cue.dependencies import mapper

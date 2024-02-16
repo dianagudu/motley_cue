@@ -1,4 +1,5 @@
 """Helper module for serving static files."""
+
 import markdown
 
 

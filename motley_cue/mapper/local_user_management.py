@@ -1,5 +1,6 @@
 """Module for interfacing with local user management, i.e. FeudalAdapter.
 """
+
 import logging
 from enum import Enum
 
