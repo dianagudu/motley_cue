@@ -1,5 +1,5 @@
 feudalAdapter>=0.7.2
-flaat>=1.1.10
+flaat>=1.1.18
 fastapi==0.*
 uvicorn[standard]==0.*
 gunicorn==20.*
