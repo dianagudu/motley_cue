@@ -68,7 +68,7 @@ export DESTDIR=debian/$(PACKAGE)
 #    # override_dh_shlibdeps
 
 %: 
-	dh $@ --with python-virtualenv
+	dh $@ --with python-virtualenv --builtin-venv
 	#dh $@ --with python-virtualenv --sourcedir $(SDIST_DIR)
 
 override_dh_virtualenv:
