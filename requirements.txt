@@ -8,3 +8,4 @@ cryptography==42.0.5
 markdown==3.*
 pydantic-settings==2.*
 pydantic==2.*
+
