@@ -59,3 +59,4 @@ trigger-integration-tests:
     # api token needs "read_api" privileges of developer
   extends:
     - .trigger-integration-tests-ssh-oidc
+
