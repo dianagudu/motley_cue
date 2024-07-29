@@ -269,13 +269,13 @@ class ConfigSection:
                 if field.type.__str__().startswith(
                     "typing.Optional"
                 ) or field.type.__str__().startswith("typing.Union"):
-                    field_type = field.type.__args__[0]  # get the type of the field
+                    field_type = field.type.__args__[0]  # pyright: ignore
                 elif field.type.__str__().startswith("typing.List"):
                     field_type = list  # treat as a list
                 else:
                     return  # no conversion
             # if the field does not have the hinted type, convert it if possible
-            if not isinstance(value, field_type):
+            if not isinstance(value, field_type):  # pyright: ignore
                 if field_type == int:
                     setattr(self, field.name, to_int(value))
                 if field_type == bool:
@@ -453,7 +453,12 @@ class Configuration:
     @classmethod
     def load(cls, config: ConfigParser):
         """Loads all config settings from the given config parser"""
-        return cls(**{f.name: f.type.load(config) for f in fields(cls)})
+        # ignore pyright error
+        # BUT: when extending this class, make sure that the new field if of type ConfigSection
+        # (or has 'load' and 'to_dict' methods)
+        return cls(
+            **{f.name: f.type.load(config) for f in fields(cls)}  # pyright: ignore
+        )
 
     def to_dict(self) -> dict:
         """Converts the config to a dict"""
