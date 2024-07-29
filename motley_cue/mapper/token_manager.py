@@ -1,6 +1,7 @@
 """
 Module for managing one-time tokens and the (long) Access Tokens they are derived from.
 """
+
 from abc import abstractmethod
 import os
 from typing import Callable, Optional
@@ -14,8 +15,8 @@ import sqlitedict
 from cryptography.fernet import Fernet
 from pathlib import Path
 
-from .config import ConfigOTP
-from .exceptions import InternalException
+from motley_cue.mapper.config import ConfigOTP
+from motley_cue.mapper.exceptions import InternalException
 
 logger = logging.getLogger(__name__)
 
@@ -457,9 +458,9 @@ class TokenManager:
                 if authz_header and authz_header.startswith("Bearer "):
                     new_headers = kwargs["request"].headers.mutablecopy()
                     new_headers["authorization"] = f"Bearer {token}"
-                    kwargs[
-                        "request"
-                    ]._headers = new_headers  # pylint: disable=protected-access
+                    kwargs["request"]._headers = (
+                        new_headers  # pylint: disable=protected-access
+                    )
                     kwargs["request"].scope.update(headers=new_headers.raw)
             return kwargs
 

@@ -1,4 +1,5 @@
 """Map OIDC remote identity to local account"""
+
 # This code is distributed under the MIT License
 
 import sys
@@ -8,12 +9,12 @@ from fastapi import Request
 from fastapi.security import HTTPBearer
 from fastapi.responses import HTMLResponse
 
-from .config import Config
-from .authorisation import Authorisation
-from .local_user_management import LocalUserManager
-from .exceptions import Unauthorised, NotFound
-from .token_manager import TokenManager
-from ..static import md_to_html
+from motley_cue.mapper.config import Config
+from motley_cue.mapper.authorisation import Authorisation
+from motley_cue.mapper.local_user_management import LocalUserManager
+from motley_cue.mapper.exceptions import Unauthorised, NotFound
+from motley_cue.mapper.token_manager import TokenManager
+from motley_cue.static import md_to_html
 
 
 class Mapper:

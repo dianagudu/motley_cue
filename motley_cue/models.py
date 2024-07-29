@@ -1,10 +1,11 @@
 """Definitions of API response models
 """
+
 from typing import Optional, Union, List, Dict
 from pydantic.dataclasses import dataclass
 from pydantic import Field
 
-from .mapper.authorisation import AuthorisationType
+from motley_cue.mapper.authorisation import AuthorisationType
 
 
 @dataclass

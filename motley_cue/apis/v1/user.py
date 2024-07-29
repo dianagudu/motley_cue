@@ -1,17 +1,18 @@
 """
 This module contains the definition of motley_cue's user API.
 """
-from fastapi import APIRouter, Request, Depends, Header
 
-from ..dependencies import mapper
-from ..models import FeudalResponse, OTPResponse, responses
+from fastapi import Request, Depends, Header
+
+from motley_cue.dependencies import mapper
+from motley_cue.models import FeudalResponse, OTPResponse, responses
+from motley_cue.apis.utils import APIRouter
 
 
-api = APIRouter(prefix="/user")
+router = APIRouter(prefix="/user")
 
 
-@api.get("")
-@api.get("/", include_in_schema=False)
+@router.get("", summary="User: API info")
 async def read_root():
     """Retrieve user API information:
 
@@ -23,16 +24,17 @@ async def read_root():
         "description": "This is the user API for mapping remote identities to local identities.",
         "usage": "All endpoints are available using an OIDC Access Token as a bearer token.",
         "endpoints": {
-            f"{api.prefix}/get_status": "Get information about your local account.",
-            f"{api.prefix}/deploy": "Provision local account.",
-            f"{api.prefix}/suspend": "Suspend local account.",
-            f"{api.prefix}/generate_otp": "Generates a one-time token for given access token.",
+            f"{router.prefix}/get_status": "Get information about your local account.",
+            f"{router.prefix}/deploy": "Provision local account.",
+            f"{router.prefix}/suspend": "Suspend local account.",
+            f"{router.prefix}/generate_otp": "Generates a one-time token for given access token.",
         },
     }
 
 
-@api.get(
+@router.get(
     "/get_status",
+    summary="User: get status",
     dependencies=[Depends(mapper.user_security)],
     response_model=FeudalResponse,
     response_model_exclude_unset=True,
@@ -53,8 +55,9 @@ async def get_status(
     return mapper.get_status(request)
 
 
-@api.get(
+@router.get(
     "/deploy",
+    summary="User: deploy",
     dependencies=[Depends(mapper.user_security)],
     response_model=FeudalResponse,
     response_model_exclude_unset=True,
@@ -72,8 +75,9 @@ async def deploy(
     return mapper.deploy(request)
 
 
-@api.get(
+@router.get(
     "/suspend",
+    summary="User: suspend",
     dependencies=[Depends(mapper.user_security)],
     response_model=FeudalResponse,
     response_model_exclude_unset=True,
@@ -91,8 +95,9 @@ async def suspend(
     return mapper.suspend(request)
 
 
-@api.get(
+@router.get(
     "/generate_otp",
+    summary="User: generate one-time token",
     dependencies=[Depends(mapper.user_security)],
     response_model=OTPResponse,
     response_model_exclude_unset=True,
