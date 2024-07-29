@@ -7,12 +7,12 @@
 
     <title>Configuration &#8212; motley_cue</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=623475cf" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=7d08decb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/css/fonts.css?v=09a796e2" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=8fd29722" />
     <script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=7af948fa"></script>
@@ -26,10 +26,11 @@
   
     <link rel="apple-touch-icon" href="_static/logos/motley-cue-notext.png" />
   
+
   
-    <link rel="canonical" href="https://motley-cue.readthedocs.ioconfiguration.html"/>
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <link rel="canonical" href="https://motley-cue.readthedocs.ioconfiguration.html" />
+  
 
   </head><body>
   <div class="document">
@@ -38,7 +39,7 @@
         <div class="sphinxsidebarwrapper">
 <p class="logo">
   <a href="index.html">
-    <img class="logo" src="_static/logos/motley-cue.png" alt="Logo"/>
+    <img class="logo" src="_static/logos/motley-cue.png" alt="Logo" />
     
   </a>
 </p>
@@ -89,7 +90,7 @@
   </ul></li>
 </ul>
 </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
@@ -97,7 +98,7 @@
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
 
 
@@ -146,7 +147,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">/etc/motley_cue/motley_cue.conf</span></code></p></li>
 </ul>
 </li>
-<li><p><strong>feudal_adapter.conf</strong> (according to the <a class="reference external" href="https://git.scc.kit.edu/feudal/feudalAdapterLdf/-/tree/master#config-file-search-path">feudalAdapter documentation</a>)</p>
+<li><p><strong>feudal_adapter.conf</strong> (according to the <a class="reference external" href="https://codebase.helmholtz.cloud/m-team/feudal/feudalAdapterLdf/-/tree/master#config-file-search-path">feudalAdapter documentation</a>)</p>
 <ul>
 <li><p>path configured via the environment variable <code class="docutils literal notranslate"><span class="pre">FEUDAL_ADAPTER_CONFIG</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">./feudal_adapter.conf</span></code></p></li>
@@ -210,14 +211,14 @@
 </section>
 <section id="account-creation-configuration">
 <span id="account-creation"></span><h2>Account creation configuration<a class="headerlink" href="#account-creation-configuration" title="Link to this heading">¶</a></h2>
-<p>This is handled by the feudal adapter in <code class="docutils literal notranslate"><span class="pre">feudal_adapter.conf</span></code> (see the <a class="reference external" href="https://git.scc.kit.edu/feudal/feudalAdapterLdf">documentation</a> for details).</p>
+<p>This is handled by the feudal adapter in <code class="docutils literal notranslate"><span class="pre">feudal_adapter.conf</span></code> (see the <a class="reference external" href="https://codebase.helmholtz.cloud/m-team/feudal/feudalAdapterLdf">documentation</a> for details).</p>
 <p>Pay close attention to the following configurations:</p>
 <ul class="simple">
-<li><p><strong>backend</strong>: how are the users managed locally (e.g. local UNIX accounts, <a class="reference external" href="https://git.scc.kit.edu/feudal/feudalAdapterLdf/-/blob/master/LDAP.md">LDAP</a>, …)</p></li>
+<li><p><strong>backend</strong>: how are the users managed locally (e.g. local UNIX accounts, <a class="reference external" href="https://codebase.helmholtz.cloud/m-team/feudal/feudalAdapterLdf/-/blob/master/LDAP.md">LDAP</a>, …)</p></li>
 <li><p><strong>assurance</strong>: specifying minimum acceptable assurance (according to the <a class="reference external" href="https://refeds.org/assurance">REFEDS Assurance Framework</a>)</p></li>
 <li><p><strong>username generator</strong>: how local usernames are generated for users (e.g. trying to honour incoming <code class="docutils literal notranslate"><span class="pre">preferred</span> <span class="pre">username</span></code> from the OP, or using pooled accounts with a custom prefix)</p></li>
 </ul>
-<p>An <a class="reference external" href="https://git.scc.kit.edu/feudal/feudalAdapterLdf/-/tree/master#approval-workflow">approval workflow</a> is supported as well, where local admins can approve or reject account creation requests. The notification system supported so far is email.</p>
+<p>An <a class="reference external" href="https://codebase.helmholtz.cloud/m-team/feudal/feudalAdapterLdf/-/tree/master#approval-workflow">approval workflow</a> is supported as well, where local admins can approve or reject account creation requests. The notification system supported so far is email.</p>
 </section>
 <section id="additional-configurations">
 <span id="id2"></span><h2>Additional configurations<a class="headerlink" href="#additional-configurations" title="Link to this heading">¶</a></h2>
@@ -303,7 +304,7 @@
     <div class="clearer"></div>
   </div>
     <div class="footer">
-      &copy;2021-present, Diana Gudu.
+      &#169;2021-present, Diana Gudu.
       
     </div>
 

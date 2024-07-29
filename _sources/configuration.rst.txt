@@ -34,7 +34,7 @@ The config files will be searched in several places. Once one is found no furthe
   - ``$HOME/.config/motley_cue/motley_cue.conf``
   - ``/etc/motley_cue/motley_cue.conf``
 
-- **feudal_adapter.conf** (according to the `feudalAdapter documentation <https://git.scc.kit.edu/feudal/feudalAdapterLdf/-/tree/master#config-file-search-path>`_)
+- **feudal_adapter.conf** (according to the `feudalAdapter documentation <https://codebase.helmholtz.cloud/m-team/feudal/feudalAdapterLdf/-/tree/master#config-file-search-path>`_)
 
   - path configured via the environment variable ``FEUDAL_ADAPTER_CONFIG``
   - ``./feudal_adapter.conf``
@@ -106,15 +106,15 @@ Furthermore, you can also configure an **audience** for the service in order to 
 Account creation configuration
 -------------------------------
 
-This is handled by the feudal adapter in ``feudal_adapter.conf`` (see the `documentation <https://git.scc.kit.edu/feudal/feudalAdapterLdf>`_ for details).
+This is handled by the feudal adapter in ``feudal_adapter.conf`` (see the `documentation <https://codebase.helmholtz.cloud/m-team/feudal/feudalAdapterLdf>`_ for details).
 
 Pay close attention to the following configurations:
 
-- **backend**: how are the users managed locally (e.g. local UNIX accounts, `LDAP <https://git.scc.kit.edu/feudal/feudalAdapterLdf/-/blob/master/LDAP.md>`_, ...)
+- **backend**: how are the users managed locally (e.g. local UNIX accounts, `LDAP <https://codebase.helmholtz.cloud/m-team/feudal/feudalAdapterLdf/-/blob/master/LDAP.md>`_, ...)
 - **assurance**: specifying minimum acceptable assurance (according to the `REFEDS Assurance Framework <https://refeds.org/assurance>`_)
 - **username generator**: how local usernames are generated for users (e.g. trying to honour incoming ``preferred username`` from the OP, or using pooled accounts with a custom prefix)
 
-An `approval workflow <https://git.scc.kit.edu/feudal/feudalAdapterLdf/-/tree/master#approval-workflow>`_ is supported as well, where local admins can approve or reject account creation requests. The notification system supported so far is email.
+An `approval workflow <https://codebase.helmholtz.cloud/m-team/feudal/feudalAdapterLdf/-/tree/master#approval-workflow>`_ is supported as well, where local admins can approve or reject account creation requests. The notification system supported so far is email.
 
 .. _additional_configurations:
 
