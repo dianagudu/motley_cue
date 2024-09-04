@@ -4,7 +4,7 @@ fastapi==0.*
 uvicorn[standard]==0.*
 gunicorn==22.*
 sqlitedict==2.*
-cryptography==42.0.5
+cryptography==43.0.1
 markdown==3.*
 pydantic-settings==2.*
 pydantic==2.*
