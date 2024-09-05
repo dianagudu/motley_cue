@@ -74,7 +74,8 @@ PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
     VERSION=$(echo "$DEBIAN_VERSION" | cut -d- -f 1)
     RELEASE=$(echo "$DEBIAN_VERSION" | cut -d- -f 2)
     PR_VERSION="${VERSION}~pr${PREREL}"
-    sed s%${VERSION}%${PR_VERSION}% -i debian/changelog
+    VERSION_ESCAPED=$(echo ${VERSION} | sed s/\\\./\\\\./g); echo $VER
+    sed s%${VERSION_ESCAPED}%${PR_VERSION}% -i debian/changelog
     #echo "$VERSION => $DEBIAN_VERSION + $DEBIAN_RELEASE => $PR_VERSION"
 }
 
@@ -85,7 +86,8 @@ SPEC_FILES=$(ls rpm/*spec)
         PR_VERSION="${VERSION}~pr${PREREL}"
         for SPEC_FILE in $SPEC_FILES; do
             grep -q "$VERSION" "$SPEC_FILE" && { # version found, needs update
-                sed "s/${VERSION}/${PR_VERSION}/" -i "$SPEC_FILE"
+                VERSION_ESCAPED=$(echo ${VERSION} | sed s/\\\./\\\\./g); echo $VER
+                sed "s/${VERSION_ESCAPED}/${PR_VERSION}/" -i "$SPEC_FILE"
             }
         done
         echo "$PR_VERSION"
