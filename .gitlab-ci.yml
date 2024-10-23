@@ -53,8 +53,8 @@ build-ubuntu-bionic:
 build-almalinux-8:
   extends:
     - .build-almalinux-8
-    rules:
-      allow_failure: true
+
+    #   allow_failure: true
 
 ##########################################################################
 # Integration (These might to to a central job def)
