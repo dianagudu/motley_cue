@@ -55,6 +55,11 @@ build-almalinux-8:
     - .build-almalinux-8
   allow_failure: true
 
+build-rockylinux-8:
+  extends:
+    - .build-rockylinux-8
+  allow_failure: true
+
 ##########################################################################
 # Integration (These might to to a central job def)
 trigger-integration-tests:
