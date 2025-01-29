@@ -1,5 +1,4 @@
-"""Executable for running motley_cue in development.
-"""
+"""Executable for running motley_cue in development."""
 
 import uvicorn
 
