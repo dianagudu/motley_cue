@@ -1,5 +1,5 @@
 Name: motley-cue
-Version: 0.7.0
+Version: 0.7.1
 Release: 1%{?dist}
 
 Summary: Mapper Oidc To Local idEntitY with loCal User managEment
@@ -23,7 +23,7 @@ BuildRequires: policycoreutils, policycoreutils-python
 %endif
 %if 0%{?centos} == 8
 # valid for centos stream and rocky linux
-BuildRequires: python39 >= 3.9, python39-devel >= 3.9
+BuildRequires: python3.11 >= 3.11, python3.11-devel >= 3.9
 BuildRequires: python3-policycoreutils >= 2.9
 %endif
 %if 0%{?sle_version} == 150500 || 0%{?suse_version} > 1600
@@ -34,8 +34,8 @@ BuildRequires: python3-policycoreutils >= 3.0
 %endif
 %if 0%{?sle_version} == 150400
 # valid for opensuse leap 15.4
-BuildRequires: python39 >= 3.9, python39-devel >= 3.9
-BuildRequires: python39-pip, python39-setuptools
+BuildRequires: python311 >= 3.11, python39-devel >= 3.11
+BuildRequires: python311-pip, python311-setuptools
 BuildRequires: python3-policycoreutils >= 3.0
 %endif
 
@@ -45,7 +45,7 @@ Requires: rh-python38 >= 2.0
 %endif
 %if 0%{?centos} == 8
 # valid for centos stream and rocky linux
-Requires: python39 >= 3.9
+Requires: python3.11 >= 3.11
 %endif
 %if 0%{?sle_version} == 150500 || 0%{?suse_version} > 1600
 # valid for opensuse leap 15.5 and opensuse tumbleweed
@@ -53,7 +53,7 @@ Requires: python311 >= 3.11
 %endif
 %if 0%{?sle_version} == 150400
 # valid for opensuse leap 15.4
-Requires: python39 >= 3.9
+Requires: python311 >= 3.11
 %endif
 Requires: nginx >= 1.16.1
 

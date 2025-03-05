@@ -1,5 +1,4 @@
-"""exceptions definitions for motley_cue
-"""
+"""exceptions definitions for motley_cue"""
 
 from typing import Union
 from pydantic import ValidationError

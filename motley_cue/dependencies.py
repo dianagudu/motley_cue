@@ -1,5 +1,4 @@
-"""Module containing global mapper object created from default configuration files.
-"""
+"""Module containing global mapper object created from default configuration files."""
 
 from typing import Optional
 from pydantic import field_validator

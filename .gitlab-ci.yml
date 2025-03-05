@@ -50,6 +50,16 @@ build-ubuntu-bionic:
       make debsource
       dpkg-buildpackage -uc -us
 
+build-almalinux-8:
+  extends:
+    - .build-almalinux-8
+  allow_failure: true
+
+build-rockylinux-8:
+  extends:
+    - .build-rockylinux-8
+  allow_failure: true
+
 ##########################################################################
 # Integration (These might to to a central job def)
 trigger-integration-tests:
