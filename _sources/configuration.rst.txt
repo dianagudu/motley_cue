@@ -8,6 +8,8 @@ Two configuration files are required:
 - ``motley_cue.conf``: contains configuration options relating to `authorisation`_.
 - ``feudal_adapter.conf``: contains configuration options relating to the `account creation`_.
 
+Optionally, you can configure additional settings in ``flaat.conf`` (see the `flaat documentation <https://flaat.readthedocs.io/en/latest/flaat/api/config.html>`_).
+
 
 Configuration templates
 -----------------------
@@ -16,6 +18,7 @@ Example config files explaining the options are included with ``motley_cue``. If
 
 - :ref:`motley_cue.conf <motley_cue_conf>`
 - :ref:`feudal_adapter.conf <feudal_adapter_conf>`
+- :ref:`flaat.conf <flaat_conf>`
 
 .. warning::
 
@@ -42,6 +45,12 @@ The config files will be searched in several places. Once one is found no furthe
   - ``$HOME/.config/feudal/feudal_adapter.conf``
   - ``/etc/feudal/feudal_adapter.conf``
 
+- **flaat.conf**
+
+  - path configured via the environment variable ``FLAAT_CONFIG``
+  - ``./flaat.conf``
+  - ``$HOME/.config/flaat/flaat.conf``
+  - ``/etc/flaat/flaat.conf``
 
 .. _authorisation:
 

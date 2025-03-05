@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>motley-cue.service &#8212; motley_cue</title>
+    <title>flaat.conf &#8212; motley_cue</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=7d08decb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -19,8 +19,6 @@
     <link rel="icon" href="../_static/motley-cue.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="nginx.motley_cue" href="nginx_motley_cue.html" />
-    <link rel="prev" title="Templates" href="templates.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -29,7 +27,7 @@
 
   
   
-    <link rel="canonical" href="https://motley-cue.readthedocs.ioconfigs/motley_cue_service.html" />
+    <link rel="canonical" href="https://motley-cue.readthedocs.ioconfigs/flaat.conf.html" />
   
 
   </head><body>
@@ -61,20 +59,10 @@
 
 
 <h3>Navigation</h3>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../running.html">Running</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../running.html#development">Development</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../running.html#production">Production</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../running.html#gunicorn">gunicorn</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../running.html#systemd">systemd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../running.html#nginx">nginx</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../running.html#config-files">Config files</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../running.html">Running</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ssh-integration.html">SSH Integration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../development.html">For developers</a></li>
@@ -87,10 +75,6 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
-  <li><a href="../running.html">Running</a><ul>
-      <li>Previous: <a href="templates.html" title="previous chapter">Templates</a></li>
-      <li>Next: <a href="nginx_motley_cue.html" title="next chapter">nginx.motley_cue</a></li>
-  </ul></li>
   </ul></li>
 </ul>
 </div>
@@ -120,23 +104,13 @@
 
           <div class="body" role="main">
             
-  <section id="motley-cue-service">
-<span id="id1"></span><h1>motley-cue.service<a class="headerlink" href="#motley-cue-service" title="Link to this heading">¶</a></h1>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">[</span>Unit<span class="o">]</span>
-<span class="nv">Description</span><span class="o">=</span>motley_cue<span class="w"> </span>with<span class="w"> </span>gunicorn<span class="w"> </span>service
-<span class="nv">Before</span><span class="o">=</span>nginx.service
-
-<span class="o">[</span>Service<span class="o">]</span>
-<span class="nv">User</span><span class="o">=</span>root
-<span class="nv">Group</span><span class="o">=</span>root
-<span class="nv">RuntimeDirectory</span><span class="o">=</span>motley_cue
-<span class="nv">WorkingDirectory</span><span class="o">=</span>/usr/lib/motley-cue
-<span class="nv">EnvironmentFile</span><span class="o">=</span>/etc/motley_cue/motley_cue.env
-<span class="nv">ExecStart</span><span class="o">=</span>/usr/lib/motley-cue/bin/gunicorn<span class="w"> </span>motley_cue.api:api<span class="w"> </span>-k<span class="w"> </span><span class="s2">&quot;uvicorn.workers.UvicornWorker&quot;</span><span class="w"> </span>--config<span class="w"> </span>/usr/lib/motley-cue/etc/gunicorn/gunicorn.conf.py
-<span class="nv">ExecReload</span><span class="o">=</span>/bin/kill<span class="w"> </span>-s<span class="w"> </span>HUP<span class="w"> </span><span class="nv">$MAINPID</span>
-
-<span class="o">[</span>Install<span class="o">]</span>
-<span class="nv">WantedBy</span><span class="o">=</span>multi-user.target
+  <section id="flaat-conf">
+<span id="id1"></span><h1>flaat.conf<a class="headerlink" href="#flaat-conf" title="Link to this heading">¶</a></h1>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[ops]</span>
+<span class="na">ops_that_support_jwt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[</span>
+<span class="w">    </span><span class="na">]</span>
+<span class="na">ops_that_support_audience</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[</span>
+<span class="w">    </span><span class="na">]</span>
 </pre></div>
 </div>
 </section>
@@ -147,14 +121,6 @@
                 &nbsp;
   <nav id="rellinks">
     <ul>
-        <li>
-          &larr;
-          <a href="templates.html" title="Previous document">Templates</a>
-        </li>
-        <li>
-          <a href="nginx_motley_cue.html" title="Next document">nginx.motley_cue</a>
-          &rarr;
-        </li>
     </ul>
   </nav>
               </div>
