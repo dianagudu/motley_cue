@@ -36,7 +36,13 @@ dh_venv_safe_lib_symlinks_update() {
 dh_venv_install_compatible_python_if_required() {
     # install python 3.12.9, only if too new python3 is on the system,
     # since we're unable to support python3.13
-    echo -e "import sys; assert sys.version_info < (3,13)" | python3 || {
+    PY_MAJOR=$(echo "import sys; print(sys.version_info.major);" | python3)
+    PY_MINOR=$(echo "import sys; print(sys.version_info.minor);" | python3)
+    [[ $PY_MAJOR == 3 ]] || {
+        echo "Error python major version is not 3"
+        exit 2
+    }
+    [[ $PY_MINOR -ge 13 ]] || {
         # setup and install with pyenv
         VARTMP_MC=/var/tmp/motley_cue
         [ -d $VARTMP_MC ] || mkdir -p $VARTMP_MC
