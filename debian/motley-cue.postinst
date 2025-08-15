@@ -32,9 +32,30 @@ dh_venv_safe_lib_symlinks_update() {
         fi
     cd $SAVED_DIR
 }
+
+dh_venv_install_compatible_python_if_required() {
+    # install python 3.12.9, only if too new python3 is on the system,
+    # since we're unable to support python3.13
+    echo -e "import sys; assert sys.version_info < (3,13)" | python3 || {
+        # setup and install with pyenv
+        VARTMP_MC=/var/tmp/motley-cue
+        [ -d $VARTMP_MC ] || mkdir -p $VARTMP_MC
+        export PYENV_ROOT=$VARTMP_MC
+        pyenv install 3.12.9
+
+        # install that python interpreter in our venv
+        [ -d /usr/lib/motley-cue/bin ] && {
+            cd /usr/lib/motley-cue/bin
+            rm pyton
+            ln -s /var/tmp/pyenv/versions/3.12.9/bin/python python
+        }
+    }
+}
+
 case "$1" in
     configure|triggered|reconfigure)
         dh_venv_safe_lib_symlinks_update
+        dh_venv_install_compatible_python_if_required
         systemctl enable motley-cue || update-rc.d motley-cue defaults || true
         systemctl restart motley-cue || service motley-cue restart || /etc/init.d/motley-cue restart || true
         systemctl restart nginx || service nginx restart || nginx -s reload || nginx || true
