@@ -45,6 +45,7 @@ dh_venv_install_compatible_python_if_required() {
     if [ $PY_MINOR -ge 13 ]; then 
         # setup and install with pyenv
         VARTMP_MC=/var/tmp/motley_cue
+        USRLIB_MC=/usr/lib/motley-cue
         if not [ -d $VARTMP_MC ]; then
             mkdir -p $VARTMP_MC
         fi
@@ -52,10 +53,10 @@ dh_venv_install_compatible_python_if_required() {
         pyenv install 3.12.9
 
         # install that python interpreter in our venv
-        if [ -d /usr/lib/motley-cue/bin ]; then
-            cd /usr/lib/motley-cue/bin
+        if [ -d ${USRLIB_MC}/bin ]; then
+            cd ${USRLIB_MC}/bin
             rm -f python
-            ln -s /var/tmp/pyenv/versions/3.12.9/bin/python python
+            ln -s $VARTMP_MC/versions/3.12.9/bin/python python
         fi
     fi 
 }
