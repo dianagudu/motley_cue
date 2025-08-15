@@ -16,7 +16,6 @@ Build-Depends: debhelper-compat (= 11),
                python3-venv (>= 3.7)  | python3.8-venv,
                python3-pip,
                python3-setuptools,
-               python3 (< 3.13)       | pyenv,
                tar,
                debhelper (>= 9),
                libffi-dev
@@ -28,7 +27,8 @@ Pre-Depends: dpkg (>= 1.16.1),
              python3-venv (>= 3.7) | python3.8-venv,
              nginx,
              ${misc:Pre-Depends}
-Depends: ${misc:Depends}
+Depends: ${misc:Depends},
+             python3 (< 3.13)      | pyenv,
 Suggests: pam-ssh-oidc
 Description: Mapper Oidc To Local idEntitY with loCal User managEment
  This tool provides an OIDC-protected REST interface that allows requesting
