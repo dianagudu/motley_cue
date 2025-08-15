@@ -38,24 +38,26 @@ dh_venv_install_compatible_python_if_required() {
     # since we're unable to support python3.13
     PY_MAJOR=$(echo "import sys; print(sys.version_info.major);" | python3)
     PY_MINOR=$(echo "import sys; print(sys.version_info.minor);" | python3)
-    [[ $PY_MAJOR == 3 ]] || {
+    if [ "$PY_MAJOR" != "3" ]; then
         echo "Error python major version is not 3"
         exit 2
-    }
-    [[ $PY_MINOR -ge 13 ]] || {
+    fi
+    if [ $PY_MINOR -ge 13 ]; then 
         # setup and install with pyenv
         VARTMP_MC=/var/tmp/motley_cue
-        [ -d $VARTMP_MC ] || mkdir -p $VARTMP_MC
+        if not [ -d $VARTMP_MC ]; then
+            mkdir -p $VARTMP_MC
+        fi
         export PYENV_ROOT=$VARTMP_MC
         pyenv install 3.12.9
 
         # install that python interpreter in our venv
-        [ -d /usr/lib/motley-cue/bin ] && {
+        if [ -d /usr/lib/motley-cue/bin ]; then
             cd /usr/lib/motley-cue/bin
             rm pyton
             ln -s /var/tmp/pyenv/versions/3.12.9/bin/python python
-        }
-    }
+        fi
+    fi 
 }
 
 case "$1" in
