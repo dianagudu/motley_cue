@@ -38,7 +38,7 @@ dh_venv_install_compatible_python_if_required() {
     # since we're unable to support python3.13
     echo -e "import sys; assert sys.version_info < (3,13)" | python3 || {
         # setup and install with pyenv
-        VARTMP_MC=/var/tmp/motley-cue
+        VARTMP_MC=/var/tmp/motley_cue
         [ -d $VARTMP_MC ] || mkdir -p $VARTMP_MC
         export PYENV_ROOT=$VARTMP_MC
         pyenv install 3.12.9
