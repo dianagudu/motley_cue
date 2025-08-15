@@ -54,7 +54,7 @@ dh_venv_install_compatible_python_if_required() {
         # install that python interpreter in our venv
         if [ -d /usr/lib/motley-cue/bin ]; then
             cd /usr/lib/motley-cue/bin
-            rm pyton
+            rm -f python
             ln -s /var/tmp/pyenv/versions/3.12.9/bin/python python
         fi
     fi 
