@@ -51,13 +51,13 @@ dh_venv_install_compatible_python_if_required() {
         fi
         export PYENV_ROOT=$VARTMP_MC
         pyenv install 3.12.9
-        echo -e "Pyenv is done: $? \n"
+        echo "Pyenv is done: $? \n"
 
-        echo -e "\n${USRLIB_MC}/bin:"
-        tree ${USRLIB_MC/bin}
-
-        echo -e "\n${VARLIB_MC}:"
-        tree ${VARLIB_MC}
+        # echo -e "\n${USRLIB_MC}/bin:"
+        # tree ${USRLIB_MC/bin}
+        #
+        # echo -e "\n${VARTMP_MC}:"
+        # tree ${VARTMP_MC}
 
         # install that python interpreter in our venv
         if [ -d ${USRLIB_MC}/bin ]; then
