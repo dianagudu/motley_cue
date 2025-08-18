@@ -34,3 +34,4 @@ Description: Mapper Oidc To Local idEntitY with loCal User managEment
  This tool provides an OIDC-protected REST interface that allows requesting
  the creation, deletion, and information of a user-account.
 
+
