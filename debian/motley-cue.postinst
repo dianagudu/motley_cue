@@ -50,7 +50,7 @@ dh_venv_install_compatible_python_if_required() {
             mkdir -p $VARTMP_MC
         fi
         export PYENV_ROOT=${VARTMP_MC}/pyenv
-        pyenv install 3.12.9
+        pyenv install -s 3.12.9
         echo "Pyenv is done: $? \n"
 
         # echo -e "\n${USRLIB_MC}/bin:"
@@ -63,7 +63,13 @@ dh_venv_install_compatible_python_if_required() {
         if [ -d ${USRLIB_MC}/bin ]; then
             cd ${USRLIB_MC}/bin
             rm -f python
-            ln -s $VARTMP_MC/versions/3.12.9/bin/python python
+            ln -s ${VARTMP_MC}/pyenv/versions/3.12.9/bin/python python
+
+            # Ensure proper PATH for the systemd service
+            echo "PATH=${USRLIB_MC}/bin:\${PATH}" >> /tmp/motley_cue.env
+            cat /etc/motley_cue/motley_cue.env >> /tmp/motley_cue.env
+            cat /tmp/motley_cue.env >> /etc/motley_cue/motley_cue.env
+            rm /tmp/motley_cue.env
         fi
     fi 
 }
