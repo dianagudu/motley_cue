@@ -49,7 +49,7 @@ dh_venv_install_compatible_python_if_required() {
         if not [ -d $VARTMP_MC ]; then
             mkdir -p $VARTMP_MC
         fi
-        export PYENV_ROOT=$VARTMP_MC
+        export PYENV_ROOT=${VARTMP_MC}/pyenv
         pyenv install 3.12.9
         echo "Pyenv is done: $? \n"
 
