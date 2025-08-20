@@ -67,10 +67,13 @@ dh_venv_install_compatible_python_if_required() {
             ln -s ${VARTMP_MC}/pyenv/versions/${PYENV_PYTHON_VERSION}/bin/python python
 
             # Ensure proper PATH for the systemd service
-            echo "PATH=${USRLIB_MC}/bin:${PATH}" >> /tmp/motley_cue.env
-            cat /etc/motley_cue/motley_cue.env >> /tmp/motley_cue.env
-            cat /tmp/motley_cue.env > /etc/motley_cue/motley_cue.env
-            rm /tmp/motley_cue.env
+            ENV_FILE="/etc/motley_cue/motley_cue.env"
+            [ -e ${ENV_FILE} ] && {
+                [ -e ${ENV_FILE}.orig ] && rm ${ENV_FILE}.orig
+                mv ${ENV_FILE} ${ENV_FILE}.orig
+                echo "PATH=${USRLIB_MC}/bin:${PATH}" >> ${ENV_FILE}
+                cat ${ENV_FILE}.orig | grep -v ^PATH >> ${ENV_FILE}
+            }
         fi
     fi 
 }
