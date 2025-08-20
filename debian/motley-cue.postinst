@@ -38,6 +38,7 @@ dh_venv_install_compatible_python_if_required() {
     # since we're unable to support python3.13
     PY_MAJOR=$(echo "import sys; print(sys.version_info.major);" | python3)
     PY_MINOR=$(echo "import sys; print(sys.version_info.minor);" | python3)
+    PYENV_PYTHON_VERSION=3.12.5
     if [ "$PY_MAJOR" != "3" ]; then
         echo "Error python major version is not 3"
         exit 2
@@ -50,7 +51,7 @@ dh_venv_install_compatible_python_if_required() {
             mkdir -p $VARTMP_MC
         fi
         export PYENV_ROOT=${VARTMP_MC}/pyenv
-        pyenv install -s 3.12.9
+        pyenv install -s ${PYENV_PYTHON_VERSION}
         echo "Pyenv is done: $? \n"
 
         # echo -e "\n${USRLIB_MC}/bin:"
@@ -63,7 +64,7 @@ dh_venv_install_compatible_python_if_required() {
         if [ -d ${USRLIB_MC}/bin ]; then
             cd ${USRLIB_MC}/bin
             rm -f python
-            ln -s ${VARTMP_MC}/pyenv/versions/3.12.9/bin/python python
+            ln -s ${VARTMP_MC}/pyenv/versions/${PYENV_PYTHON_VERSION}/bin/python python
 
             # Ensure proper PATH for the systemd service
             echo "PATH=${USRLIB_MC}/bin:${PATH}" >> /tmp/motley_cue.env
