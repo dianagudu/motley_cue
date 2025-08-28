@@ -113,7 +113,7 @@ install %{installroot}/etc/init.d/motley-cue %{buildroot}/etc/init.d/
 %else
 %exclude %{share_dir}/*
 %endif
-%config(noreplace) /etc/nginx/conf.d/nginx.motley_cue.conf
+%config(noreplace) /etc/nginx/location.d/nginx.motley_cue.conf
 /lib/systemd/system/motley-cue.service
 /usr/sbin/motley-cue
 /etc/init.d/motley-cue
