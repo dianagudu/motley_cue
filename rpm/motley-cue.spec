@@ -88,7 +88,7 @@ make install DESTDIR=%{buildroot}
 mkdir -p %{buildroot}{%{etc_dir},%{log_dir},%{run_dir},%{share_dir}/selinux,%{lib_dir},%{cache_dir},/etc/nginx/conf.d,/lib/systemd/system,/usr/sbin,/etc/init.d}
 cp -r %{installroot}%{etc_dir}/* %{buildroot}%{etc_dir}/
 install %{installroot}%{share_dir}/selinux/* %{buildroot}%{share_dir}/selinux/
-mkdir -p %{buildroot}/etc/nginx.location.d
+mkdir -p %{buildroot}/etc/nginx/location.d
 install %{installroot}/etc/nginx/nginx.motley_cue.conf %{buildroot}/etc/nginx/location.d/nginx.motley_cue.conf
 install %{installroot}/etc/systemd/system/motley-cue.service %{buildroot}/lib/systemd/system/
 install %{installroot}/bin/motley-cue %{buildroot}/usr/sbin/
