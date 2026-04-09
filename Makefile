@@ -62,7 +62,7 @@ distclean: clean
 	rm -rf .pytest_cache
 	find -type d -name __pycache__ | xargs rm -rf 
 	rm -rf rpm/rpmbuild
-	rm -rf debian/motley_cue debian/motley-cue debian/debhelper-build-step
+	./debian/rules clean
 
 cleandist:
 	rm -rf dist
