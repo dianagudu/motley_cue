@@ -218,7 +218,9 @@ class Authorisation(Flaat):
         )
         return auth_flow.decorate_view_func(func)
 
-    def get_user_infos_from_access_token(self, access_token, issuer_hint="") -> Optional[UserInfos]:
+    def get_user_infos_from_access_token(
+        self, access_token, issuer_hint=""
+    ) -> Optional[UserInfos]:  # pyright: ignore
         """Get a (flaat) UserInfos object from given OIDC Access Token."""
         user_infos = super().get_user_infos_from_access_token(access_token, issuer_hint)
         if (
