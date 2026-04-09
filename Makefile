@@ -54,9 +54,11 @@ clean: cleandist
 	rm -rf doc/build
 	rm -rf *.egg-info
 	rm -rf .eggs
+	rm -rf htmlcov coverage.svg coverage.locv
 
 distclean: clean
 	rm -rf .tox
+	rm -rf venv
 	rm -rf .pytest_cache
 	find -type d -name __pycache__ | xargs rm -rf 
 
