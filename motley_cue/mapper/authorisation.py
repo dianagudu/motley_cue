@@ -217,7 +217,8 @@ class Authorisation(Flaat):
             request_requirements=_check_request,
         )
         return auth_flow.decorate_view_func(func)
-    def get_user_infos_from_access_token( # pyright: ignore
+
+    def get_user_infos_from_access_token(  # pyright: ignore
         self, access_token, issuer_hint=""
     ) -> Optional[UserInfos]:
         """Get a (flaat) UserInfos object from given OIDC Access Token."""
