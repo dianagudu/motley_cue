@@ -26,3 +26,4 @@ docker*log
 .tool-versions
 coverage.lcov
 coverage.svg
+CLAUDE.md
