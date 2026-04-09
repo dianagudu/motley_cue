@@ -85,11 +85,11 @@ make install DESTDIR=%{buildroot}
 ./rpm/fix-venv-paths.sh %{buildroot} %{name} %{_basedir}
 ./rpm/compile-semodules.sh %{installroot}%{share_dir}/selinux
 
-mkdir -p %{buildroot}{%{etc_dir},%{log_dir},%{run_dir},%{share_dir}/selinux,%{lib_dir},%{cache_dir},/etc/nginx/conf.d,/lib/systemd/system,/usr/sbin,/etc/init.d}
+mkdir -p %{buildroot}{%{etc_dir},%{log_dir},%{run_dir},%{share_dir}/selinux,%{lib_dir},%{cache_dir},/etc/nginx/conf.d,/etc/nginx/location.d,/etc/caddy/handlers,/lib/systemd/system,/usr/sbin,/etc/init.d}
 cp -r %{installroot}%{etc_dir}/* %{buildroot}%{etc_dir}/
 install %{installroot}%{share_dir}/selinux/* %{buildroot}%{share_dir}/selinux/
-mkdir -p %{buildroot}/etc/nginx/location.d
-install %{installroot}/etc/nginx/nginx.motley_cue.conf %{buildroot}/etc/nginx/location.d/nginx.motley_cue.conf
+install %{installroot}/etc/nginx/motley_cue.nginx %{buildroot}/etc/nginx/location.d/motley_cue.nginx
+install %{installroot}/etc/caddy/motley_cue.caddy %{buildroot}/etc/caddy/handlers/motley_cue.caddy
 install %{installroot}/etc/systemd/system/motley-cue.service %{buildroot}/lib/systemd/system/
 install %{installroot}/bin/motley-cue %{buildroot}/usr/sbin/
 install %{installroot}/etc/init.d/motley-cue %{buildroot}/etc/init.d/
@@ -113,7 +113,8 @@ install %{installroot}/etc/init.d/motley-cue %{buildroot}/etc/init.d/
 %else
 %exclude %{share_dir}/*
 %endif
-%config(noreplace) /etc/nginx/location.d/nginx.motley_cue.conf
+%config(noreplace) /etc/nginx/location.d/motley_cue.nginx
+%config(noreplace) /etc/caddy/handlers/motley_cue.caddy
 /lib/systemd/system/motley-cue.service
 /usr/sbin/motley-cue
 /etc/init.d/motley-cue
