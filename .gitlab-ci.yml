@@ -28,9 +28,9 @@ variables:
   # See generic-ci.yml -> .build-definition for the full list
   # DOCKER_IMAGE_VERSION
   # DOCKER_IMAGE_VERSION_WINDOWS
-  MTEAM_CI_ADDITIONAL_PACKAGES_APT: libsasl2-dev libldap2-dev
-  MTEAM_CI_ADDITIONAL_PACKAGES_YUM: cyrus-sasl-devel openldap-devel
-  MTEAM_CI_ADDITIONAL_PACKAGES_ZYPPER: cyrus-sasl-devel openldap2-devel
+  MTEAM_CI_ADDITIONAL_PACKAGES_APT: libsasl2-dev libldap2-dev python3-dev
+  MTEAM_CI_ADDITIONAL_PACKAGES_YUM: cyrus-sasl-devel openldap-devel python3-devel
+  MTEAM_CI_ADDITIONAL_PACKAGES_ZYPPER: cyrus-sasl-devel openldap2-devel python3-devel
 
 build-centos-7:
   extends:
