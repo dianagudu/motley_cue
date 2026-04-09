@@ -2,7 +2,6 @@
 
 import markdown
 
-
 TEMPLATE = """<!DOCTYPE html>
 <html>
     <head>
