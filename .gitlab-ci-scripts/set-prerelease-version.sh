@@ -60,6 +60,9 @@ get_master_branch_of_mteam() {
 MASTER_BRANCH=$(get_master_branch_of_mteam)
 PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
 
+echo "MASTER_BRANCH: ${MASTER_BRANCH}" >> $LOG
+echo "PREREL: ${PREREL}" >> $LOG
+
 # if we use a version file, things are easy:
 [ -e $VERSION_FILE ] && {
     # version for python packages
