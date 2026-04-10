@@ -3,8 +3,8 @@
 DEVSTRING="pr"
 VERSION_FILE=motley_cue/VERSION
 
-echo "---- set-prerlease-version -------------------------------------"
-echo "set-prerelease-version params: >>$0 $@<<"
+echo -e "---- set-prerlease-version -------------------------------------\n\n"
+echo -e "set-prerelease-version params: >>$0 $@<<\n\n"
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -42,15 +42,15 @@ get_master_branch_of_mteam() {
             | sed -n '/HEAD branch/s/.*: //p')
         MASTER_BRANCH="refs/remotes/${REMOTE}/${MASTER}"
         [ "x${HOST}" == "xcodebase.helmholtz.cloud" ] && {
-            echo "${MASTER_BRANCH}"
+            echo "Master branch: ${MASTER_BRANCH}"
             break
         }
         [ "x${HOST}" == "xgit.scc.kit.edu" ] && {
-            echo "${MASTER_BRANCH}"
+            echo "Master branch: ${MASTER_BRANCH}"
             break
         }
         [ "x${REMOTE}" == "xorigin" ] && {
-            echo "${MASTER_BRANCH}"
+            echo "Master branch: ${MASTER_BRANCH}"
             break
         }
     done
@@ -81,7 +81,9 @@ PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
     VERSION_ESCAPED=$(echo ${VERSION} | sed s/\\\./\\\\./g); echo $VER
     cp debian/changelog /tmp/changelog-$$
     sed s%${VERSION_ESCAPED}%${PR_VERSION}% -i debian/changelog
+    echo -e " ====================== diff ==========================\n\n"
     diff -Ny debian/changelog /tmp/changelog-$$
+    echo -e " ====================== /diff ==========================\n\n"
     rm /tmp/changelog-$$
     #echo "$VERSION => $DEBIAN_VERSION + $DEBIAN_RELEASE => $PR_VERSION"
 }
@@ -96,7 +98,9 @@ SPEC_FILES=$(ls rpm/*spec)
                 VERSION_ESCAPED=$(echo ${VERSION} | sed s/\\\./\\\\./g); echo $VER
                 cp $SPEC_FILE /tmp/spec-$$
                 sed "s/${VERSION_ESCAPED}/${PR_VERSION}/" -i "$SPEC_FILE"
+                echo -e " ====================== diff ==========================\n\n"
                 diff -Ny $SPEC_FILE /tmp/spec-$$
+                echo -e " ====================== /diff ==========================\n\n"
                 rm /tmp/spec-$$
             }
         done
