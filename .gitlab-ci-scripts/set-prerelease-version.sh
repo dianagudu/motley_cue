@@ -3,6 +3,8 @@
 DEVSTRING="pr"
 VERSION_FILE=motley_cue/VERSION
 LOG=/tmp/set-prerelease-version.log
+exec >> $LOG
+exec 2>> $LOG
 rm -f $LOG
 
 echo -e "---- set-prerlease-version -------------------------------------\n\n" >> $LOG
@@ -43,16 +45,16 @@ get_master_branch_of_mteam() {
         MASTER=$(git remote show "$REMOTE"  2>/dev/null \
             | sed -n '/HEAD branch/s/.*: //p')
         MASTER_BRANCH="refs/remotes/${REMOTE}/${MASTER}"
-        [ "x${HOST}" == "xcodebase.helmholtz.cloud" ] && {
-            echo "Master branch: ${MASTER_BRANCH}"
+        [[ "${HOST}" == "codebase.helmholtz.cloud" ]] && {
+            echo "${MASTER_BRANCH}"
             break
         }
-        [ "x${HOST}" == "xgit.scc.kit.edu" ] && {
-            echo "Master branch: ${MASTER_BRANCH}" >> $LOG
+        [[ "${HOST}" == "git.scc.kit.edu" ]] && {
+            echo "${MASTER_BRANCH}"
             break
         }
-        [ "x${REMOTE}" == "xorigin" ] && {
-            echo "Master branch: ${MASTER_BRANCH}" >> $LOG
+        [[ "${REMOTE}" == "origin" ]] && {
+            echo "${MASTER_BRANCH}"
             break
         }
     done
