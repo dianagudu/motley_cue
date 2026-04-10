@@ -2,9 +2,11 @@
 
 DEVSTRING="pr"
 VERSION_FILE=motley_cue/VERSION
+LOG=/tmp/set-prerelease-version.log
+rm -r $LOG
 
-printf "---- set-prerlease-version -------------------------------------\n\n"
-printf "set-prerelease-version params: >>%s %s<<\n\n" "$0" "$*"
+echo -e "---- set-prerlease-version -------------------------------------\n\n" >> $LOG
+echo "set-prerelease-version params: $0 $@"
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -19,8 +21,8 @@ while [[ $# -gt 0 ]]; do
       shift # past value
       ;;
     -*|--*)
-      echo "Unknown option $1"
-      echo "---- /set-prerlease-version -------------------------------------"
+      echo "Unknown option $1" >> $LOG
+      echo "---- /set-prerlease-version -------------------------------------" >> $LOG
       exit 1
       ;;
   esac
@@ -46,11 +48,11 @@ get_master_branch_of_mteam() {
             break
         }
         [ "x${HOST}" == "xgit.scc.kit.edu" ] && {
-            echo "Master branch: ${MASTER_BRANCH}"
+            echo "Master branch: ${MASTER_BRANCH}" >> $LOG
             break
         }
         [ "x${REMOTE}" == "xorigin" ] && {
-            echo "Master branch: ${MASTER_BRANCH}"
+            echo "Master branch: ${MASTER_BRANCH}" >> $LOG
             break
         }
     done
@@ -64,7 +66,7 @@ PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
     VERSION=$(cat $VERSION_FILE)
     PR_VERSION="${VERSION}.${DEVSTRING}${PREREL}"
     echo "$PR_VERSION" > $VERSION_FILE
-    echo "PR_VERSION: >$PR_VERSION<"
+    echo "$PR_VERSION"
 }
 
 # if we store the version in debian changelog:
@@ -81,9 +83,9 @@ PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
     VERSION_ESCAPED=$(echo ${VERSION} | sed s/\\\./\\\\./g); echo $VER
     cp debian/changelog /tmp/changelog-$$
     sed s%${VERSION_ESCAPED}%${PR_VERSION}% -i debian/changelog
-    printf " ====================== diff deb ======================\n\n"
-    diff -Nu debian/changelog /tmp/changelog-$$
-    printf " ====================== /diff ==========================\n\n"
+    echo -e " ====================== diff deb ======================\n\n" >> $LOG
+    diff -Nu debian/changelog /tmp/changelog-$$ >> $LOG
+    echo -e " ====================== /diff ==========================\n\n" >> $LOG
     rm /tmp/changelog-$$
     #echo "$VERSION => $DEBIAN_VERSION + $DEBIAN_RELEASE => $PR_VERSION"
 }
@@ -98,13 +100,13 @@ SPEC_FILES=$(ls rpm/*spec)
                 VERSION_ESCAPED=$(echo ${VERSION} | sed s/\\\./\\\\./g); echo $VER
                 cp $SPEC_FILE /tmp/spec-$$
                 sed "s/${VERSION_ESCAPED}/${PR_VERSION}/" -i "$SPEC_FILE"
-                printf " ====================== diff rpm ======================\n\n"
-                diff -Nu $SPEC_FILE /tmp/spec-$$
-                printf " ====================== /diff ==========================\n\n"
+                echo -e " ====================== diff rpm ======================\n\n" >> $LOG
+                diff -Nu $SPEC_FILE /tmp/spec-$$ >> $LOG
+                echo -e " ====================== /diff ==========================\n\n" >> $LOG
                 rm /tmp/spec-$$
             }
         done
-        echo "PR_VERSION: >$PR_VERSION<"
+        echo "$PR_VERSION"
     }
 }
-echo "---- /set-prerlease-version -------------------------------------"
+echo -e "---- /set-prerlease-version -------------------------------------\n\n" >> $LOG
