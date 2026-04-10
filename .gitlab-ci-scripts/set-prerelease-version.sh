@@ -3,7 +3,7 @@
 DEVSTRING="pr"
 VERSION_FILE=motley_cue/VERSION
 LOG=/tmp/set-prerelease-version.log
-rm -r $LOG
+rm -f $LOG
 
 echo -e "---- set-prerlease-version -------------------------------------\n\n" >> $LOG
 echo "set-prerelease-version params: $0 $@"
