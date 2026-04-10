@@ -64,7 +64,7 @@ PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
     VERSION=$(cat $VERSION_FILE)
     PR_VERSION="${VERSION}.${DEVSTRING}${PREREL}"
     echo "$PR_VERSION" > $VERSION_FILE
-    echo "$PR_VERSION"
+    echo "PR_VERSION: >$PR_VERSION<"
 }
 
 # if we store the version in debian changelog:
@@ -100,7 +100,7 @@ SPEC_FILES=$(ls rpm/*spec)
                 rm /tmp/spec-$$
             }
         done
-        echo "$PR_VERSION"
+        echo "PR_VERSION: >$PR_VERSION<"
     }
 }
 echo "---- /set-prerlease-version -------------------------------------"
