@@ -3,6 +3,9 @@
 DEVSTRING="pr"
 VERSION_FILE=motley_cue/VERSION
 
+echo "---- set-prerlease-version -------------------------------------"
+echo "set-prerelease-version params: >>$0 $@<<"
+
 while [[ $# -gt 0 ]]; do
   case $1 in
     --devstring)
@@ -17,6 +20,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     -*|--*)
       echo "Unknown option $1"
+      echo "---- /set-prerlease-version -------------------------------------"
       exit 1
       ;;
   esac
@@ -75,7 +79,10 @@ PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
     RELEASE=$(echo "$DEBIAN_VERSION" | cut -d- -f 2)
     PR_VERSION="${VERSION}~${DEVSTRING}${PREREL}"
     VERSION_ESCAPED=$(echo ${VERSION} | sed s/\\\./\\\\./g); echo $VER
+    cp debian/changelog /tmp/changelog-$$
     sed s%${VERSION_ESCAPED}%${PR_VERSION}% -i debian/changelog
+    diff -Nury debian/changelog /tmp/changelog-$$
+    rm /tmp/changelog-$$
     #echo "$VERSION => $DEBIAN_VERSION + $DEBIAN_RELEASE => $PR_VERSION"
 }
 
@@ -87,9 +94,13 @@ SPEC_FILES=$(ls rpm/*spec)
         for SPEC_FILE in $SPEC_FILES; do
             grep -q "$VERSION" "$SPEC_FILE" && { # version found, needs update
                 VERSION_ESCAPED=$(echo ${VERSION} | sed s/\\\./\\\\./g); echo $VER
+                cp $SPEC_FILE /tmp/spec-$$
                 sed "s/${VERSION_ESCAPED}/${PR_VERSION}/" -i "$SPEC_FILE"
+                diff -Nury $SPEC_FILE /tmp/spec-$$
+                rm /tmp/spec-$$
             }
         done
         echo "$PR_VERSION"
     }
 }
+echo "---- /set-prerlease-version -------------------------------------"
