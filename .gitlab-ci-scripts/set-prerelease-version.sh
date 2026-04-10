@@ -60,16 +60,20 @@ get_master_branch_of_mteam() {
     done
 }
 MASTER_BRANCH=$(get_master_branch_of_mteam)
-PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
+PREREL_NUMBER=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
+
+[[ ${DEVSTRING} == "dev" ]] && {
+    PREREL_NUMBER=$(date +%y%m%d%H%M)
+}
 
 echo "MASTER_BRANCH: ${MASTER_BRANCH}" >> $LOG
-echo "PREREL: ${PREREL}" >> $LOG
+echo "PREREL_NUMBER: ${PREREL_NUMBER}" >> $LOG
 
 # if we use a version file, things are easy:
 [ -e $VERSION_FILE ] && {
     # version for python packages
     VERSION=$(cat $VERSION_FILE)
-    PR_VERSION="${VERSION}.${DEVSTRING}${PREREL}"
+    PR_VERSION="${VERSION}.${DEVSTRING}${PREREL_NUMBER}"
     echo "$PR_VERSION" > $VERSION_FILE
     echo "$PR_VERSION"
 }
@@ -84,7 +88,7 @@ echo "PREREL: ${PREREL}" >> $LOG
         | cut -d\) -f 1)
     VERSION=$(echo "$DEBIAN_VERSION" | cut -d- -f 1)
     RELEASE=$(echo "$DEBIAN_VERSION" | cut -d- -f 2)
-    PR_VERSION="${VERSION}~${DEVSTRING}${PREREL}"
+    PR_VERSION="${VERSION}~${DEVSTRING}${PREREL_NUMBER}"
     VERSION_ESCAPED=$(echo ${VERSION} | sed s/\\\./\\\\./g); echo $VER
     cp debian/changelog /tmp/changelog-$$
     sed s%${VERSION_ESCAPED}%${PR_VERSION}% -i debian/changelog
@@ -99,7 +103,7 @@ echo "PREREL: ${PREREL}" >> $LOG
 SPEC_FILES=$(ls rpm/*spec)
 [ -z "${SPEC_FILES}" ] || {
     [ -z "${VERSION}" ] || {
-        PR_VERSION="${VERSION}~${DEVSTRING}${PREREL}"
+        PR_VERSION="${VERSION}~${DEVSTRING}${PREREL_NUMBER}"
         for SPEC_FILE in $SPEC_FILES; do
             grep -q "$VERSION" "$SPEC_FILE" && { # version found, needs update
                 VERSION_ESCAPED=$(echo ${VERSION} | sed s/\\\./\\\\./g); echo $VER
