@@ -58,7 +58,7 @@ PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
 [ -e $VERSION_FILE ] && {
     # version for python packages
     VERSION=$(cat $VERSION_FILE)
-    PR_VERSION="${VERSION}.dev${PREREL}"
+    PR_VERSION="${VERSION}.${DEVSTRING}${PREREL}"
     echo "$PR_VERSION" > $VERSION_FILE
     echo "$PR_VERSION"
 }
