@@ -81,7 +81,7 @@ PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
     VERSION_ESCAPED=$(echo ${VERSION} | sed s/\\\./\\\\./g); echo $VER
     cp debian/changelog /tmp/changelog-$$
     sed s%${VERSION_ESCAPED}%${PR_VERSION}% -i debian/changelog
-    diff -Nury debian/changelog /tmp/changelog-$$
+    diff -Ny debian/changelog /tmp/changelog-$$
     rm /tmp/changelog-$$
     #echo "$VERSION => $DEBIAN_VERSION + $DEBIAN_RELEASE => $PR_VERSION"
 }
@@ -96,7 +96,7 @@ SPEC_FILES=$(ls rpm/*spec)
                 VERSION_ESCAPED=$(echo ${VERSION} | sed s/\\\./\\\\./g); echo $VER
                 cp $SPEC_FILE /tmp/spec-$$
                 sed "s/${VERSION_ESCAPED}/${PR_VERSION}/" -i "$SPEC_FILE"
-                diff -Nury $SPEC_FILE /tmp/spec-$$
+                diff -Ny $SPEC_FILE /tmp/spec-$$
                 rm /tmp/spec-$$
             }
         done
