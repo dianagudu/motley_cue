@@ -6,7 +6,7 @@ LOG=/tmp/set-prerelease-version.log
 rm -f $LOG
 
 echo -e "---- set-prerlease-version -------------------------------------\n\n" >> $LOG
-echo "set-prerelease-version params: $0 $@"
+echo "set-prerelease-version params: $0 $@" >> $LOG
 
 while [[ $# -gt 0 ]]; do
   case $1 in
