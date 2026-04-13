@@ -7,7 +7,8 @@ case "$1" in
     purge)
         #$DH_VENV_DEBUG echo "$0 $1 called with $# args:" "$@"
         rm -rf /etc/motley_cue
-        rm -rf /usr/lib/motley_cue
+        rm -rf /usr/lib/motley-cue
+        rm -rf /var/tmp/motley_cue
         rm -rf /var/lib/motley_cue
         rm -rf /var/log/motley_cue
         rm -rf /var/cache/motley_cue

@@ -17,6 +17,7 @@ debian/debhelper-build-stamp
 debian/motley-cue
 debian/*debhelper
 debian/*substvars
+rpm/rpmbuild
 *.swp
 .pc
 docker*log
@@ -25,3 +26,4 @@ docker*log
 .tool-versions
 coverage.lcov
 coverage.svg
+CLAUDE.md

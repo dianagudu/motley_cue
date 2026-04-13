@@ -2,6 +2,13 @@
 
 DEVSTRING="pr"
 VERSION_FILE=motley_cue/VERSION
+LOG=/tmp/set-prerelease-version.log
+exec >> $LOG
+exec 2>> $LOG
+rm -f $LOG
+
+echo -e "---- set-prerlease-version -------------------------------------\n\n" >> $LOG
+echo "set-prerelease-version params: $0 $@" >> $LOG
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -16,7 +23,8 @@ while [[ $# -gt 0 ]]; do
       shift # past value
       ;;
     -*|--*)
-      echo "Unknown option $1"
+      echo "Unknown option $1" >> $LOG
+      echo "---- /set-prerlease-version -------------------------------------" >> $LOG
       exit 1
       ;;
   esac
@@ -37,28 +45,35 @@ get_master_branch_of_mteam() {
         MASTER=$(git remote show "$REMOTE"  2>/dev/null \
             | sed -n '/HEAD branch/s/.*: //p')
         MASTER_BRANCH="refs/remotes/${REMOTE}/${MASTER}"
-        [ "x${HOST}" == "xcodebase.helmholtz.cloud" ] && {
+        [[ "${HOST}" == "codebase.helmholtz.cloud" ]] && {
             echo "${MASTER_BRANCH}"
             break
         }
-        [ "x${HOST}" == "xgit.scc.kit.edu" ] && {
+        [[ "${HOST}" == "git.scc.kit.edu" ]] && {
             echo "${MASTER_BRANCH}"
             break
         }
-        [ "x${REMOTE}" == "xorigin" ] && {
+        [[ "${REMOTE}" == "origin" ]] && {
             echo "${MASTER_BRANCH}"
             break
         }
     done
 }
 MASTER_BRANCH=$(get_master_branch_of_mteam)
-PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
+PREREL_NUMBER=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
+
+[[ ${DEVSTRING} == "dev" ]] && {
+    PREREL_NUMBER=$(date +%y%m%d%H%M)
+}
+
+echo "MASTER_BRANCH: ${MASTER_BRANCH}" >> $LOG
+echo "PREREL_NUMBER: ${PREREL_NUMBER}" >> $LOG
 
 # if we use a version file, things are easy:
 [ -e $VERSION_FILE ] && {
     # version for python packages
     VERSION=$(cat $VERSION_FILE)
-    PR_VERSION="${VERSION}.dev${PREREL}"
+    PR_VERSION="${VERSION}.${DEVSTRING}${PREREL_NUMBER}"
     echo "$PR_VERSION" > $VERSION_FILE
     echo "$PR_VERSION"
 }
@@ -73,9 +88,14 @@ PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
         | cut -d\) -f 1)
     VERSION=$(echo "$DEBIAN_VERSION" | cut -d- -f 1)
     RELEASE=$(echo "$DEBIAN_VERSION" | cut -d- -f 2)
-    PR_VERSION="${VERSION}~pr${PREREL}"
+    PR_VERSION="${VERSION}~${DEVSTRING}${PREREL_NUMBER}"
     VERSION_ESCAPED=$(echo ${VERSION} | sed s/\\\./\\\\./g); echo $VER
+    cp debian/changelog /tmp/changelog-$$
     sed s%${VERSION_ESCAPED}%${PR_VERSION}% -i debian/changelog
+    echo -e " ====================== diff deb ======================\n\n" >> $LOG
+    diff -Nu debian/changelog /tmp/changelog-$$ >> $LOG
+    echo -e " ====================== /diff ==========================\n\n" >> $LOG
+    rm /tmp/changelog-$$
     #echo "$VERSION => $DEBIAN_VERSION + $DEBIAN_RELEASE => $PR_VERSION"
 }
 
@@ -83,13 +103,19 @@ PREREL=$(git rev-list --count HEAD ^"$MASTER_BRANCH")
 SPEC_FILES=$(ls rpm/*spec)
 [ -z "${SPEC_FILES}" ] || {
     [ -z "${VERSION}" ] || {
-        PR_VERSION="${VERSION}~pr${PREREL}"
+        PR_VERSION="${VERSION}~${DEVSTRING}${PREREL_NUMBER}"
         for SPEC_FILE in $SPEC_FILES; do
             grep -q "$VERSION" "$SPEC_FILE" && { # version found, needs update
                 VERSION_ESCAPED=$(echo ${VERSION} | sed s/\\\./\\\\./g); echo $VER
+                cp $SPEC_FILE /tmp/spec-$$
                 sed "s/${VERSION_ESCAPED}/${PR_VERSION}/" -i "$SPEC_FILE"
+                echo -e " ====================== diff rpm ======================\n\n" >> $LOG
+                diff -Nu $SPEC_FILE /tmp/spec-$$ >> $LOG
+                echo -e " ====================== /diff ==========================\n\n" >> $LOG
+                rm /tmp/spec-$$
             }
         done
         echo "$PR_VERSION"
     }
 }
+echo -e "---- /set-prerlease-version -------------------------------------\n\n" >> $LOG

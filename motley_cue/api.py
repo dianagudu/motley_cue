@@ -63,9 +63,7 @@ for version_submodule in pkgutil.iter_modules(motley_cue.apis.__path__):
 try:
     current_api_router = api_routers[settings.api_version]
 except KeyError as exc:
-    raise InternalException(
-        f"API version {settings.api_version} does not exist."
-    ) from exc
+    raise InternalException(f"API version {settings.api_version} does not exist.") from exc
 
 # current API version
 api.include_router(current_api_router, prefix="/api", tags=["API"])
@@ -74,9 +72,7 @@ api.include_router(current_api_router, prefix="", include_in_schema=False)
 
 # all API versions
 for api_version, api_router in api_routers.items():
-    api.include_router(
-        api_router, prefix=f"/api/{api_version}", tags=[f"API {api_version}"]
-    )
+    api.include_router(api_router, prefix=f"/api/{api_version}", tags=[f"API {api_version}"])
 
 # Logo for redoc. This must be at the end after all the routes have been set!
 api.openapi()["info"]["x-logo"] = {

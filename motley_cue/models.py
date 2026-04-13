@@ -68,9 +68,7 @@ class InfoAuthorisation:
     authorisation_info: str = Field(
         ..., examples=[AuthorisationType.VO_BASED.description()["authorisation_info"]]
     )
-    supported_VOs: Optional[list] = Field(
-        [], examples=[["/wlcg"]]
-    )  # pylint: disable=invalid-name
+    supported_VOs: Optional[list] = Field([], examples=[["/wlcg"]])  # pylint: disable=invalid-name
     audience: Optional[Union[str, List[str]]] = Field("", examples=["ssh_localhost"])
 
 
@@ -89,9 +87,7 @@ class FeudalResponse:
     """
 
     state: str = Field(..., examples=["deployed"])
-    message: str = Field(
-        ..., examples=["User was created and was added to groups wlcg."]
-    )
+    message: str = Field(..., examples=["User was created and was added to groups wlcg."])
     credentials: Optional[dict] = Field(
         {},
         examples=[

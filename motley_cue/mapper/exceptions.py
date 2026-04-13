@@ -56,10 +56,7 @@ class MissingParameter(JSONResponse):
         no_errors = len(errors)
         message = (
             f"{no_errors} request validation error{'' if no_errors == 1 else 's'}: "
-            + "; ".join(
-                f"{e['msg']} ({(' -> '.join(str(l) for l in e['loc']))})"
-                for e in errors
-            )
+            + "; ".join(f"{e['msg']} ({(' -> '.join(str(l) for l in e['loc']))})" for e in errors)
         )
         super().__init__(status_code=HTTP_400_BAD_REQUEST, content={"detail": message})
 
@@ -74,9 +71,7 @@ class InvalidResponse(JSONResponse):
     def __init__(self, exc: Union[ResponseValidationError, ValidationError]):
         message = "Could not validate response model."
         _ = exc
-        super().__init__(
-            status_code=HTTP_500_INTERNAL_SERVER_ERROR, content={"detail": message}
-        )
+        super().__init__(status_code=HTTP_500_INTERNAL_SERVER_ERROR, content={"detail": message})
 
 
 class InternalException(Exception):

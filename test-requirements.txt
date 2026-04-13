@@ -5,3 +5,5 @@ pytest-env
 python-dotenv
 pytest-asyncio
 pytest-httpx
+# to fix coverage-badge
+setuptools<82.0.0

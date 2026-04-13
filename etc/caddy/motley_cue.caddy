@@ -1,0 +1,23 @@
+# Motley-cue API handler
+@motley_cue path /motley_cue /motley_cue/*
+handle @motley_cue {
+    uri strip_prefix /motley_cue
+
+	# CORS headers
+	header Access-Control-Allow-Origin *
+	header Access-Control-Allow-Credentials true
+	header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+	header Access-Control-Allow-Headers "Content-Type, Accept, Authorization"
+
+	# Handle preflight requests
+	@options method OPTIONS
+	header @options Access-Control-Allow-Origin *
+	header @options Access-Control-Allow-Credentials true
+	header @options Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+	header @options Access-Control-Allow-Headers "Content-Type, Accept, Authorization"
+	header @options Content-Type "text/plain charset=UTF-8"
+	respond @options "" 204
+
+	# Proxy to Unix socket
+	reverse_proxy unix//run/motley_cue/motley-cue.sock
+}

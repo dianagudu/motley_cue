@@ -78,7 +78,7 @@ def test_info_op_not_supported(test_api):
 )
 def test_protected_endpoints_missing_token(test_api, endpoint):
     response = test_api.get(endpoint.url)
-    assert response.status_code == 403
+    assert response.status_code == 401
 
 
 @pytest.mark.parametrize(

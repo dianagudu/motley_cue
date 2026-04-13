@@ -12,14 +12,10 @@ class APIRouter(FastAPIRouter):
         if path.endswith("/") and len(path) > 1:
             path = path[:-1]
 
-        add_path = super().api_route(
-            path, include_in_schema=include_in_schema, **kwargs
-        )
+        add_path = super().api_route(path, include_in_schema=include_in_schema, **kwargs)
 
         alternate_path = path + "/"
-        add_alternate_path = super().api_route(
-            alternate_path, include_in_schema=False, **kwargs
-        )
+        add_alternate_path = super().api_route(alternate_path, include_in_schema=False, **kwargs)
 
         def decorator(func: DecoratedCallable) -> DecoratedCallable:
             add_alternate_path(func)

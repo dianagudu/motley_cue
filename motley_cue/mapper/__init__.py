@@ -81,8 +81,7 @@ class Mapper:
             "login_info": self.__lum.login_info(),
             "supported_OPs": self.__authorisation.trusted_op_list,
             "ops_info": dict(
-                (op, self.__config.get_op_info(op))
-                for op in self.__authorisation.trusted_op_list
+                (op, self.__config.get_op_info(op)) for op in self.__authorisation.trusted_op_list
             ),
         }
 
@@ -193,15 +192,11 @@ class Mapper:
                 mdfile=self.config.privacy.privacy_file,
                 title="motley-cue privacy policy",
             )
-            html = html.replace(
-                "{{privacy_contact}}", self.config.privacy.privacy_contact
-            )
+            html = html.replace("{{privacy_contact}}", self.config.privacy.privacy_contact)
             return HTMLResponse(content=html, status_code=200)
         except FileNotFoundError as e:
             logging.getLogger(__name__).error("Privacy policy file not found: %s", e)
             return HTMLResponse(content="Privacy policy not found", status_code=404)
         except Exception as e:
             logging.getLogger(__name__).error("Error retrieving privacy policy: %s", e)
-            return HTMLResponse(
-                content=f"Error retrieving privacy policy", status_code=500
-            )
+            return HTMLResponse(content=f"Error retrieving privacy policy", status_code=500)

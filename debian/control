@@ -26,10 +26,13 @@ Pre-Depends: dpkg (>= 1.16.1),
              python3 (>= 3.7)      | python3.8,
              python3-venv (>= 3.7) | python3.8-venv,
              nginx,
+             nginx-location-includer,
              ${misc:Pre-Depends}
-Depends: ${misc:Depends}
+Depends: ${misc:Depends},
+             python3 (< 3.13)      | pyenv,
 Suggests: pam-ssh-oidc
 Description: Mapper Oidc To Local idEntitY with loCal User managEment
  This tool provides an OIDC-protected REST interface that allows requesting
  the creation, deletion, and information of a user-account.
+
 

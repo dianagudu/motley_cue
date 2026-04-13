@@ -9,7 +9,6 @@ from motley_cue.apis.utils import APIRouter
 from motley_cue.dependencies import mapper
 from motley_cue.models import Info, InfoAuthorisation, InfoOp, VerifyUser, responses
 
-
 router = APIRouter()
 
 
