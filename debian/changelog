@@ -1,4 +1,4 @@
-motley-cue (0.7.4-1) UNRELEASED; urgency=medium
+motley-cue (0.7.5-1) UNRELEASED; urgency=medium
 
   [ Marcus Hardt ]
   * Initial go for packageing
@@ -6,6 +6,7 @@ motley-cue (0.7.4-1) UNRELEASED; urgency=medium
   * reload nginx config on install
   * Add support for CentOS 7
   * Add example for pooled accounts in config
+  * Use feudal-v1.1.3
   
   [ Diana Gudu ]
   * New version number
