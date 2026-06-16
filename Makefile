@@ -86,8 +86,8 @@ dockerised_some_packages: dockerised_deb_debian_buster\
 
 .PHONY: dockerised_most_packages
 dockerised_most_packages: dockerised_deb_debian_buster\
-	dockerised_deb_debian_bullseye\
 	dockerised_deb_debian_bookworm\
+	dockerised_deb_debian_trixie\
 	dockerised_rpm_centos7\
 	dockerised_rpm_centos_stream\
 	dockerised_rpm_rocky8.5\
@@ -98,8 +98,10 @@ dockerised_most_packages: dockerised_deb_debian_buster\
 dockerised_all_packages: dockerised_deb_debian_buster\
 	dockerised_deb_debian_bullseye\
 	dockerised_deb_debian_bookworm\
-	dockerised_deb_ubuntu_bionic\
 	dockerised_deb_ubuntu_focal\
+	dockerised_deb_ubuntu_jammy\
+	dockerised_deb_ubuntu_noble\
+	dockerised_deb_ubuntu_resolute\
 	dockerised_rpm_centos7\
 	dockerised_rpm_centos8\
 	dockerised_rpm_centos_stream\
@@ -118,8 +120,10 @@ docker_images: docker_rocky8.5\
 	docker_debian_bullseye\
 	docker_debian_buster\
 	docker_debian_bookworm\
-	docker_ubuntu_bionic\
 	docker_ubuntu_focal\
+	docker_ubuntu_jammy\
+	docker_ubuntu_noble\
+	docker_ubuntu_resolute\
 	docker_opensuse15.4\
 	docker_opensuse15.5\
 	docker_opensuse_tumbleweed
@@ -154,6 +158,16 @@ docker_debian_bookworm:
 		"python3-virtualenv dh-virtualenv python3-venv devscripts git "\
 		"python3 python3-dev python3-pip python3-setuptools "| \
 	docker build --tag debian_bookworm -f - .  >> docker.log
+.PHONY: docker_debian_trixie
+docker_debian_trixie:
+	@echo -e "\ndebian_trixie"
+	@echo -e "FROM debian:trixie\n"\
+	"RUN apt-get update && "\
+		"apt-get -y upgrade && "\
+		"apt-get -y install build-essential dh-make quilt "\
+		"python3-virtualenv dh-virtualenv python3-venv devscripts git "\
+		"python3 python3-dev python3-pip python3-setuptools "| \
+	docker build --tag debian_trixie -f - .  >> docker.log
 .PHONY: docker_ubuntu_bionic
 docker_ubuntu_bionic:
 	@echo -e "\nubuntu_bionic"
@@ -164,10 +178,10 @@ docker_ubuntu_bionic:
 		"dh-virtualenv devscripts git "\
 		"python3.8 python3.8-dev python3.8-venv python3-pip "| \
 	docker build --tag ubuntu_bionic -f - .  >> docker.log
-.PHONY: docker_ubuntu_focal
-docker_ubuntu_focal:
-	@echo -e "\nubuntu_focal"
-	@echo -e "FROM ubuntu:focal\n"\
+.PHONY: docker_ubuntu_jammy
+docker_ubuntu_jammy:
+	@echo -e "\nubuntu_jammy"
+	@echo -e "FROM ubuntu:jammy\n"\
 	"ENV DEBIAN_FRONTEND=noninteractive\n"\
 	"ENV  TZ=Europe/Berlin\n"\
 	"RUN apt-get update && "\
@@ -175,7 +189,31 @@ docker_ubuntu_focal:
 		"apt-get -y install build-essential dh-make quilt "\
 		"python3-virtualenv python3-venv devscripts git "\
 		"python3 python3-dev python3-pip python3-setuptools "| \
-	docker build --tag ubuntu_focal -f - .  >> docker.log
+	docker build --tag ubuntu_jammy -f - .  >> docker.log
+.PHONY: docker_ubuntu_noble
+docker_ubuntu_noble:
+	@echo -e "\nubuntu_noble"
+	@echo -e "FROM ubuntu:noble\n"\
+	"ENV DEBIAN_FRONTEND=noninteractive\n"\
+	"ENV  TZ=Europe/Berlin\n"\
+	"RUN apt-get update && "\
+		"apt-get -y upgrade && "\
+		"apt-get -y install build-essential dh-make quilt "\
+		"python3-virtualenv python3-venv devscripts git "\
+		"python3 python3-dev python3-pip python3-setuptools "| \
+	docker build --tag ubuntu_noble -f - .  >> docker.log
+.PHONY: docker_ubuntu_resolute
+docker_ubuntu_resolute:
+	@echo -e "\nubuntu_resolute"
+	@echo -e "FROM ubuntu:resolute\n"\
+	"ENV DEBIAN_FRONTEND=noninteractive\n"\
+	"ENV  TZ=Europe/Berlin\n"\
+	"RUN apt-get update && "\
+		"apt-get -y upgrade && "\
+		"apt-get -y install build-essential dh-make quilt "\
+		"python3-virtualenv python3-venv devscripts git "\
+		"python3 python3-dev python3-pip python3-setuptools "| \
+	docker build --tag ubuntu_resolute -f - .  >> docker.log
 .PHONY: docker_centos7
 docker_centos7:
 	@echo -e "\ncentos7"
@@ -259,9 +297,13 @@ docker_clean:
 	docker image rm	centos_stream || true
 	docker image rm ubuntu_bionic || true
 	docker image rm	ubuntu_focal || true
+	docker image rm	ubuntu_jammy || true
+	docker image rm	ubuntu_noble || true
+	docker image rm	ubuntu_resolute || true
 	docker image rm debian_buster || true
 	docker image rm	debian_bullseye || true
 	docker image rm	debian_bookworm || true
+	docker image rm	debian_trixie || true
 
 .PHONY: dockerised_deb_debian_buster
 dockerised_deb_debian_buster: docker_debian_buster
@@ -280,6 +322,12 @@ dockerised_deb_debian_bookworm: docker_debian_bookworm
 	@echo "Writing build log to $@.log"
 	@docker run --tty --rm -v ${DOCKER_BASE}:/home/build debian_bookworm \
 		/home/build/${PACKAGE}/build.sh ${PACKAGE} debian_bookworm ${PKG_NAME} > $@.log
+
+.PHONY: dockerised_deb_debian_trixie
+dockerised_deb_debian_trixie: docker_debian_trixie
+	@echo "Writing build log to $@.log"
+	@docker run --tty --rm -v ${DOCKER_BASE}:/home/build debian_trixie \
+		/home/build/${PACKAGE}/build.sh ${PACKAGE} debian_trixie ${PKG_NAME} > $@.log
 
 .PHONY: dockerised_deb_ubuntu_bionic
 dockerised_deb_ubuntu_bionic: docker_ubuntu_bionic
@@ -358,8 +406,12 @@ publish-to-repo:
 	@scp ../results/debian_buster/* build@repo.data.kit.edu:/var/www/debian/buster
 	@scp ../results/debian_bullseye/* build@repo.data.kit.edu:/var/www/debian/bullseye
 	@scp ../results/debian_bookworm/* build@repo.data.kit.edu:/var/www/debian/bookworm
+	@scp ../results/debian_trixie/* build@repo.data.kit.edu:/var/www/debian/bookworm
 	@scp ../results/ubuntu_bionic/* build@repo.data.kit.edu:/var/www/ubuntu/bionic 
 	@scp ../results/ubuntu_focal/* build@repo.data.kit.edu:/var/www/ubuntu/focal
+	@scp ../results/ubuntu_jammy/* build@repo.data.kit.edu:/var/www/ubuntu/focal
+	@scp ../results/ubuntu_noble/* build@repo.data.kit.edu:/var/www/ubuntu/focal
+	@scp ../results/ubuntu_resolute/* build@repo.data.kit.edu:/var/www/ubuntu/focal
 	@scp ../results/opensuse15.4/* build@repo.data.kit.edu:/var/www/suse/opensuse-leap-15.4
 	@scp ../results/opensuse15.5/* build@repo.data.kit.edu:/var/www/suse/opensuse-leap-15.5
 	@scp ../results/opensuse_tumbleweed/* build@repo.data.kit.edu:/var/www/suse/opensuse-tumbleweed
