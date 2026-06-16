@@ -18,15 +18,14 @@ PACKAGE=`basename ${PWD}`
 SRC_TAR:=$(PKG_NAME).tar.gz
 
 SHELL:=bash
-#VIRTUALENV:=$(shell virtualenv --version ; shell if [ $? == 0 ]; then echo "virtualenv"; else echo "virtualenv-3"; fi)
-HAS_VENV:=$(shell virtualenv    --version >/dev/null 2>&1 && echo "yes" || echo "")
-HAS_VENV3:=$(shell virtualenv-3 --version >/dev/null 2>&1 && echo "yes" || echo "")
-ifeq ($(HAS_VENV),yes)
-	VIRTUALENV:=virtualenv
-endif
-ifeq ($(HAS_VENV3),yes)
-	VIRTUALENV:=virtualenv-3
-endif
+
+# Python interpreter used to build the bundled virtualenv (rpm/install targets).
+# EL8 and openSUSE Leap ship an ancient default python3 (3.6), so when a newer
+# interpreter has been installed explicitly (python3.11, matching the spec's
+# BuildRequires) we prefer it; everywhere else (EL9/EL10, Fedora, Tumbleweed,
+# Debian/Ubuntu) the distro default python3 is recent enough.
+# Override on the command line with e.g.: make PYTHON=python3.12 rpms
+PYTHON ?= $(shell command -v python3.11 >/dev/null 2>&1 && echo python3.11 || echo python3)
 
 info:
 	@echo "############################################################"
@@ -395,16 +394,11 @@ rpmsource: virtualenv
 
 .PHONY: virtualenv # called from specfile
 virtualenv:
-	${VIRTUALENV} venv
-	( \
-		source venv/bin/activate; \
-		echo "PATH"; \
-		echo ${PATH}; \
-		pip --version; \
-		pip install -I -r requirements.txt build; \
-		grep -q "CentOS Linux release 7" /etc/redhat-release && pip install --force-reinstall -v "urllib3==1.26.16"; \
-		pip freeze > venv/all_versions.txt; \
-	)
+	@echo "Building virtualenv with: $(PYTHON) ($$($(PYTHON) --version 2>&1))"
+	$(PYTHON) -m venv venv
+	venv/bin/python -m pip install --upgrade pip
+	venv/bin/python -m pip install -I -r requirements.txt build
+	venv/bin/python -m pip freeze > venv/all_versions.txt
 
 .PHONY: rpms
 rpms: srpm rpm 
@@ -423,8 +417,7 @@ srpm: rpmsource
 install:
 	install -D -d -m 755 ${DESTDIR}/usr/lib/${PKG_NAME}
 	cp -af venv/* ${DESTDIR}/usr/lib/${PKG_NAME}
-	( \
-		source ${DESTDIR}/usr/lib/${PKG_NAME}/bin/activate; \
-		pip install . --prefix ${DESTDIR}/usr/lib/${PKG_NAME}; \
-	)
+	# Invoke the copied venv's interpreter directly: its console-script
+	# shebangs still point at the build path until fix-venv-paths.sh runs.
+	${DESTDIR}/usr/lib/${PKG_NAME}/bin/python -m pip install . --prefix ${DESTDIR}/usr/lib/${PKG_NAME}
 	@test -e ${DESTDIR}/usr/lib/motley-cue/.gitignore && rm ${DESTDIR}/usr/lib/motley-cue/.gitignore || true
