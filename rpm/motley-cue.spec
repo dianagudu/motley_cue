@@ -16,43 +16,36 @@ AutoReq: no
 Group: System/Libraries
 %endif
 
-%if 0%{?centos} == 7
-BuildRequires: centos-release-scl-rh, centos-release-scl
-BuildRequires: rh-python38 >= 2.0, rh-python38-python-devel >= 3.8
-BuildRequires: policycoreutils, policycoreutils-python
-%endif
-%if 0%{?centos} == 8
-# valid for centos stream and rocky linux
-BuildRequires: python3.11 >= 3.11, python3.11-devel >= 3.9
+# Most targets ship a recent enough default python3 (EL9/EL10, Fedora,
+# openSUSE Tumbleweed): for those we build against the distro's python3 and
+# rely on the *-devel package pulled in by CI. Only distros whose default
+# python3 is too old need an explicit newer interpreter pinned here.
+%if 0%{?rhel} == 8 || 0%{?centos} == 8
+# RHEL 8 family (Rocky/Alma/CentOS Stream 8): default python3 is 3.6
+BuildRequires: python3.11 >= 3.11, python3.11-devel >= 3.11
 BuildRequires: python3-policycoreutils >= 2.9
 %endif
-%if 0%{?sle_version} == 150500 || 0%{?suse_version} > 1600
-# valid for opensuse leap 15.5 and opensuse tumbleweed
+%if 0%{?sle_version} == 150500 || 0%{?sle_version} == 150600
+# openSUSE Leap 15.5 / 15.6: default python3 is 3.6
 BuildRequires: python311 >= 3.11, python311-devel >= 3.11
 BuildRequires: python311-pip, python311-setuptools
 BuildRequires: python3-policycoreutils >= 3.0
 %endif
-%if 0%{?sle_version} == 150400
-# valid for opensuse leap 15.4
-BuildRequires: python311 >= 3.11, python39-devel >= 3.11
+%if 0%{?suse_version} > 1600
+# openSUSE Tumbleweed
+BuildRequires: python311 >= 3.11, python311-devel >= 3.11
 BuildRequires: python311-pip, python311-setuptools
 BuildRequires: python3-policycoreutils >= 3.0
 %endif
 
 BuildRoot:	%{_tmppath}/%{name}
-%if 0%{?centos} == 7
-Requires: rh-python38 >= 2.0
-%endif
-%if 0%{?centos} == 8
-# valid for centos stream and rocky linux
+%if 0%{?rhel} == 8 || 0%{?centos} == 8
 Requires: python3.11 >= 3.11
 %endif
-%if 0%{?sle_version} == 150500 || 0%{?suse_version} > 1600
-# valid for opensuse leap 15.5 and opensuse tumbleweed
+%if 0%{?sle_version} == 150500 || 0%{?sle_version} == 150600
 Requires: python311 >= 3.11
 %endif
-%if 0%{?sle_version} == 150400
-# valid for opensuse leap 15.4
+%if 0%{?suse_version} > 1600
 Requires: python311 >= 3.11
 %endif
 Requires: nginx >= 1.16.1
@@ -122,40 +115,7 @@ install %{installroot}/etc/init.d/motley-cue %{buildroot}/etc/init.d/
 %changelog
 
 %post
-SAVED_DIR=`pwd`
-    # LIB 
-    cd %{venv_dir}/lib
-    PKG_PYTHONDIR=""
-    PYTHON3_MAJOR=`python3 --version| cut -d\  -f 2 | cut -d\. -f 1`
-    PYTHON3_MINOR=`python3 --version| cut -d\  -f 2 | cut -d\. -f 2`
-    for PYTHONDIR in python*; do
-        #echo "For loop: PYTHONDIR: ${PYTHONDIR}"
-        test -e $PYTHONDIR && {
-            test -L $PYTHONDIR || {
-                # If it exists but is not a symlink, then we found the
-                # Python dir for the version this package was created for
-                PKG_PYTHONDIR=$PYTHONDIR
-                #echo "PKG_PYTHONDIR: $PKG_PYTHONDIR"
-            } || true
-        } || true
-    done
-    test -z $PKG_PYTHONDIR && {
-        echo "Can not find python package dir"
-        exit 44
-    }
-    if [ "x${PKG_PYTHONDIR}" = "xpython${PYTHON3_MAJOR}.${PYTHON3_MINOR}" ] ; then
-        echo -n ""
-    else
-        echo "Package was packed for $PKG_PYTHONDIR adjusting symlinks for installed python${PYTHON3_MAJOR}.${PYTHON3_MINOR}"
-        test -e python${PYTHON3_MAJOR}.${PYTHON3_MINOR} || {
-            ln -s $PKG_PYTHONDIR python${PYTHON3_MAJOR}.${PYTHON3_MINOR}
-        }
-    fi
-    # BIN 
-    #cd %{venv_dir}/bin
-    
 %if 0%{?centos}
-cd $SAVED_DIR
 (
     semodule -i %{share_dir}/selinux/motley-cue-gunicorn.pp
     semodule -i %{share_dir}/selinux/motley-cue-sshd.pp
