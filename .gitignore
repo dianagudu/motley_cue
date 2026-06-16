@@ -3,6 +3,7 @@ doc/build
 *.egg-info
 */*.egg-info
 .eggs
+/build
 .tox
 .vscode
 __pycache__

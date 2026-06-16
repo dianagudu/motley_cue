@@ -1,0 +1,17 @@
+almalinux-9
+almalinux-10
+centos-8
+debian-bookworm
+debian-trixie
+fedora-40
+fedora-44
+fedora-45
+fedora-46
+opensuse-15.5
+opensuse-15.6
+opensuse-tumbleweed
+rockylinux-8
+rockylinux-9
+ubuntu-jammy
+ubuntu-noble 
+ubuntu-resolute
