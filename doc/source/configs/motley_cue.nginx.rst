@@ -1,7 +1,7 @@
-.. _motley_cue_nginx:
+.. _motley_cue_nginx.conf:
 
-motley_cue.nginx
-================
+motley_cue.nginx.conf
+=====================
 
-.. literalinclude:: ../../../etc/nginx/motley_cue.nginx
+.. literalinclude:: ../../../etc/nginx/motley_cue.nginx.conf
     :language: bash

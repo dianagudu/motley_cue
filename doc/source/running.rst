@@ -50,7 +50,7 @@ The code examples below assume a python virtualenv at ``/usr/lib/motley-cue``, w
 Templates for all referred configuration files are provided with either the package or the ``pip`` installation.
 
 ..
- You can change the port and other nginx settings by editing ``/etc/nginx/sites-enabled/motley_cue.nginx``.
+ You can change the port and other nginx settings by editing ``/etc/nginx/sites-enabled/motley_cue.nginx.conf``.
 
 
 gunicorn
@@ -90,24 +90,24 @@ Start the service with:
 caddy
 ^^^^^
 
-An example :ref:`site configuration <motley_cue_caddy>` is provided below: 
+An example :ref:`site configuration <motley_cue_caddy.conf>` is provided below: 
 
-.. literalinclude:: ../../etc/caddy/motley_cue.caddy
+.. literalinclude:: ../../etc/caddy/motley_cue.caddy.conf
     :language: bash
 
-Copy it to the appropriate location (e.g. ``/etc/caddy/sites-enabled/motley_cue.caddy``) and reload ``caddy``.
+Copy it to the appropriate location (e.g. ``/etc/caddy/sites-enabled/motley_cue.caddy.conf``) and reload ``caddy``.
 
 .. _nginx:
 
 nginx
 ^^^^^
 
-An example :ref:`site configuration <motley_cue_nginx>` is provided below: 
+An example :ref:`site configuration <motley_cue_nginx.conf>` is provided below: 
 
-.. literalinclude:: ../../etc/nginx/motley_cue.nginx
+.. literalinclude:: ../../etc/nginx/motley_cue.nginx.conf
     :language: bash
 
-Copy it to the appropriate location (e.g. ``/etc/nginx/sites-enabled/motley_cue.nginx``) and reload ``nginx``.
+Copy it to the appropriate location (e.g. ``/etc/nginx/sites-enabled/motley_cue.nginx.conf``) and reload ``nginx``.
 
 
 Config files
@@ -123,6 +123,7 @@ This is the list of the required configuration files, which are usually present 
     /etc/motley_cue/motley_cue.env <configs/motley_cue_env>
     /etc/motley_cue/templates <configs/templates>
     /lib/systemd/system/motley-cue.service <configs/motley_cue_service>
-    /etc/nginx/sites-available/motley_cue.nginx <configs/motley_cue.nginx>
-    /etc/caddy/handlers/motley_cue.caddy <configs/motley_cue.caddy>
+    /etc/nginx/sites-available/motley_cue.nginx.conf <configs/motley_cue.nginx.conf>
+    /etc/caddy/handlers/motley_cue.caddy.conf
+    <configs/motley_cue.caddy.conf>
     /usr/lib/motley-cue/etc/gunicorn/gunicorn.conf.py <configs/gunicorn_conf>

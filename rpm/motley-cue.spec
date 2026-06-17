@@ -80,8 +80,8 @@ make install DESTDIR=%{buildroot}
 mkdir -p %{buildroot}{%{etc_dir},%{log_dir},%{run_dir},%{share_dir}/selinux,%{lib_dir},%{cache_dir},/etc/nginx/conf.d,/etc/nginx/location.d,/etc/caddy/handlers,/lib/systemd/system,/usr/sbin,/etc/init.d}
 cp -r %{installroot}%{etc_dir}/* %{buildroot}%{etc_dir}/
 install %{installroot}%{share_dir}/selinux/* %{buildroot}%{share_dir}/selinux/
-install %{installroot}/etc/nginx/location.d/motley_cue.nginx %{buildroot}/etc/nginx/location.d/motley_cue.nginx
-install %{installroot}/etc/caddy/handlers/motley_cue.caddy %{buildroot}/etc/caddy/handlers/motley_cue.caddy
+install %{installroot}/etc/nginx/location.d/motley_cue.nginx.conf %{buildroot}/etc/nginx/location.d/motley_cue.nginx.conf
+install %{installroot}/etc/caddy/handlers/motley_cue.caddy.conf %{buildroot}/etc/caddy/handlers/motley_cue.caddy.conf
 install %{installroot}/etc/systemd/system/motley-cue.service %{buildroot}/lib/systemd/system/
 install %{installroot}/bin/motley-cue %{buildroot}/usr/sbin/
 install %{installroot}/etc/init.d/motley-cue %{buildroot}/etc/init.d/
@@ -105,8 +105,8 @@ install %{installroot}/etc/init.d/motley-cue %{buildroot}/etc/init.d/
 %else
 %exclude %{share_dir}/*
 %endif
-%config(noreplace) /etc/nginx/location.d/motley_cue.nginx
-%config(noreplace) /etc/caddy/handlers/motley_cue.caddy
+%config(noreplace) /etc/nginx/location.d/motley_cue.nginx.conf
+%config(noreplace) /etc/caddy/handlers/motley_cue.caddy.conf
 /lib/systemd/system/motley-cue.service
 /usr/sbin/motley-cue
 /etc/init.d/motley-cue
