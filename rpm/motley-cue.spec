@@ -48,7 +48,9 @@ Requires: python311 >= 3.11
 Requires: python311 >= 3.11
 %endif
 Requires: nginx >= 1.16.1
-Requires: nginx-location-includer >= 0.0.2
+# Trailing '~' so prerelease builds (e.g. 0.0.2~devNNN, which RPM sorts
+# *before* 0.0.2) still satisfy the dependency in the dev/prerel repos.
+Requires: nginx-location-includer >= 0.0.2~
 
 %define debug_package %{nil}
 %define modname motley_cue
