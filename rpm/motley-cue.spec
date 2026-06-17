@@ -3,7 +3,6 @@ Version: 0.7.5
 Release: 1%{?dist}
 
 Summary: Mapper Oidc To Local idEntitY with loCal User managEment
-Group: Misc
 License: MIT
 URL: https://github.com/dianagudu/motley_cue
 Source0: motley-cue.tar.gz
@@ -69,7 +68,7 @@ the creation, deletion, and information of a user-account.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch -P 0 -p1
 
 %build
 
