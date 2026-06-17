@@ -1,9 +1,17 @@
 ---
 include:
-  - "https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/generic-ci.yml"
-  - "https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/pipeline-jobs.yml"
-  - "https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/pipeline-jobs-publish-to-repo.yml"
-  - "https://codebase.helmholtz.cloud/m-team/tools/ci-voodoo/raw/master/ci-include/github-status-sync.yml"
+  - project: 'm-team/tools/ci-voodoo'
+    ref: 'master'
+    file: 'ci-include/generic-ci.yml'
+  - project: 'm-team/tools/ci-voodoo'
+    ref: 'master'
+    file: 'ci-include/pipeline-jobs.yml'
+  - project: 'm-team/tools/ci-voodoo'
+    ref: 'master'
+    file: 'ci-include/pipeline-jobs-publish-to-repo.yml'
+  - project: 'm-team/tools/ci-voodoo'
+    ref: 'master'
+    file: 'ci-include/github-status-sync.yml'
 
 default:
   tags:
