@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "### local-before-script.sh #####################################"
-echo -n "findind python3 version: "
+echo -n "find python3 version: "
 python3 --version
 ls -l `which python3`
 ls -l /etc/alternatives/python3*
