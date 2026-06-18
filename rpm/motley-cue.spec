@@ -66,6 +66,24 @@ Requires: python3
 %endif
 %endif
 %endif
+
+# Runtime shared libraries the bundled venv links against. AutoReq is off, so
+# they are declared explicitly: bonsai needs libldap/libsasl2, the stdlib
+# _ctypes needs libffi, and the stdlib sqlite3 module needs libsqlite3.
+%if 0%{?rhel} || 0%{?fedora} || 0%{?centos}
+Requires: openldap
+Requires: cyrus-sasl-lib
+Requires: libffi
+%if 0%{?rhel} == 9
+# EL9 GA sqlite-libs (3.34.1) was built without SQLITE_ENABLE_DESERIALIZE, so
+# it lacks sqlite3_deserialize which python >= 3.11 requires; the symbol was
+# enabled in 3.34.1-7.el9_3.
+Requires: sqlite-libs >= 3.34.1-7.el9_3
+%else
+Requires: sqlite-libs
+%endif
+%endif
+
 Requires: nginx >= 1.16.1
 # Trailing '~' so prerelease builds (e.g. 0.0.2~devNNN, which RPM sorts
 # *before* 0.0.2) still satisfy the dependency in the dev/prerel repos.
