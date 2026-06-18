@@ -461,7 +461,7 @@ rpms: srpm rpm
 .PHONY: rpm
 rpm: rpmsource
 	echo ${PATH}
-	pip3 --version
+	pip --version
 	rpmbuild --define "_basedir ${PWD}" --define "_topdir ${PWD}/rpm/rpmbuild" --define "_build_id_links none" -bb  rpm/${PKG_NAME}.spec
 
 .PHONY: srpm
