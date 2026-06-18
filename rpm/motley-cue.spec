@@ -42,6 +42,16 @@ BuildRequires: python3-policycoreutils >= 3.0
 %endif
 %endif
 
+# Headers for bonsai (feudalAdapter's LDAP backend): it ships no wheels and is
+# always compiled from source, so it needs the OpenLDAP and Cyrus SASL devel
+# packages (mirrors the non-python MTEAM_CI_ADDITIONAL_PACKAGES_YUM/ZYPPER).
+BuildRequires: cyrus-sasl-devel
+%if 0%{?suse_version}
+BuildRequires: openldap2-devel
+%else
+BuildRequires: openldap-devel
+%endif
+
 BuildRoot:	%{_tmppath}/%{name}
 %if 0%{?rhel} == 8 || 0%{?centos} == 8
 Requires: python3.11
