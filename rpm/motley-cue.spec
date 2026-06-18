@@ -17,14 +17,17 @@ Group: System/Libraries
 
 # The application requires Python >= 3.10 (deps use PEP 604 "X | Y" unions that
 # are evaluated at runtime). Most targets ship a new-enough default python3
-# (EL10, Fedora, openSUSE Tumbleweed) and build against it. EL8 and openSUSE
-# Leap 15.x default to python 3.6, so build against python3.11 there.
-# TODO(EL9): Alma/Rocky 9 default to python 3.9 (too old). The build fails
-# loudly until a newer interpreter (e.g. python3.12) is installed and pinned
-# here for `0%{?rhel} == 9`.
+# (EL10, Fedora, openSUSE Tumbleweed) and build against it. The rest default to
+# an older python3, so pin a newer interpreter that the distro packages:
+# python3.11 on EL8 and openSUSE Leap 15.x (default 3.6), python3.12 on EL9
+# (Alma/Rocky 9, default 3.9). The Makefile picks the pinned interpreter
+# automatically (newest python3.x >= 3.10 available).
 %if 0%{?rhel} == 8 || 0%{?centos} == 8
 BuildRequires: python3.11, python3.11-devel
 BuildRequires: python3-policycoreutils >= 2.9
+%else
+%if 0%{?rhel} == 9
+BuildRequires: python3.12, python3.12-devel
 %else
 %if 0%{?sle_version} == 150500 || 0%{?sle_version} == 150600
 BuildRequires: python311, python311-devel
@@ -37,15 +40,20 @@ BuildRequires: python3-policycoreutils >= 3.0
 %endif
 %endif
 %endif
+%endif
 
 BuildRoot:	%{_tmppath}/%{name}
 %if 0%{?rhel} == 8 || 0%{?centos} == 8
 Requires: python3.11
 %else
+%if 0%{?rhel} == 9
+Requires: python3.12
+%else
 %if 0%{?sle_version} == 150500 || 0%{?sle_version} == 150600
 Requires: python311
 %else
 Requires: python3
+%endif
 %endif
 %endif
 Requires: nginx >= 1.16.1
