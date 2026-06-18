@@ -75,10 +75,11 @@ Requires: openldap
 Requires: cyrus-sasl-lib
 Requires: libffi
 %if 0%{?rhel} == 9
-# EL9 GA sqlite-libs (3.34.1) was built without SQLITE_ENABLE_DESERIALIZE, so
-# it lacks sqlite3_deserialize which python >= 3.11 requires; the symbol was
-# enabled in 3.34.1-7.el9_3.
-Requires: sqlite-libs >= 3.34.1-7.el9_3
+# EL9's sqlite-libs was built without SQLITE_ENABLE_DESERIALIZE for a long
+# time, so it lacks sqlite3_deserialize which python >= 3.11 requires
+# ("undefined symbol: sqlite3_deserialize"). Confirmed broken at 3.34.1-7.el9_3
+# and fixed by 3.34.1-10.el9_8, so require at least that build.
+Requires: sqlite-libs >= 3.34.1-10.el9_8
 %else
 Requires: sqlite-libs
 %endif
