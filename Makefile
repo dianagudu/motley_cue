@@ -19,14 +19,14 @@ SRC_TAR:=$(PKG_NAME).tar.gz
 
 SHELL:=bash
 
-# Python interpreter used to build the bundled virtualenv (rpm/install targets).
-# EL8 and openSUSE Leap ship an ancient default python3 (3.6), so when a newer
-# interpreter has been installed explicitly (python3.11, matching the spec's
-# BuildRequires) we prefer it; everywhere else (EL9/EL10, Fedora, Tumbleweed,
-# Debian/Ubuntu) the distro default python3 is recent enough.
-# Override on the command line with e.g.: make PYTHON=python3.12 rpms
-# PYTHON ?= $(shell command -v python3 >/dev/null 2>&1 && echo python3.12 || echo python3)
-PYTHON="python3"
+# Interpreter used to build the bundled virtualenv (rpm/install targets).
+# The app requires Python >= 3.10 (deps use PEP 604 "X | Y" unions that are
+# evaluated at runtime). Prefer the distro's own python3 when it is new enough;
+# otherwise fall back to the newest pinned interpreter the spec installs
+# (python3.12 / python3.11). Resolves to empty when nothing >= 3.10 is found, so
+# the build fails loudly (see the virtualenv target) rather than shipping a
+# package that crashes at runtime. Override with e.g.: make PYTHON=python3.12 rpms
+PYTHON ?= $(shell for p in python3 python3.12 python3.11; do command -v $$p >/dev/null 2>&1 && $$p -c 'import sys; sys.exit(0 if sys.version_info[:2] >= (3,10) else 1)' 2>/dev/null && { echo $$p; exit; }; done)
 
 info:
 	@echo "############################################################"
@@ -448,6 +448,7 @@ rpmsource: virtualenv
 
 .PHONY: virtualenv # called from specfile
 virtualenv:
+	@test -n "$(PYTHON)" || { echo "ERROR: no Python >= 3.10 found on this build host. Install one (e.g. python3.12) or pass PYTHON=<interp>."; exit 1; }
 	@echo "Building virtualenv with: $(PYTHON) ($$($(PYTHON) --version 2>&1))"
 	$(PYTHON) -m venv venv
 	venv/bin/python -m pip install --upgrade pip

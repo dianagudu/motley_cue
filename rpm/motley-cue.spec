@@ -15,37 +15,38 @@ AutoReq: no
 Group: System/Libraries
 %endif
 
-# Most targets ship a recent enough default python3 (EL9/EL10, Fedora,
-# openSUSE Tumbleweed): for those we build against the distro's python3 and
-# rely on the *-devel package pulled in by CI. Only distros whose default
-# python3 is too old need an explicit newer interpreter pinned here.
+# The application requires Python >= 3.10 (deps use PEP 604 "X | Y" unions that
+# are evaluated at runtime). Most targets ship a new-enough default python3
+# (EL10, Fedora, openSUSE Tumbleweed) and build against it. EL8 and openSUSE
+# Leap 15.x default to python 3.6, so build against python3.11 there.
+# TODO(EL9): Alma/Rocky 9 default to python 3.9 (too old). The build fails
+# loudly until a newer interpreter (e.g. python3.12) is installed and pinned
+# here for `0%{?rhel} == 9`.
 %if 0%{?rhel} == 8 || 0%{?centos} == 8
-# RHEL 8 family (Rocky/Alma/CentOS Stream 8): default python3 is 3.6
-BuildRequires: python3.11 >= 3.11, python3.11-devel >= 3.11
+BuildRequires: python3.11, python3.11-devel
 BuildRequires: python3-policycoreutils >= 2.9
-%endif
+%else
 %if 0%{?sle_version} == 150500 || 0%{?sle_version} == 150600
-# openSUSE Leap 15.5 / 15.6: default python3 is 3.6
-BuildRequires: python311 >= 3.11, python311-devel >= 3.11
+BuildRequires: python311, python311-devel
 BuildRequires: python311-pip, python311-setuptools
+BuildRequires: python3-policycoreutils >= 3.0
+%else
+BuildRequires: python3, python3-devel
+%if 0%{?suse_version}
 BuildRequires: python3-policycoreutils >= 3.0
 %endif
-%if 0%{?suse_version} > 1600
-# openSUSE Tumbleweed
-BuildRequires: python311 >= 3.11, python311-devel >= 3.11
-BuildRequires: python311-pip, python311-setuptools
-BuildRequires: python3-policycoreutils >= 3.0
+%endif
 %endif
 
 BuildRoot:	%{_tmppath}/%{name}
 %if 0%{?rhel} == 8 || 0%{?centos} == 8
-Requires: python3.11 >= 3.11
-%endif
+Requires: python3.11
+%else
 %if 0%{?sle_version} == 150500 || 0%{?sle_version} == 150600
-Requires: python311 >= 3.11
+Requires: python311
+%else
+Requires: python3
 %endif
-%if 0%{?suse_version} > 1600
-Requires: python311 >= 3.11
 %endif
 Requires: nginx >= 1.16.1
 # Trailing '~' so prerelease builds (e.g. 0.0.2~devNNN, which RPM sorts
