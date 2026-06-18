@@ -25,7 +25,7 @@ SHELL:=bash
 # BuildRequires) we prefer it; everywhere else (EL9/EL10, Fedora, Tumbleweed,
 # Debian/Ubuntu) the distro default python3 is recent enough.
 # Override on the command line with e.g.: make PYTHON=python3.12 rpms
-PYTHON ?= $(shell command -v python3.11 >/dev/null 2>&1 && echo python3.11 || echo python3)
+PYTHON ?= $(shell command -v python3 >/dev/null 2>&1 && echo python3.11 || echo python3)
 
 info:
 	@echo "############################################################"
