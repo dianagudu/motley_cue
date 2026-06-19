@@ -21,12 +21,20 @@ SHELL:=bash
 
 # Interpreter used to build the bundled virtualenv (rpm/install targets).
 # The app requires Python >= 3.10 (deps use PEP 604 "X | Y" unions that are
-# evaluated at runtime). Prefer the distro's own python3 when it is new enough;
-# otherwise fall back to the newest pinned interpreter the spec installs
-# (python3.12 / python3.11). Resolves to empty when nothing >= 3.10 is found, so
-# the build fails loudly (see the virtualenv target) rather than shipping a
-# package that crashes at runtime. Override with e.g.: make PYTHON=python3.12 rpms
-PYTHON ?= $(shell for p in python3 python3.12 python3.11; do command -v $$p >/dev/null 2>&1 && $$p -c 'import sys; sys.exit(0 if sys.version_info[:2] >= (3,10) else 1)' 2>/dev/null && { echo $$p; exit; }; done)
+# evaluated at runtime).
+#
+# Prefer a *versioned* interpreter (python3.X) over the generic "python3", and
+# only fall back to "python3" last. A venv records its base interpreter as a
+# symlink: a versioned name yields a stable, absolute /usr/bin/python3.X that
+# resolves to the same interpreter on every host, whereas the generic
+# /usr/bin/python3 is an alternatives symlink that can point at a different
+# version on the build host vs. the target (on EL8 it built with 3.12 but
+# resolved to the system 3.6 at runtime, so nothing in the venv imported -
+# "No module named pip").
+#
+# Resolves to empty when nothing >= 3.10 is found, so the build fails loudly
+# (see the virtualenv target). Override with e.g.: make PYTHON=python3.12 rpms
+PYTHON ?= $(shell for p in python3.14 python3.13 python3.12 python3.11 python3.10 python3; do command -v $$p >/dev/null 2>&1 && $$p -c 'import sys; sys.exit(0 if sys.version_info[:2] >= (3,10) else 1)' 2>/dev/null && { echo $$p; exit; }; done)
 
 info:
 	@echo "############################################################"
