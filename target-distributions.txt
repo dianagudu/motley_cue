@@ -1,6 +1,5 @@
 almalinux-9
 almalinux-10
-centos-8
 debian-bookworm
 debian-trixie
 fedora-40
