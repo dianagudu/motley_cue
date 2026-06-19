@@ -472,7 +472,11 @@ srpm: rpmsource
 install:
 	install -D -d -m 755 ${DESTDIR}/usr/lib/${PKG_NAME}
 	cp -af venv/* ${DESTDIR}/usr/lib/${PKG_NAME}
-	# Invoke the copied venv's interpreter directly: its console-script
-	# shebangs still point at the build path until fix-venv-paths.sh runs.
-	${DESTDIR}/usr/lib/${PKG_NAME}/bin/python -m pip install . --prefix ${DESTDIR}/usr/lib/${PKG_NAME}
+	# Install into the copied venv via its own interpreter. No --prefix: that
+	# would switch pip to the "prefix" scheme (purelib -> lib/), break the
+	# venv's lib64 -> lib symlink on EL, and split motley_cue away from pip so
+	# the venv's pip3 can no longer import pip. Plain install uses the venv
+	# scheme and keeps everything in one site-packages. Console-script shebangs
+	# still point at the build path until fix-venv-paths.sh rewrites them.
+	${DESTDIR}/usr/lib/${PKG_NAME}/bin/python -m pip install .
 	@test -e ${DESTDIR}/usr/lib/motley-cue/.gitignore && rm ${DESTDIR}/usr/lib/motley-cue/.gitignore || true
