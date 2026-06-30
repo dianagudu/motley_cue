@@ -3,6 +3,8 @@ motley-cue (0.8.0-1) UNRELEASED; urgency=medium
   [ Marcus Hardt ]
   * Improve python handling
 
+ -- Marcus Hardt <marcus@hardt-it.de>  Tue, 30 Jun 2026 14:55:25 +0000
+
 motley-cue (0.7.5-1) UNRELEASED; urgency=medium
 
   [ Marcus Hardt ]
