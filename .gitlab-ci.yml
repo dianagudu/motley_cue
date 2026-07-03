@@ -1,16 +1,16 @@
 ---
 include:
   - project: 'm-team/tools/ci-voodoo'
-    ref: '67d10a3de859c0858c1c3e0529a4f974e892f669'
+    ref: 'master'
     file: 'ci-include/generic-ci.yml'
   - project: 'm-team/tools/ci-voodoo'
-    ref: '67d10a3de859c0858c1c3e0529a4f974e892f669'
+    ref: 'master'
     file: 'ci-include/pipeline-jobs.yml'
   - project: 'm-team/tools/ci-voodoo'
-    ref: '67d10a3de859c0858c1c3e0529a4f974e892f669'
+    ref: 'master'
     file: 'ci-include/pipeline-jobs-publish-to-repo.yml'
   - project: 'm-team/tools/ci-voodoo'
-    ref: '67d10a3de859c0858c1c3e0529a4f974e892f669'
+    ref: 'master'
     file: 'ci-include/github-status-sync.yml'
 
 default:
