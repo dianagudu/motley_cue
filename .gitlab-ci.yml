@@ -1,16 +1,16 @@
 ---
 include:
   - project: 'm-team/tools/ci-voodoo'
-    ref: 'master'
+    ref: 'devel'
     file: 'ci-include/generic-ci.yml'
   - project: 'm-team/tools/ci-voodoo'
-    ref: 'master'
+    ref: 'devel'
     file: 'ci-include/pipeline-jobs.yml'
   - project: 'm-team/tools/ci-voodoo'
-    ref: 'master'
+    ref: 'devel'
     file: 'ci-include/pipeline-jobs-publish-to-repo.yml'
   - project: 'm-team/tools/ci-voodoo'
-    ref: 'master'
+    ref: 'devel'
     file: 'ci-include/github-status-sync.yml'
 
 default:
