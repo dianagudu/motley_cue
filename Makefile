@@ -3,6 +3,7 @@ PKG_NAME_UNDERSCORES  = motley_cue
 
 SPECFILE := rpm/${PKG_NAME}.spec
 RPM_VERSION := $(shell grep ^Version ${SPECFILE} | cut -d : -f 2 | sed s/\ //g)
+SOURCEDIR ?= rpm/rpmbuild/SOURCES        # CI's exported $SOURCEDIR overrides this
 
 BASE_VERSION := $(shell head debian/changelog  -n 1 | cut -d \( -f 2 | cut -d \) -f 1 | cut -d \- -f 1)
 DEBIAN_VERSION := $(shell head debian/changelog  -n 1 | cut -d \( -f 2 | cut -d \) -f 1 | sed s/-[0-9][0-9]*//)
@@ -448,7 +449,14 @@ deb: cleanapi create_obj_dir_structure preparedeb
 
 .PHONY: rpmsource
 rpmsource: virtualenv
-	SOURCEDIR=${SOURCEDIR:-rpm/rpmbuild/SOURCES}
+	(cd ..; tar czf $(SRC_TAR) --exclude-from=$(PKG_NAME_UNDERSCORES)/.gitignore --exclude-vcs --exclude-caches-all \
+	        $(PKG_NAME_UNDERSCORES) --transform='s^$(PKG_NAME_UNDERSCORES)^$(PKG_NAME)-$(RPM_VERSION)^')
+	mkdir -p $(SOURCEDIR)
+	mv ../$(SRC_TAR) $(SOURCEDIR)
+	cp rpm/*.patch $(SOURCEDIR)
+	ls -la $(SOURCEDIR)
+
+
 	(cd ..; tar czf $(SRC_TAR) --exclude-from=$(PKG_NAME_UNDERSCORES)/.gitignore --exclude-vcs --exclude-caches-all \
 		$(PKG_NAME_UNDERSCORES) --transform='s^${PKG_NAME_UNDERSCORES}^${PKG_NAME}-$(RPM_VERSION)^')
 	mkdir -p rpm/rpmbuild/SOURCES
