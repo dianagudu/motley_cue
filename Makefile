@@ -3,7 +3,9 @@ PKG_NAME_UNDERSCORES  = motley_cue
 
 SPECFILE := rpm/${PKG_NAME}.spec
 RPM_VERSION := $(shell grep ^Version ${SPECFILE} | cut -d : -f 2 | sed s/\ //g)
-SOURCEDIR = ${PWD}/rpmbuild/SOURCES   # CI's exported $SOURCEDIR overrides this
+RPM_TOPDIR ?= $(CURDIR)/rpm/rpmbuild # CI's exported $SOURCEDIR overrides this
+SOURCEDIR  ?= $(RPM_TOPDIR)/SOURCES
+
 
 BASE_VERSION := $(shell head debian/changelog  -n 1 | cut -d \( -f 2 | cut -d \) -f 1 | cut -d \- -f 1)
 DEBIAN_VERSION := $(shell head debian/changelog  -n 1 | cut -d \( -f 2 | cut -d \) -f 1 | sed s/-[0-9][0-9]*//)
@@ -456,6 +458,8 @@ rpmsource: virtualenv
 	cp rpm/*.patch $(SOURCEDIR)
 	ls -la $(SOURCEDIR)
 
+
+
 .PHONY: virtualenv # called from specfile
 virtualenv:
 	@test -n "$(PYTHON)" || { echo "ERROR: no Python >= 3.10 found on this build host. Install one (e.g. python3.12) or pass PYTHON=<interp>."; exit 1; }
@@ -472,11 +476,12 @@ rpms: srpm rpm
 rpm: rpmsource
 	@echo "PATH=${PATH}"
 	venv/bin/python -m pip --version
-	rpmbuild --define "_basedir ${PWD}" \
-	         --define "_topdir ${PWD}/rpm/rpmbuild" \
-	         --define "_sourcedir $(SOURCEDIR)" \
-	         --define "_build_id_links none" \
-	         -bb rpm/${PKG_NAME}.spec
+	rpmbuild --define "_basedir $(CURDIR)" \
+			 --define "_topdir $(RPM_TOPDIR)" \
+			 --define "_sourcedir $(SOURCEDIR)" \
+			 --define "_build_id_links none" \
+			 -bb rpm/$(PKG_NAME).spec
+
 # rpm: rpmsource
 #     @echo "PATH=${PATH}"
 #     venv/bin/python -m pip --version
