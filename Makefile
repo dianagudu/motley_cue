@@ -448,10 +448,11 @@ deb: cleanapi create_obj_dir_structure preparedeb
 
 .PHONY: rpmsource
 rpmsource: virtualenv
+	SOURCEDIR=${SOURCEDIR:-rpm/rpmbuild/SOURCES}
 	(cd ..; tar czf $(SRC_TAR) --exclude-from=$(PKG_NAME_UNDERSCORES)/.gitignore --exclude-vcs --exclude-caches-all \
 		$(PKG_NAME_UNDERSCORES) --transform='s^${PKG_NAME_UNDERSCORES}^${PKG_NAME}-$(RPM_VERSION)^')
 	mkdir -p rpm/rpmbuild/SOURCES
-	mv ../$(SRC_TAR) rpm/rpmbuild/SOURCES/
+	mv ../$(SRC_TAR) $(SOURCEDIR)
 	cp rpm/*.patch rpm/rpmbuild/SOURCES/
 
 .PHONY: virtualenv # called from specfile
