@@ -456,16 +456,6 @@ rpmsource: virtualenv
 	cp rpm/*.patch $(SOURCEDIR)
 	ls -la $(SOURCEDIR)
 
-
-	(cd ..; tar czf $(SRC_TAR) --exclude-from=$(PKG_NAME_UNDERSCORES)/.gitignore --exclude-vcs --exclude-caches-all \
-		$(PKG_NAME_UNDERSCORES) --transform='s^${PKG_NAME_UNDERSCORES}^${PKG_NAME}-$(RPM_VERSION)^')
-	mkdir -p rpm/rpmbuild/SOURCES
-	mv ../$(SRC_TAR) $(SOURCEDIR)
-	# cp rpm/*.patch rpm/rpmbuild/SOURCES/
-	cp rpm/*.patch $(SOURCEDIR)
-	ls -la $(SOURCEDIR}
-
-
 .PHONY: virtualenv # called from specfile
 virtualenv:
 	@test -n "$(PYTHON)" || { echo "ERROR: no Python >= 3.10 found on this build host. Install one (e.g. python3.12) or pass PYTHON=<interp>."; exit 1; }
