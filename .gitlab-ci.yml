@@ -63,8 +63,15 @@ trigger-integration-tests:
   variables:
     TRIGGER_TOKEN: ${TRIGGER_TOKEN_OIDC_SSH_MOTLEY_CUE}
     API_TOKEN: ${API_TOKEN_OIDC_SSH_MOTLEY_CUE}
-    # api token needs "read_api" privileges of developer
+    ### Parameters for trigger-pipeline
+    # TRIGGER_TOKEN
+    # API_TOKEN
+    # TRIGGER_PROJECT_NAME (default: m-team/tools/integration/test-ssh-oidc)
+    # BRANCH_TO_TRIGGER (default: devel)
+    # RESOLVE_DEPENDENCIES_REPO
+    # RESOLVE_DEPENDENCIES_FALLBACK_REPO
   extends:
-    - .trigger-integration-tests-ssh-oidc
+    - .trigger-pipeline
+ 
  
  
