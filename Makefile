@@ -480,7 +480,8 @@ rpm: rpmsource
 			 --define "_topdir $(RPM_TOPDIR)" \
 			 --define "_sourcedir $(SOURCEDIR)" \
 			 --define "_build_id_links none" \
-			 -bb rpm/$(PKG_NAME).spec
+			 -bb $(SPECFILE)
+			 # -bb rpm/$(PKG_NAME).spec
 
 # rpm: rpmsource
 #     @echo "PATH=${PATH}"
@@ -489,7 +490,10 @@ rpm: rpmsource
 
 .PHONY: srpm
 srpm: rpmsource
-	rpmbuild --define "_basedir ${PWD}" --define "_topdir ${PWD}/rpm/rpmbuild" -bs  rpm/${PKG_NAME}.spec
+	rpmbuild --define "_basedir ${PWD}" \
+			 --define "_topdir ${PWD}/rpm/rpmbuild" \
+			 -bs  $(SPECFILE)
+			 # -bs  rpm/${PKG_NAME}.spec
 
 .PHONY: install # called from specfile
 install:
