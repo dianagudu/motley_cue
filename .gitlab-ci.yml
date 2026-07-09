@@ -26,15 +26,6 @@ variables:
   # MTEAM_CI_ADDITIONAL_PACKAGES_YUM: cyrus-sasl-devel openldap-devel python3-devel
   # MTEAM_CI_ADDITIONAL_PACKAGES_ZYPPER: cyrus-sasl-devel openldap2-devel python3-devel
 
-build-centos-7:
-  extends:
-    - .build-centos-7
-  script:
-    - |
-      # Force RPM's python-bytecompile script to use python3
-      sed "s@^default_python@default_python=python3\n#default_python@" -i /usr/lib/rpm/brp-python-bytecompile
-      echo "typing-extensions" >> requirements.txt
-    - !reference [.rpm-build-script]
 build-ubuntu-bionic:
   extends:
     - .build-ubuntu-bionic
@@ -46,16 +37,6 @@ build-ubuntu-bionic:
       cat debian/new-rules > debian/rules
       make debsource
       dpkg-buildpackage -uc -us
-
-build-almalinux-8:
-  extends:
-    - .build-almalinux-8
-  allow_failure: true
-
-build-rockylinux-8:
-  extends:
-    - .build-rockylinux-8
-  allow_failure: true
 
 ##########################################################################
 # Integration (These might to to a central job def)
@@ -70,6 +51,9 @@ trigger-integration-tests:
     # BRANCH_TO_TRIGGER (default: devel)
     # RESOLVE_DEPENDENCIES_REPO
     # RESOLVE_DEPENDENCIES_FALLBACK_REPO
+    # CHILD_SHOULD both default to false
+    # CHILD_SHOULD_PUBLISH: 'true'
+    CHILD_SHOULD_INTEGRATION_TEST: 'true'
   extends:
     - .trigger-pipeline
  
