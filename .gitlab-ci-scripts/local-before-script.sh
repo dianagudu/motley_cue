@@ -11,18 +11,12 @@ ls -l /usr/bin/python3*
 # (motley_cue needs >= 3.10; bullseye ships 3.9, focal ships 3.8/3.9).
 export DEBIAN_FRONTEND=noninteractive
 case "${DISTRO}-${RELEASE}" in
-    ubuntu-focal)
-        echo "installing python3.10 from the deadsnakes PPA"
-        apt-get update
-        apt-get install -y software-properties-common
-        add-apt-repository -y ppa:deadsnakes/ppa
-        apt-get update
-        apt-get install -y python3.10 python3.10-venv python3.10-dev python3.10-distutils
-        ;;
-    debian-bullseye)
-        # deadsnakes has no Debian packages, so build 3.10 from source into
-        # /usr/local (make altinstall keeps the system python3.9 intact).
-        echo "building python3.10 from source"
+    debian-bullseye|ubuntu-focal)
+        # Neither distro ships python3.10 and deadsnakes has no Debian packages
+        # (and its PPA is unreliable in the focal build container), so build
+        # 3.10 from source into /usr/local. "make altinstall" keeps the system
+        # python3 (3.9) intact, so apt's python tooling is not disturbed.
+        echo "building python3.10 from source for ${DISTRO}-${RELEASE}"
         PYVER=3.10.16
         apt-get update
         apt-get install -y wget ca-certificates build-essential \
