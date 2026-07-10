@@ -38,6 +38,26 @@ build-ubuntu-bionic:
       make debsource
       dpkg-buildpackage -uc -us
 
+# bullseye ships python3.9 and focal ships 3.8/3.9, both too old for motley_cue.
+# local-before-script.sh installs python3.10; point dh_virtualenv at it here.
+build-debian-bullseye:
+  extends:
+    - .build-debian-bullseye
+  script:
+    - |
+      sed -i s/"dh_virtualenv --python python3"/"dh_virtualenv --python python3.10"/ debian/rules
+      make debsource
+      dpkg-buildpackage -uc -us
+
+build-ubuntu-focal:
+  extends:
+    - .build-ubuntu-focal
+  script:
+    - |
+      sed -i s/"dh_virtualenv --python python3"/"dh_virtualenv --python python3.10"/ debian/rules
+      make debsource
+      dpkg-buildpackage -uc -us
+
 ##########################################################################
 # Integration (These might to to a central job def)
 trigger-integration-tests:
