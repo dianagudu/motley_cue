@@ -28,26 +28,9 @@ variables:
   # MTEAM_CI_ADDITIONAL_PACKAGES_YUM: cyrus-sasl-devel openldap-devel python3-devel
   # MTEAM_CI_ADDITIONAL_PACKAGES_ZYPPER: cyrus-sasl-devel openldap2-devel python3-devel
 
-build-ubuntu-bionic:
-  extends:
-    - .build-ubuntu-bionic
-  script:
-    - |
-      cat debian/rules \
-      | sed s/"dh_virtualenv --python python3"/"dh_virtualenv --python python3.8"/ \
-      > debian/new-rules
-      cat debian/new-rules > debian/rules
-      make debsource
-      dpkg-buildpackage -uc -us
-
 # bullseye ships python3.9, too old for motley_cue (>= 3.10). local-before-
 # script.sh installs python3.10 from the pascalroeleven repo; point
 # dh_virtualenv at it here.
-#
-# Note: ubuntu-focal is intentionally not built. It is EOL (April 2025) and its
-# only python3.10 source, the deadsnakes PPA, has had its focal binaries purged
-# (the repo's Packages index is now empty), so there is no way to install a
-# python >= 3.10 there.
 build-debian-bullseye:
   extends:
     - .build-debian-bullseye
