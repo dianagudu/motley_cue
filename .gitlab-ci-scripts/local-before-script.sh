@@ -36,14 +36,14 @@ case "${DISTRO}-${RELEASE}" in
         # the PPA in the build container.
         echo "installing python3.10 from the deadsnakes PPA"
         apt-get update
-        apt-get install -y gnupg ca-certificates
+        apt-get install -y wget ca-certificates
         install -d /etc/apt/keyrings
-        gpg --no-default-keyring --keyring /tmp/deadsnakes-kr.gpg \
-            --keyserver keyserver.ubuntu.com \
-            --recv-keys F23C5A6CF475977595C89F51BA6932366A755776
-        gpg --no-default-keyring --keyring /tmp/deadsnakes-kr.gpg \
-            --export > /etc/apt/keyrings/deadsnakes.gpg
-        echo "deb [signed-by=/etc/apt/keyrings/deadsnakes.gpg] https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu focal main" \
+        # Fetch the deadsnakes PPA signing key over HTTPS as an armored file and
+        # reference it via signed-by. This avoids gpg --recv-keys, which needs
+        # dirmngr and a writable ~/.gnupg (both absent in the build container).
+        wget -qO /etc/apt/keyrings/deadsnakes.asc \
+            "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF23C5A6CF475977595C89F51BA6932366A755776"
+        echo "deb [signed-by=/etc/apt/keyrings/deadsnakes.asc] https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu focal main" \
             > /etc/apt/sources.list.d/deadsnakes.list
         apt-get update
         apt-get install -y python3.10 python3.10-venv python3.10-dev python3.10-distutils
