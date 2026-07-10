@@ -40,21 +40,17 @@ build-ubuntu-bionic:
       make debsource
       dpkg-buildpackage -uc -us
 
-# bullseye and focal ship a python3 that is too old for motley_cue (>= 3.10).
-# local-before-script.sh installs python3.10 (bullseye from pascalroeleven,
-# focal from deadsnakes); point dh_virtualenv at it here.
+# bullseye ships python3.9, too old for motley_cue (>= 3.10). local-before-
+# script.sh installs python3.10 from the pascalroeleven repo; point
+# dh_virtualenv at it here.
+#
+# Note: ubuntu-focal is intentionally not built. It is EOL (April 2025) and its
+# only python3.10 source, the deadsnakes PPA, has had its focal binaries purged
+# (the repo's Packages index is now empty), so there is no way to install a
+# python >= 3.10 there.
 build-debian-bullseye:
   extends:
     - .build-debian-bullseye
-  script:
-    - |
-      sed -i s/"dh_virtualenv --python python3"/"dh_virtualenv --python python3.10"/ debian/rules
-      make debsource
-      dpkg-buildpackage -uc -us
-
-build-ubuntu-focal:
-  extends:
-    - .build-ubuntu-focal
   script:
     - |
       sed -i s/"dh_virtualenv --python python3"/"dh_virtualenv --python python3.10"/ debian/rules
