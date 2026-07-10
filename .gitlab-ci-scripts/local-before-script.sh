@@ -13,25 +13,21 @@ export DEBIAN_FRONTEND=noninteractive
 case "${DISTRO}-${RELEASE}" in
     debian-bullseye)
         # bullseye ships python3.9; motley_cue needs >= 3.10. No official or
-        # backports python3.10 exists for bullseye, so use python3.11 from the
-        # (unofficial, Debian-developer-maintained) paravoid backports repo.
-        echo "installing python3.11 from the paravoid backports repo"
+        # backports python3.10 exists for bullseye, so use the (third-party)
+        # pascalroeleven backport repo, which ships a full 3.10 package set
+        # (python3.10 + -venv + -dev) that coexists with the system python3.9.
+        echo "installing python3.10 from the pascalroeleven backports repo"
         apt-get update
-        apt-get install -y wget gnupg ca-certificates
+        apt-get install -y wget ca-certificates
         install -d /etc/apt/keyrings
-        wget -qO - https://people.debian.org/~paravoid/python-all/unofficial-python-all.asc \
-            | gpg --dearmor > /etc/apt/keyrings/paravoid-python-all.gpg
-        echo "deb [signed-by=/etc/apt/keyrings/paravoid-python-all.gpg] http://people.debian.org/~paravoid/python-all bullseye main" \
-            > /etc/apt/sources.list.d/paravoid-python-all.list
+        wget -qO /etc/apt/keyrings/pascalroeleven.gpg \
+            https://pascalroeleven.nl/deb-pascalroeleven.gpg
+        echo "deb [signed-by=/etc/apt/keyrings/pascalroeleven.gpg] http://deb.pascalroeleven.nl/python3.10 bullseye-backports main" \
+            > /etc/apt/sources.list.d/pascalroeleven.list
         apt-get update
-        apt-get install -y python3.11 python3-stdlib-extensions
-        # The -venv/-dev subpackages may not be published separately (the
-        # python3.11 package bundles the stdlib, incl. venv). Pull them if they
-        # exist, but don't fail the build if they don't.
-        apt-get install -y python3.11-venv python3.11-dev || true
-        # Verify the venv module is usable, since dh_virtualenv --builtin-venv
-        # relies on `python3.11 -m venv`.
-        python3.11 -m venv --help > /dev/null
+        apt-get install -y python3.10 python3.10-venv python3.10-dev
+        # dh_virtualenv --builtin-venv relies on `python3.10 -m venv`.
+        python3.10 -m venv --help > /dev/null
         ;;
     ubuntu-focal)
         # focal ships python3.8; motley_cue needs >= 3.10. Install python3.10

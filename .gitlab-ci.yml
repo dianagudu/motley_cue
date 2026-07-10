@@ -41,14 +41,14 @@ build-ubuntu-bionic:
       dpkg-buildpackage -uc -us
 
 # bullseye and focal ship a python3 that is too old for motley_cue (>= 3.10).
-# local-before-script.sh installs a newer python (3.11 on bullseye from the
-# paravoid repo, 3.10 on focal from deadsnakes); point dh_virtualenv at it here.
+# local-before-script.sh installs python3.10 (bullseye from pascalroeleven,
+# focal from deadsnakes); point dh_virtualenv at it here.
 build-debian-bullseye:
   extends:
     - .build-debian-bullseye
   script:
     - |
-      sed -i s/"dh_virtualenv --python python3"/"dh_virtualenv --python python3.11"/ debian/rules
+      sed -i s/"dh_virtualenv --python python3"/"dh_virtualenv --python python3.10"/ debian/rules
       make debsource
       dpkg-buildpackage -uc -us
 
