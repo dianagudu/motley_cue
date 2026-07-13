@@ -73,3 +73,14 @@ export DESTDIR=debian/$(PACKAGE)
 
 override_dh_virtualenv:
 	dh_virtualenv --python python3
+	# dh_virtualenv rewrites the shebang of pip3 and other venv scripts to
+	# #!.../bin/python, but some interpreters (e.g. the bullseye python3.10
+	# backport) build a venv without that unversioned `python` symlink, leaving
+	# those scripts with a dangling interpreter. Create it if missing, pointing
+	# at whichever versioned interpreter the venv actually shipped.
+	set -e ; bin=debian/motley-cue/usr/lib/motley-cue/bin ; \
+	if [ ! -e $$bin/python ]; then \
+		for p in python3 python3.10 python3.11 python3.12 python3.13; do \
+			if [ -e $$bin/$$p ]; then ln -s $$p $$bin/python ; break ; fi ; \
+		done ; \
+	fi
