@@ -6,6 +6,7 @@ case "$1" in
     configure|triggered|reconfigure)
         systemctl enable motley-cue || update-rc.d motley-cue defaults || true
         systemctl restart motley-cue || service motley-cue restart || /etc/init.d/motley-cue restart || true
+        # FIXME: Consider caddy here, too
         systemctl restart nginx || service nginx restart || nginx -s reload || nginx || true
         ;;
 esac
