@@ -5,7 +5,7 @@ This module contains the definition of motley_cue's user API.
 from fastapi import Request, Depends, Header
 
 from motley_cue.dependencies import mapper
-from motley_cue.models import FeudalResponse, OTPResponse, responses
+from motley_cue.models import FeudalResponse, OTPResponse, UserStatusResponse, responses
 from motley_cue.apis.utils import APIRouter
 
 router = APIRouter(prefix="/user")
@@ -24,6 +24,7 @@ async def read_root():
         "usage": "All endpoints are available using an OIDC Access Token as a bearer token.",
         "endpoints": {
             f"{router.prefix}/get_status": "Get information about your local account.",
+            f"{router.prefix}/status": "Get local account status including resolved sub, iss and username.",
             f"{router.prefix}/deploy": "Provision local account.",
             f"{router.prefix}/suspend": "Suspend local account.",
             f"{router.prefix}/generate_otp": "Generates a one-time token for given access token.",
@@ -52,6 +53,34 @@ async def get_status(
     Requires an authorised user.
     """
     return mapper.get_status(request)
+
+
+@router.get(
+    "/status",
+    summary="User: get full status",
+    dependencies=[Depends(mapper.user_security)],
+    response_model=UserStatusResponse,
+    response_model_exclude_unset=True,
+    responses={**responses, 200: {"model": UserStatusResponse}},
+)
+@mapper.authorised_user_required
+async def status(
+    request: Request,
+    header: str = Header(..., alias="Authorization", description="OIDC Access Token"),
+):  # pylint: disable=unused-argument
+    """Get information about your local account, including the resolved OIDC
+    identity and local username:
+
+    * **state**: one of the supported states, such as deployed, not_deployed, suspended.
+    * **message**: could contain additional information, such as the local username
+    * **credentials**: login credentials for the local account, when deployed
+    * **username**: the local account username, when available
+    * **sub**: the OIDC subject claim of the authenticated user
+    * **iss**: the OIDC issuer of the authenticated user
+
+    Requires an authorised user.
+    """
+    return mapper.get_full_status(request)
 
 
 @router.get(

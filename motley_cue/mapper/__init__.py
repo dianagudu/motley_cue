@@ -143,6 +143,22 @@ class Mapper:
         userinfo = self.__authorisation.get_uid_from_request(request)
         return self.__lum.get_status(userinfo)
 
+    def get_full_status(self, request: Request):
+        """Get the status of a local account corresponding to the user identified
+        by token, enriched with the resolved OIDC identity (sub, iss) and the
+        local username.
+        OIDC Access Token should be found in request headers.
+        """
+        userinfo = self.__authorisation.get_uid_from_request(request)
+        status = dict(self.__lum.get_status(userinfo))
+        if userinfo is not None:
+            status["sub"] = userinfo.get("sub", "")
+            status["iss"] = userinfo.get("iss", "")
+        username = self.__lum.extract_username(status)
+        if username is not None:
+            status["username"] = username
+        return status
+
     def suspend(self, request: Request):
         """Suspend a local account corresponding to the user identified by token.
         OIDC Access Token should be found in request headers.

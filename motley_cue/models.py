@@ -103,6 +103,34 @@ class FeudalResponse:
 
 
 @dataclass
+class UserStatusResponse:
+    """Data model for responses on the /user/status endpoint.
+
+    Extends FeudalResponse with the resolved OIDC identity (sub, iss) and the
+    local username, as required by SSH-CA clients such as oinit (which need the
+    sub/iss claims to identify the user for opaque, non-JWT access tokens).
+    """
+
+    state: str = Field(..., examples=["deployed"])
+    message: str = Field(..., examples=["User was created and was added to groups wlcg."])
+    credentials: Optional[dict] = Field(
+        {},
+        examples=[
+            {
+                "commandline": "ssh wlcg001@localhost",
+                "description": "Local SSH Test Service",
+                "login_help": "Login via `mccli ssh {login_host}`.",
+                "ssh_host": "localhost",
+                "ssh_user": "wlcg001",
+            }
+        ],
+    )
+    username: str = Field("", examples=["wlcg001"])
+    sub: str = Field("", examples=["6c611e2a-2c1c-487f-9948-c058a36c8f0e"])
+    iss: str = Field("", examples=["https://wlcg.cloud.cnaf.infn.it/"])
+
+
+@dataclass
 class OTPResponse:
     """Data model for any responses coming from TokenManager,
     on /user/generate_otp.

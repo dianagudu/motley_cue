@@ -188,6 +188,35 @@ def test_verify_user_fail(
 
 
 @pytest.mark.parametrize(
+    "status_result,expected",
+    [
+        # username taken from credentials.ssh_user when present
+        ({"state": "deployed", "credentials": {"ssh_user": "wlcg001"}}, "wlcg001"),
+        # credentials take precedence over the message
+        (
+            {
+                "state": "deployed",
+                "message": "username other",
+                "credentials": {"ssh_user": "wlcg001"},
+            },
+            "wlcg001",
+        ),
+        # fall back to parsing the message (verify_user convention: 2nd word)
+        ({"state": "deployed", "message": "username wlcg003"}, "wlcg003"),
+        ({"state": "suspended", "message": "username wlcg004"}, "wlcg004"),
+        # no username available for these states
+        ({"state": "not_deployed", "message": "username wlcg005"}, None),
+        ({"state": "unknown", "message": "username wlcg006"}, None),
+        # message without a second word yields no username
+        ({"state": "deployed", "message": "deployed"}, None),
+        ({"state": "deployed"}, None),
+    ],
+)
+def test_extract_username(test_local_user_manager, status_result, expected):
+    assert test_local_user_manager.extract_username(status_result) == expected
+
+
+@pytest.mark.parametrize(
     "mocker",
     [
         mock_deployed_result(),

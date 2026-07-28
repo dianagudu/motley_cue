@@ -78,6 +78,18 @@ User = Endpoint(
         for child_url, child_resp, child_mapper_method in [
             ("/user/deploy", {"state": "", "message": "", "credentials": {}}, "deploy"),
             ("/user/get_status", {"state": "", "message": ""}, "get_status"),
+            (
+                "/user/status",
+                {
+                    "state": "",
+                    "message": "",
+                    "credentials": {},
+                    "username": "",
+                    "sub": "",
+                    "iss": "",
+                },
+                "get_full_status",
+            ),
             ("/user/suspend", {"state": "", "message": ""}, "suspend"),
             (
                 "/user/generate_otp",

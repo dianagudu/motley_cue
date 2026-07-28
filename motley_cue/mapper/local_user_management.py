@@ -103,6 +103,26 @@ class LocalUserManager:
             "verified": (local_username == username and username is not None),
         }
 
+    @staticmethod
+    def extract_username(status_result: dict):
+        """Best-effort extraction of the local username from a status result
+        (as returned by get_status/deploy). Prefers the 'ssh_user' field in the
+        credentials, and falls back to parsing it from the message (same
+        convention as verify_user). Returns None if no username can be found,
+        e.g. for a not-yet-deployed account.
+        """
+        credentials = status_result.get("credentials") or {}
+        username = credentials.get("ssh_user")
+        if username:
+            return username
+        state = status_result.get("state")
+        if state not in [States.not_deployed.name, States.unknown.name]:
+            message = status_result.get("message", "")
+            parts = message.split()
+            if len(parts) > 1:
+                return parts[1]
+        return None
+
     def _reach_state(self, userinfo, state_target: States):
         """Interface with the Feudal Adapter s.t. the local account of the OIDC user
         given by userinfo is put into the state "state_target".
