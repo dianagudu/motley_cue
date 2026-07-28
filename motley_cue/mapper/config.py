@@ -64,6 +64,11 @@ class Config:
         return self.CONFIG.authorisation
 
     @property
+    def assurance(self):
+        """Return assurance (shell-tier) configuration"""
+        return self.CONFIG.assurance
+
+    @property
     def log_file(self):
         """Return log file name"""
         return self.CONFIG.mapper.log_file
@@ -305,6 +310,34 @@ class ConfigOTP(ConfigSection):
 
 
 @dataclass
+class ConfigAssurance(ConfigSection):
+    """Config section for assurance-based shell tiers.
+
+    motley_cue evaluates each user's assurance claims against the tier
+    expressions (highest priority first: full, then limited, then restricted)
+    and passes the resulting tier to feudalAdapter, which maps it to a shell.
+
+    Tier expressions use the same boolean grammar as feudal's former
+    ``assurance.require``: ``E -> E "&" E | E "|" E | "(" E ")" | string``,
+    where ``&`` binds stronger than ``|``. A string is an absolute claim value
+    (if it starts with ``http[s]://``) or is interpreted relative to ``prefix``.
+    ``"+"`` matches if the user has any claim at all, ``"*"`` always matches.
+    """
+
+    prefix: str = "https://refeds.org/assurance/"
+    # claims whose values are unioned into the evaluated assurance set
+    claims: list = field(default_factory=lambda: ["eduperson_assurance", "acr"])
+    tier_full: str = ""
+    tier_limited: str = ""
+    tier_restricted: str = "*"
+    default_tier: str = "restricted"
+
+    @classmethod
+    def __section__name__(cls):
+        return "assurance"
+
+
+@dataclass
 class ConfigPrivacy(ConfigSection):
     """Config section for privacy policy."""
 
@@ -332,6 +365,9 @@ class ConfigOPAuthZ(ConfigSection):
     # admin authorisation
     authorised_admins: list = field(default_factory=list)
     authorise_admins_for_all_ops: bool = False
+    # assurance: optional per-OP cap on the shell tier (e.g. an OP that cannot
+    # assert MFA caps everyone at "limited"). Empty means no cap.
+    max_tier: str = ""
 
     def get_info(self) -> dict:
         """Returns a dict with the info for this OP"""
@@ -431,6 +467,7 @@ class Configuration:
     otp: ConfigOTP = field(default_factory=ConfigOTP)
     privacy: ConfigPrivacy = field(default_factory=ConfigPrivacy)
     authorisation: ConfigAuthorisation = field(default_factory=ConfigAuthorisation)
+    assurance: ConfigAssurance = field(default_factory=ConfigAssurance)
 
     @classmethod
     def load(cls, config: ConfigParser):

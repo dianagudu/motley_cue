@@ -1,5 +1,7 @@
 import pytest
 
+from ldf_adapter.results import Deployed
+
 from .utils import (
     mock_deployed_result,
     mock_exception,
@@ -185,6 +187,32 @@ def test_verify_user_fail(
 ):
     with pytest.raises(test_internal_server_error):
         test_local_user_manager_patched.verify_user({}, username)
+
+
+@pytest.mark.parametrize("shell_tier", ["full", "limited", "restricted", None])
+def test_deploy_passes_shell_tier(monkeypatch, shell_tier):
+    """The deploy data sent to feudalAdapter carries shell_tier when set,
+    and omits it when None (backward compatible)."""
+    captured = {}
+
+    class CapturingUser:
+        def __init__(self, data):
+            captured["data"] = data
+
+        def reach_state(self, target):
+            return Deployed(credentials={"ssh_user": "u"}, message="ok")
+
+    from motley_cue.mapper import local_user_management
+
+    monkeypatch.setattr(local_user_management, "User", CapturingUser)
+    lum = local_user_management.LocalUserManager()
+    lum.deploy({"sub": MOCK_SUB, "iss": MOCK_ISS}, shell_tier=shell_tier)
+
+    user_data = captured["data"]["user"]
+    if shell_tier is None:
+        assert "shell_tier" not in user_data
+    else:
+        assert user_data["shell_tier"] == shell_tier
 
 
 @pytest.mark.parametrize(

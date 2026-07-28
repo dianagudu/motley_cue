@@ -47,9 +47,13 @@ class LocalUserManager:
         # e.g. feudal config if the adapter would support it
         # or supported states, etc...
 
-    def deploy(self, userinfo):
-        """Deploys a local account for given userinfo"""
-        return self._reach_state(userinfo, States.deployed)
+    def deploy(self, userinfo, shell_tier=None):
+        """Deploys a local account for given userinfo.
+
+        shell_tier -- optional assurance-based shell tier (e.g. full/limited/
+        restricted) passed through to feudalAdapter, which maps it to a shell.
+        """
+        return self._reach_state(userinfo, States.deployed, shell_tier=shell_tier)
 
     def get_status(self, userinfo):
         """Gets the status of the local account corresponding given userinfo"""
@@ -123,9 +127,12 @@ class LocalUserManager:
                 return parts[1]
         return None
 
-    def _reach_state(self, userinfo, state_target: States):
+    def _reach_state(self, userinfo, state_target: States, shell_tier=None):
         """Interface with the Feudal Adapter s.t. the local account of the OIDC user
         given by userinfo is put into the state "state_target".
+
+        shell_tier -- optional assurance-based shell tier passed to feudalAdapter
+        (only meaningful when deploying); feudalAdapter maps it to a login shell.
         """
         if userinfo is None:
             logging.getLogger(__name__).error(
@@ -139,6 +146,8 @@ class LocalUserManager:
                 "userinfo": userinfo,
             },
         }
+        if shell_tier is not None:
+            data["user"]["shell_tier"] = shell_tier
         try:
             result = User(data).reach_state(data["state_target"])
         except ExceptionalResult as result:

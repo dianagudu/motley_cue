@@ -10,6 +10,7 @@ from fastapi.security import HTTPBearer
 from fastapi.responses import HTMLResponse
 
 from motley_cue.mapper.config import Config
+from motley_cue.mapper.assurance import AssuranceEvaluator
 from motley_cue.mapper.authorisation import Authorisation
 from motley_cue.mapper.local_user_management import LocalUserManager
 from motley_cue.mapper.exceptions import Unauthorised, NotFound
@@ -48,6 +49,7 @@ class Mapper:
         self.__user_security = HTTPBearer(description="OIDC Access Token")
         self.__admin_security = HTTPBearer(description="OIDC Access Token")
         self.__authorisation = Authorisation(self.__config)
+        self.__assurance = AssuranceEvaluator(self.__config.assurance)
         self.__lum = LocalUserManager()
         self.__token_manager = TokenManager.from_config(self.__config.otp)
 
@@ -130,11 +132,16 @@ class Mapper:
     def deploy(self, request: Request):
         """Deploy a local account for user identified by token.
         OIDC Access Token should be found in request headers.
+
+        The user's assurance claims are evaluated (per-OP) into a shell tier,
+        which is passed to the local user management / feudalAdapter.
         """
         user_infos = self.__authorisation.get_user_infos_from_request(request)
         if user_infos is None:
             raise Unauthorised(message="No user infos")
-        return self.__lum.deploy(user_infos.user_info)
+        op_authz = self.__config.authorisation.get_op_authz(user_infos)
+        shell_tier = self.__assurance.evaluate(user_infos, op_authz)
+        return self.__lum.deploy(user_infos.user_info, shell_tier=shell_tier)
 
     def get_status(self, request: Request):
         """Get the status of a local account corresponding to the user identified by token.
