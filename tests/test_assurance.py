@@ -141,8 +141,19 @@ def test_assurance_config_defaults():
     assurance = Config(load_config(CONFIG_BASE)).assurance
     assert assurance.prefix == "https://refeds.org/assurance/"
     assert assurance.claims == ["eduperson_assurance", "acr"]
-    assert assurance.tier_restricted == "*"
-    assert assurance.default_tier == "restricted"
+    # feature is opt-in: unset tier expressions + default_tier "full"
+    assert assurance.tier_full == ""
+    assert assurance.tier_limited == ""
+    assert assurance.tier_restricted == ""
+    assert assurance.default_tier == "full"
+
+
+def test_unconfigured_assurance_yields_full():
+    """With no [assurance] configuration every user resolves to the full tier
+    (backward compatible: feudalAdapter then uses its default shell)."""
+    ev = AssuranceEvaluator(Config(load_config(CONFIG_BASE)).assurance)
+    assert ev.evaluate(make_user_infos({})) == "full"
+    assert ev.evaluate(make_user_infos({"eduperson_assurance": [CAPPUCCINO]})) == "full"
 
 
 def test_assurance_config_loaded():

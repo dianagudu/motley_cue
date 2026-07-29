@@ -322,6 +322,12 @@ class ConfigAssurance(ConfigSection):
     where ``&`` binds stronger than ``|``. A string is an absolute claim value
     (if it starts with ``http[s]://``) or is interpreted relative to ``prefix``.
     ``"+"`` matches if the user has any claim at all, ``"*"`` always matches.
+
+    The feature is opt-in: with the defaults below (all tier expressions empty)
+    no expression matches, so every user resolves to ``default_tier`` = "full"
+    and feudalAdapter uses its default shell -- i.e. the same behaviour as before
+    assurance-based shells existed. Operators enable tiers by configuring the
+    ``tier_*`` expressions (typically with ``tier_restricted = *`` as a catch-all).
     """
 
     prefix: str = "https://refeds.org/assurance/"
@@ -329,8 +335,8 @@ class ConfigAssurance(ConfigSection):
     claims: list = field(default_factory=lambda: ["eduperson_assurance", "acr"])
     tier_full: str = ""
     tier_limited: str = ""
-    tier_restricted: str = "*"
-    default_tier: str = "restricted"
+    tier_restricted: str = ""
+    default_tier: str = "full"
 
     @classmethod
     def __section__name__(cls):
