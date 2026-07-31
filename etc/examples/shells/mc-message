@@ -1,0 +1,22 @@
+#!/bin/sh
+# motley_cue "restricted" assurance-tier login shell: show a message and exit.
+#
+# Assigned (via feudalAdapter's [backend.local_unix] shell_restricted) to users
+# whose assurance/MFA claims do not qualify them for an interactive shell.
+# It ignores any arguments (including `-c "<command>"` from a non-interactive
+# ssh), so it also blocks remote command execution -- it only ever prints the
+# message and exits.
+
+cat <<'MSG'
+==============================================================================
+  Login succeeded, but no interactive shell was granted.
+
+  This account did not meet the identity-assurance level required for shell
+  access on this host (for example: multi-factor authentication and/or a
+  sufficient REFEDS assurance profile were not asserted by your token).
+
+  If you believe this is an error, please contact the service administrators.
+==============================================================================
+MSG
+
+exit 0

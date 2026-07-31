@@ -1,0 +1,52 @@
+#!/bin/sh
+# motley_cue "limited" assurance-tier login shell: a minimal restricted shell
+# that permits only a safe whitelist of commands.
+#
+# Assigned (via feudalAdapter's [backend.local_unix] shell_limited) to users who
+# meet a partial assurance level (e.g. a REFEDS profile but no MFA). It supports
+# both interactive logins and non-interactive `ssh host <command>` (which sshd
+# runs as `mc-rbash -c "<command>"`); in both cases only whitelisted commands
+# with no shell metacharacters are allowed.
+#
+# NOTE: this is a deliberately simple, self-contained example. For production
+# you may prefer a hardened restricted shell (e.g. rbash with a curated PATH).
+
+ALLOWED="ls id whoami pwd echo cat date hostname uptime"
+
+run_line() {
+    _line=$1
+    # Reject anything that could chain, redirect, or expand into other commands.
+    case "$_line" in
+        *'|'* | *'&'* | *';'* | *'<'* | *'>'* | *'`'* | *'$'* | *'('* | *')'*)
+            printf 'limited-shell: shell metacharacters are not permitted\n' >&2
+            return 1
+            ;;
+    esac
+    # Intentional word splitting to separate the command from its arguments.
+    # shellcheck disable=SC2086
+    set -- $_line
+    [ "$#" -eq 0 ] && return 0
+    _cmd=$1
+    for _a in $ALLOWED; do
+        if [ "$_cmd" = "$_a" ]; then
+            command "$@"
+            return $?
+        fi
+    done
+    printf "limited-shell: '%s' is not permitted (allowed: %s)\n" "$_cmd" "$ALLOWED" >&2
+    return 127
+}
+
+# Non-interactive: `mc-rbash -c "<command>"`
+if [ "$1" = "-c" ]; then
+    run_line "$2"
+    exit $?
+fi
+
+# Interactive session
+printf 'Limited shell (assurance-restricted). Allowed commands: %s\n' "$ALLOWED"
+printf "Type 'exit' or press Ctrl-D to disconnect.\n"
+while printf 'limited$ ' && IFS= read -r _l; do
+    [ "$_l" = "exit" ] && break
+    run_line "$_l"
+done
