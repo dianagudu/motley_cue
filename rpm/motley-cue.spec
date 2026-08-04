@@ -120,8 +120,8 @@ make install DESTDIR=%{buildroot}
 
 mkdir -p %{buildroot}{%{etc_dir},%{log_dir},%{run_dir},%{share_dir}/selinux,%{lib_dir},%{cache_dir},/etc/nginx/conf.d,/etc/nginx/location.d,/etc/caddy/handlers,/lib/systemd/system,/usr/sbin,/etc/init.d}
 cp -r %{installroot}%{etc_dir}/* %{buildroot}%{etc_dir}/
-# data_files installs the example shells without the exec bit; restore it
-chmod 0755 %{buildroot}%{etc_dir}/examples/shells/mc-message %{buildroot}%{etc_dir}/examples/shells/mc-rbash
+# data_files installs the assurance-tier shells without the exec bit; restore it
+chmod 0755 %{buildroot}%{etc_dir}/shells/mc-message %{buildroot}%{etc_dir}/shells/mc-rbash
 install %{installroot}%{share_dir}/selinux/* %{buildroot}%{share_dir}/selinux/
 install %{installroot}/etc/nginx/location.d/motley_cue.nginx.conf %{buildroot}/etc/nginx/location.d/motley_cue.nginx.conf
 install %{installroot}/etc/caddy/handlers/motley_cue.caddy.conf %{buildroot}/etc/caddy/handlers/motley_cue.caddy.conf

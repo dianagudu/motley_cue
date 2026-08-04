@@ -5,6 +5,7 @@ etc/flaat.conf etc/motley_cue
 etc/nginx/motley_cue.nginx.conf etc/nginx/location.d
 etc/caddy/motley_cue.caddy.conf etc/caddy/handlers
 etc/privacystatement.md etc/motley_cue
+etc/shells etc/motley_cue
 etc/examples etc/motley_cue
 etc/bin/motley-cue usr/sbin
 etc/init.d/motley-cue etc/init.d
