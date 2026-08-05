@@ -49,7 +49,7 @@ class Mapper:
         self.__user_security = HTTPBearer(description="OIDC Access Token")
         self.__admin_security = HTTPBearer(description="OIDC Access Token")
         self.__authorisation = Authorisation(self.__config)
-        self.__assurance = AssuranceEvaluator(self.__config.assurance)
+        self.__assurance = AssuranceEvaluator(self.__config.authorisation)
         self.__lum = LocalUserManager()
         self.__token_manager = TokenManager.from_config(self.__config.otp)
 
@@ -139,8 +139,7 @@ class Mapper:
         user_infos = self.__authorisation.get_user_infos_from_request(request)
         if user_infos is None:
             raise Unauthorised(message="No user infos")
-        op_authz = self.__config.authorisation.get_op_authz(user_infos)
-        shell_tier = self.__assurance.evaluate(user_infos, op_authz)
+        shell_tier = self.__assurance.evaluate(user_infos)
         return self.__lum.deploy(user_infos.user_info, shell_tier=shell_tier)
 
     def get_status(self, request: Request):

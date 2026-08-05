@@ -98,6 +98,15 @@ Below, a configuration block for one OP with default values.
     ## list of authorised admins specified by OIDC 'sub'
     authorised_admins = []
 
+    ## assurance-based shell tiers (opt-in, see below)
+    assurance_prefix = https://refeds.org/assurance/
+    assurance_claims = [assurance, eduperson_assurance, acr]
+    assurance_based_shell_tier_full =
+    assurance_based_shell_tier_limited =
+    assurance_based_shell_tier_restricted =
+    assurance_based_shell_default_tier = full
+    assurance_based_shell_max_tier =
+
 - The section name has to start with ``authorisation.``
 - The OP URL must be specified
 - A VO must be specified as a string or an entitlement according to the AARC guideline `AARC-G002 <https://aarc-community.org/guidelines/aarc-g002>`_ (or `AARC-G069 <https://aarc-community.org/guidelines/aarc-g069>`_, once it is published)
@@ -110,6 +119,47 @@ Furthermore, you can also configure an **audience** for the service in order to 
 
   Most OPs do not support requesting a specific audience for access tokens, in which case this setting is ignored. So far, only IAM allows requesting the audience.
 
+.. _assurance-based shell tiers:
+
+Assurance-based shell tiers
+---------------------------
+
+motley_cue can give users a different login shell depending on the identity assurance their token asserts (according to the `REFEDS Assurance Framework <https://refeds.org/assurance>`_, including MFA). It classifies each deployment into a **tier** and passes that tier to the feudal adapter, which maps it to a shell.
+
+This does **not** reject anyone: every authorised user is still deployed, the tier only decides which shell they get.
+
++--------------------------------------+----------------+----------------------------------------------+
+| Signals                              | Tier           | feudal_adapter.conf ``[backend.local_unix]`` |
++======================================+================+==============================================+
+| MFA **and** ``profile/cappuccino``   | ``full``       | ``shell``                                    |
++--------------------------------------+----------------+----------------------------------------------+
+| ``profile/cappuccino``, no MFA       | ``limited``    | ``shell_limited``                            |
++--------------------------------------+----------------+----------------------------------------------+
+| neither                              | ``restricted`` | ``shell_restricted``                         |
++--------------------------------------+----------------+----------------------------------------------+
+
+The feature is **opt-in**: with no tier expression configured, every user resolves to ``full`` and gets the default shell, i.e. behaviour is unchanged. All options live in the authorisation sections, so they can be set once in ``[DEFAULT]`` and overridden for any individual OP -- which is the point, since OPs differ in what assurance they can actually assert.
+
+.. code-block:: ini
+
+    [DEFAULT]
+    assurance_based_shell_tier_full = https://refeds.org/profile/mfa & profile/cappuccino
+    assurance_based_shell_tier_limited = profile/cappuccino
+    assurance_based_shell_tier_restricted = *
+
+    [authorisation.google]
+    op_url = https://accounts.google.com/
+    ## this OP cannot assert MFA -- cap it, rather than restating the expressions
+    assurance_based_shell_max_tier = restricted
+
+The three ``assurance_based_shell_tier_*`` options hold **expressions**, evaluated highest privilege first; the first one that matches wins. The grammar is ``E -> E "&" E | E "|" E | "(" E ")" | string``, where ``&`` binds stronger than ``|``. A string matches if the user's assurance set contains it verbatim **or** prefixed with ``assurance_prefix``, so both full REFEDS URLs and bare values (such as an ``acr`` of ``1``) can be matched. ``+`` matches if the user has any assurance claim at all, and ``*`` always matches -- use it for ``assurance_based_shell_tier_restricted`` so that no user falls through unclassified.
+
+The remaining two options hold a **tier name** (``full``, ``limited`` or ``restricted``): ``assurance_based_shell_default_tier`` is used when no expression matches, and ``assurance_based_shell_max_tier`` caps the result. The cap can only ever lower a tier, never raise one.
+
+The assurance set itself is the union of the values of every claim in ``assurance_claims``, collected from **all** available sources: the userinfo endpoint, the access token body (when it is a JWT) and token introspection. Run motley_cue at ``log_level = DEBUG`` to see which claim was found in which source.
+
+A complete, working example -- along with two ready-made tier shells -- is installed under ``/etc/motley_cue/examples/``.
+
 .. _account creation:
 
 Account creation configuration
@@ -120,8 +170,8 @@ This is handled by the feudal adapter in ``feudal_adapter.conf`` (see the `docum
 Pay close attention to the following configurations:
 
 - **backend**: how are the users managed locally (e.g. local UNIX accounts, `LDAP <https://codebase.helmholtz.cloud/m-team/feudal/feudalAdapterLdf/-/blob/master/LDAP.md>`_, ...)
-- **assurance**: specifying minimum acceptable assurance (according to the `REFEDS Assurance Framework <https://refeds.org/assurance>`_)
 - **username generator**: how local usernames are generated for users (e.g. trying to honour incoming ``preferred username`` from the OP, or using pooled accounts with a custom prefix)
+- **shell**: the login shell given to new accounts, including the ``shell_limited`` and ``shell_restricted`` variants used by `assurance-based shell tiers`_
 
 An `approval workflow <https://codebase.helmholtz.cloud/m-team/feudal/feudalAdapterLdf/-/tree/master#approval-workflow>`_ is supported as well, where local admins can approve or reject account creation requests. The notification system supported so far is email.
 

@@ -5,15 +5,20 @@ This logic was formerly part of feudalAdapter (a single global
 which has the per-OP context and the full token (userinfo, access-token body,
 introspection). Instead of rejecting, the evaluation classifies each user into a
 shell *tier* that is passed to feudalAdapter, which maps it to a login shell.
+
+The policy is configured per OP, in the ``[authorisation.<op>]`` sections (with
+``[DEFAULT]`` supplying the values an OP does not override) -- see
+:class:`motley_cue.mapper.config.ConfigOPAuthZ`.
 """
 
 import logging
 import re
-from typing import Callable, Optional, Set
+from typing import Callable, Dict, Set
 
 from flaat.user_infos import UserInfos
 
-from motley_cue.mapper.config import ConfigAssurance, ConfigOPAuthZ
+from motley_cue.mapper.config import ConfigAuthorisation, ConfigOPAuthZ, canonical_url
+from motley_cue.mapper.exceptions import InternalException
 
 logger = logging.getLogger(__name__)
 
@@ -28,10 +33,12 @@ def parse_requirement(expression: str, prefix: str) -> Callable[[Set[str]], bool
     """Parse a boolean assurance expression into a predicate over a set of claim values.
 
     Grammar: ``E -> E "&" E | E "|" E | "(" E ")" | string``, where ``&`` binds
-    stronger than ``|``. A string is an absolute claim value (if it starts with
-    ``http[s]://``) or is interpreted relative to ``prefix``. ``"+"`` matches if
-    the user has any claim at all; ``"*"`` always matches. An empty expression
-    never matches.
+    stronger than ``|``. A string matches if the assurance set contains it
+    verbatim or expanded with ``prefix``; this makes both REFEDS-style URLs and
+    bare claim values (e.g. an ``acr`` of ``1``, or an ``amr`` of ``mfa``)
+    reachable. Absolute ``http[s]://`` strings are only matched verbatim.
+    ``"+"`` matches if the user has any claim at all; ``"*"`` always matches. An
+    empty expression never matches.
     """
     if not expression or expression.strip() == "":
         return lambda values: False
@@ -85,54 +92,77 @@ def parse_requirement(expression: str, prefix: str) -> Callable[[Set[str]], bool
             return lambda values: len(values) > 0
         if value == "*":
             return lambda values: True
-        value = value if re.match("https?://", value) else prefix + value
-        return lambda values: value in values
+        if re.match("https?://", value):
+            return lambda values: value in values
+        # a relative value matches verbatim or expanded with the prefix, so that
+        # non-REFEDS claim values (acr = 1, amr = mfa, ...) are reachable too
+        prefixed = prefix + value
+        return lambda values: value in values or prefixed in values
 
     return parse_expr(tokens)
 
 
-class AssuranceEvaluator:
-    """Classifies a user into a shell tier based on their assurance claims."""
+class _OPAssurance:
+    """Assurance policy of a single OP, with its tier expressions pre-parsed."""
 
-    def __init__(self, config: ConfigAssurance):
-        self._claims = config.claims
-        self._default_tier = config.default_tier
-        self._tier_reqs = {
-            "full": parse_requirement(config.tier_full, config.prefix),
-            "limited": parse_requirement(config.tier_limited, config.prefix),
-            "restricted": parse_requirement(config.tier_restricted, config.prefix),
+    def __init__(self, op_authz: ConfigOPAuthZ):
+        self._op_url = op_authz.op_url
+        self._claims = op_authz.assurance_claims
+        self._default_tier = op_authz.assurance_based_shell_default_tier
+        self._max_tier = op_authz.assurance_based_shell_max_tier
+        expressions = {
+            "full": op_authz.assurance_based_shell_tier_full,
+            "limited": op_authz.assurance_based_shell_tier_limited,
+            "restricted": op_authz.assurance_based_shell_tier_restricted,
         }
+        self._tier_reqs = {}
+        for tier, expression in expressions.items():
+            try:
+                self._tier_reqs[tier] = parse_requirement(expression, op_authz.assurance_prefix)
+            except ValueError as ex:
+                raise InternalException(
+                    f"Invalid assurance_based_shell_tier_{tier} for OP "
+                    f"'{op_authz.op_url}': {expression!r} ({ex})"
+                ) from ex
 
     def _assurance_set(self, user_infos: UserInfos) -> Set[str]:
         """Collect the union of all configured claim values from every available
-        token source (userinfo, access-token body, introspection)."""
+        token source (userinfo, access-token body, introspection).
+
+        This reads the three source dicts directly instead of going through
+        `UserInfos.get`, which returns only the first source that has the claim
+        and would hide values carried by the others.
+        """
         values: Set[str] = set()
         access_token_info = getattr(user_infos, "access_token_info", None)
         sources = [
-            getattr(user_infos, "user_info", None),
-            getattr(access_token_info, "body", None),
-            getattr(user_infos, "introspection_info", None),
+            ("user_info", getattr(user_infos, "user_info", None)),
+            ("access_token_info.body", getattr(access_token_info, "body", None)),
+            ("introspection_info", getattr(user_infos, "introspection_info", None)),
         ]
         for claim in self._claims:
-            for src in sources:
+            for source_name, src in sources:
                 if not src:
                     continue
                 val = src.get(claim)
                 if val is None:
                     continue
+                found: Set[str] = set()
                 if isinstance(val, str):
                     # a claim like `acr` may be a single value or a
                     # space-separated list of class references
-                    values.add(val)
-                    values.update(val.split())
+                    found.add(val)
+                    found.update(val.split())
                 elif isinstance(val, (list, tuple, set)):
-                    values.update(str(v) for v in val)
+                    found.update(str(v) for v in val)
                 else:
-                    values.add(str(val))
+                    found.add(str(val))
+                logger.debug("Assurance claim '%s' from %s: %s", claim, source_name, sorted(found))
+                values.update(found)
         return values
 
-    def evaluate(self, user_infos: UserInfos, op_authz: Optional[ConfigOPAuthZ] = None) -> str:
-        """Return the shell tier for the given user, optionally capped per-OP."""
+    def evaluate(self, user_infos: UserInfos) -> str:
+        """Return the shell tier for the given user."""
         values = self._assurance_set(user_infos)
         tier = self._default_tier
         for candidate in TIERS:
@@ -140,10 +170,14 @@ class AssuranceEvaluator:
             if req is not None and req(values):
                 tier = candidate
                 break
-        max_tier = getattr(op_authz, "max_tier", "") if op_authz is not None else ""
-        capped = self._cap(tier, max_tier)
+        capped = self._cap(tier, self._max_tier)
         if capped != tier:
-            logger.debug("Capping assurance tier %s to %s (per-OP max_tier)", tier, capped)
+            logger.debug(
+                "Capping assurance tier %s to %s (assurance_based_shell_max_tier of %s)",
+                tier,
+                capped,
+                self._op_url,
+            )
         logger.debug("Evaluated assurance tier: %s", capped)
         return capped
 
@@ -155,3 +189,28 @@ class AssuranceEvaluator:
         if TIERS.index(tier) < TIERS.index(max_tier):
             return max_tier
         return tier
+
+
+class AssuranceEvaluator:
+    """Classifies a user into a shell tier, using their OP's assurance policy.
+
+    All tier expressions are parsed once, at startup, per OP.
+    """
+
+    def __init__(self, authorisation: ConfigAuthorisation):
+        self._per_op: Dict[str, _OPAssurance] = {
+            op_key: _OPAssurance(op_authz)
+            for op_key, op_authz in authorisation.all_op_authz.items()
+        }
+        # for an OP without its own section; such a user is not authorised
+        # anyway, but this keeps the evaluation total
+        self._fallback = _OPAssurance(ConfigOPAuthZ())
+
+    def evaluate(self, user_infos: UserInfos) -> str:
+        """Return the shell tier for the given user, per their OP's policy."""
+        op_key = canonical_url(user_infos.issuer)
+        op_assurance = self._per_op.get(op_key)
+        if op_assurance is None:
+            logger.debug("No assurance configuration for OP %s, using defaults", op_key)
+            op_assurance = self._fallback
+        return op_assurance.evaluate(user_infos)

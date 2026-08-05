@@ -22,7 +22,8 @@ as a reference.
 
 ## Files
 
-- `motley_cue.assurance.conf` — motley_cue config with the `[assurance]` tiers enabled.
+- `motley_cue.assurance.conf` — motley_cue config with the shell tiers enabled: the
+  policy in `[DEFAULT]`, plus one OP overriding it.
 - `feudal_adapter.assurance.conf` — feudalAdapter config mapping each tier to a shell.
 
 The shells themselves live one level up, in `/etc/motley_cue/shells/`:
@@ -82,7 +83,8 @@ The SSH/mccli functional tests live in the sibling project
 `.gitlab-ci.yml`). To cover the *enabled* path there, that pipeline needs to:
 
 1. Point `MOTLEY_CUE_CONFIG` / `FEUDAL_ADAPTER_CONFIG` at these example files
-   (or splice the `[assurance]` and `[backend.local_unix]` blocks into the
+   (or splice the `assurance_based_shell_*` options and the `[backend.local_unix]`
+   block into the
    configs it already generates — e.g. via `contextualise_ssh_server`). The
    shells are installed by the package, so nothing extra needs copying.
 2. Provide (at least) two access tokens of differing assurance — one reaching

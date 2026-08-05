@@ -64,11 +64,6 @@ class Config:
         return self.CONFIG.authorisation
 
     @property
-    def assurance(self):
-        """Return assurance (shell-tier) configuration"""
-        return self.CONFIG.assurance
-
-    @property
     def log_file(self):
         """Return log file name"""
         return self.CONFIG.mapper.log_file
@@ -310,40 +305,6 @@ class ConfigOTP(ConfigSection):
 
 
 @dataclass
-class ConfigAssurance(ConfigSection):
-    """Config section for assurance-based shell tiers.
-
-    motley_cue evaluates each user's assurance claims against the tier
-    expressions (highest priority first: full, then limited, then restricted)
-    and passes the resulting tier to feudalAdapter, which maps it to a shell.
-
-    Tier expressions use the same boolean grammar as feudal's former
-    ``assurance.require``: ``E -> E "&" E | E "|" E | "(" E ")" | string``,
-    where ``&`` binds stronger than ``|``. A string is an absolute claim value
-    (if it starts with ``http[s]://``) or is interpreted relative to ``prefix``.
-    ``"+"`` matches if the user has any claim at all, ``"*"`` always matches.
-
-    The feature is opt-in: with the defaults below (all tier expressions empty)
-    no expression matches, so every user resolves to ``default_tier`` = "full"
-    and feudalAdapter uses its default shell -- i.e. the same behaviour as before
-    assurance-based shells existed. Operators enable tiers by configuring the
-    ``tier_*`` expressions (typically with ``tier_restricted = *`` as a catch-all).
-    """
-
-    prefix: str = "https://refeds.org/assurance/"
-    # claims whose values are unioned into the evaluated assurance set
-    claims: list = field(default_factory=lambda: ["eduperson_assurance", "acr"])
-    tier_full: str = ""
-    tier_limited: str = ""
-    tier_restricted: str = ""
-    default_tier: str = "full"
-
-    @classmethod
-    def __section__name__(cls):
-        return "assurance"
-
-
-@dataclass
 class ConfigPrivacy(ConfigSection):
     """Config section for privacy policy."""
 
@@ -357,7 +318,34 @@ class ConfigPrivacy(ConfigSection):
 
 @dataclass
 class ConfigOPAuthZ(ConfigSection):
-    """Config section for authorisation of one OP."""
+    """Config section for authorisation of one OP.
+
+    Loaded from one ``[authorisation.<op>]`` section, with ``[DEFAULT]``
+    supplying the values that section does not set. Every option below can
+    therefore be configured once globally and overridden per OP.
+
+    ASSURANCE-BASED SHELL TIERS
+    ---------------------------
+    motley_cue evaluates each user's assurance claims against the
+    ``assurance_based_shell_tier_*`` expressions (highest privilege first: full,
+    then limited, then restricted) and passes the resulting tier to
+    feudalAdapter, which maps it to a login shell.
+
+    The expressions use the boolean grammar inherited from feudal's former
+    ``assurance.require``: ``E -> E "&" E | E "|" E | "(" E ")" | string``,
+    where ``&`` binds stronger than ``|``. A string matches if the user's
+    assurance set contains it verbatim or prefixed with ``assurance_prefix``
+    (so both ``https://refeds.org/assurance/profile/cappuccino`` and a bare
+    ``acr`` value such as ``1`` are reachable). ``"+"`` matches if the user has
+    any assurance claim at all, ``"*"`` always matches.
+
+    The feature is opt-in: with the defaults below (all tier expressions empty)
+    no expression matches, so every user resolves to
+    ``assurance_based_shell_default_tier`` = "full" and feudalAdapter uses its
+    default shell -- i.e. the same behaviour as before assurance-based shells
+    existed. Operators enable tiers by configuring the expressions (typically
+    with ``assurance_based_shell_tier_restricted = *`` as a catch-all).
+    """
 
     op_url: str = ""
     scopes: list = field(default_factory=list)
@@ -371,9 +359,20 @@ class ConfigOPAuthZ(ConfigSection):
     # admin authorisation
     authorised_admins: list = field(default_factory=list)
     authorise_admins_for_all_ops: bool = False
-    # assurance: optional per-OP cap on the shell tier (e.g. an OP that cannot
-    # assert MFA caps everyone at "limited"). Empty means no cap.
-    max_tier: str = ""
+    # assurance-based shell tiers
+    assurance_prefix: str = "https://refeds.org/assurance/"
+    # claims whose values are unioned into the evaluated assurance set
+    assurance_claims: list = field(
+        default_factory=lambda: ["assurance", "eduperson_assurance", "acr"]
+    )
+    assurance_based_shell_tier_full: str = ""
+    assurance_based_shell_tier_limited: str = ""
+    assurance_based_shell_tier_restricted: str = ""
+    # tier used when no expression matches
+    assurance_based_shell_default_tier: str = "full"
+    # optional cap on the resulting tier (e.g. an OP that cannot assert MFA caps
+    # everyone at "limited"). Empty means no cap; it can only ever lower a tier.
+    assurance_based_shell_max_tier: str = ""
 
     def get_info(self) -> dict:
         """Returns a dict with the info for this OP"""
@@ -473,7 +472,6 @@ class Configuration:
     otp: ConfigOTP = field(default_factory=ConfigOTP)
     privacy: ConfigPrivacy = field(default_factory=ConfigPrivacy)
     authorisation: ConfigAuthorisation = field(default_factory=ConfigAuthorisation)
-    assurance: ConfigAssurance = field(default_factory=ConfigAssurance)
 
     @classmethod
     def load(cls, config: ConfigParser):
