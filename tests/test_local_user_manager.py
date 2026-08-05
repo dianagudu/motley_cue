@@ -215,6 +215,44 @@ def test_deploy_passes_shell_tier(monkeypatch, shell_tier):
         assert user_data["shell_tier"] == shell_tier
 
 
+def test_deploy_forwards_merged_userinfo(monkeypatch):
+    """Mapper.deploy hands feudalAdapter the claims merged from all token
+    sources, not just the userinfo endpoint."""
+    from flaat.access_tokens import AccessTokenInfo
+    from flaat.user_infos import UserInfos
+
+    from motley_cue.mapper import local_user_management
+    from motley_cue.mapper.authorisation import Authorisation
+
+    captured = {}
+
+    class CapturingUser:
+        def __init__(self, data):
+            captured["data"] = data
+
+        def reach_state(self, target):
+            return Deployed(credentials={"ssh_user": "u"}, message="ok")
+
+    monkeypatch.setattr(local_user_management, "User", CapturingUser)
+
+    user_infos = UserInfos(
+        access_token_info=AccessTokenInfo(
+            complete_decode={"payload": {"wlcg.groups": ["/wlcg"]}}, verification=None
+        ),
+        user_info={"sub": MOCK_SUB, "iss": MOCK_ISS},
+        introspection_info={"email": "user@example.org"},
+    )
+    lum = local_user_management.LocalUserManager()
+    lum.deploy(Authorisation.merged_userinfo(user_infos), shell_tier="full")
+
+    userinfo = captured["data"]["user"]["userinfo"]
+    assert userinfo["sub"] == MOCK_SUB
+    assert userinfo["iss"] == MOCK_ISS
+    # claims that only exist outside the userinfo endpoint now reach feudal
+    assert userinfo["wlcg.groups"] == ["/wlcg"]
+    assert userinfo["email"] == "user@example.org"
+
+
 @pytest.mark.parametrize(
     "status_result,expected",
     [

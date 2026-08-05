@@ -229,7 +229,13 @@ class Authorisation(Flaat):
             and user_infos.access_token_info is not None
         ):
             # HACK for wlcg OP: copy groups from AT body in 'wlcg.groups' claim
-            # to 'groups' claim in userinfo; also needed by feudalAdapter
+            # to 'groups' claim in userinfo; also needed by feudalAdapter.
+            # NOTE: merged_userinfo() below already surfaces 'wlcg.groups' to
+            # feudalAdapter, but that is not enough: feudal's `entitlement`
+            # falls back to 'wlcg.groups' and then fails to parse the plain
+            # paths as AARC-G002 URNs, ending up with no groups at all. It only
+            # picks them up from the 'groups' claim, so this copy is still
+            # required.
             wlcg_groups = user_infos.access_token_info.body.get("wlcg.groups", None)
             if wlcg_groups is not None:
                 if "groups" in user_infos.user_info:
@@ -239,6 +245,36 @@ class Authorisation(Flaat):
                 else:
                     user_infos.user_info["groups"] = wlcg_groups
         return user_infos
+
+    @staticmethod
+    def merged_userinfo(user_infos: UserInfos) -> dict:
+        """Flatten a (flaat) UserInfos into the single claim dict feudalAdapter expects.
+
+        A user's claims can arrive in any of three places -- the userinfo
+        endpoint, the access token body (when it is a JWT) and token
+        introspection -- and which one carries what differs per OP. feudalAdapter
+        is deliberately unaware of all this and just reads claims out of one
+        dict, so the merging happens here.
+
+        Precedence matches flaat's own `UserInfos.__getitem__` (user_info >
+        introspection_info > access_token_info.body), so feudalAdapter sees the
+        same value for a claim that authorisation did. Since `user_info` is
+        applied last, this can only ever *add* claims that were missing from it,
+        never change one that was already there.
+
+        Returns a new dict: `user_infos` is cached by flaat and shared between
+        requests using the same access token, so it must not be modified.
+        """
+        merged = {}
+        access_token_info = getattr(user_infos, "access_token_info", None)
+        for source in [
+            getattr(access_token_info, "body", None),
+            getattr(user_infos, "introspection_info", None),
+            getattr(user_infos, "user_info", None),
+        ]:
+            if source:
+                merged.update(source)
+        return merged
 
     def get_uid_from_request(self, request: Request):
         """Get a (flaat) UserInfos object from given request.

@@ -183,3 +183,86 @@ def test_get_uid_from_request_success(test_authorisation):
 def test_get_uid_from_request_fail(test_authorisation):
     assert test_authorisation.get_uid_from_request(request=MOCK_BAD_REQUEST) == None
     assert test_authorisation.get_uid_from_request(request=None) == None
+
+
+# ---------------------------------------------------------------------------
+# merged_userinfo: the claim dict handed to feudalAdapter
+# ---------------------------------------------------------------------------
+def _merged(user_info=None, at_body=None, introspection=None):
+    from flaat.access_tokens import AccessTokenInfo
+    from flaat.user_infos import UserInfos
+
+    from motley_cue.mapper.authorisation import Authorisation
+
+    access_token_info = None
+    if at_body is not None:
+        access_token_info = AccessTokenInfo(
+            complete_decode={"payload": at_body}, verification=None
+        )
+    user_infos = UserInfos(
+        access_token_info=access_token_info,
+        user_info=user_info,
+        introspection_info=introspection,
+    )
+    return Authorisation.merged_userinfo(user_infos), user_infos
+
+
+def test_merged_userinfo_collects_all_sources():
+    merged, _ = _merged(
+        user_info={"sub": MOCK_SUB, "iss": MOCK_ISS},
+        at_body={"wlcg.groups": ["/wlcg"]},
+        introspection={"email": "user@example.org"},
+    )
+    assert merged == {
+        "sub": MOCK_SUB,
+        "iss": MOCK_ISS,
+        "wlcg.groups": ["/wlcg"],
+        "email": "user@example.org",
+    }
+
+
+@pytest.mark.parametrize(
+    "at_body,introspection,expected",
+    [
+        # user_info always wins
+        ({"email": "at@x"}, {"email": "intro@x"}, "userinfo@x"),
+        ({"email": "at@x"}, None, "userinfo@x"),
+        (None, {"email": "intro@x"}, "userinfo@x"),
+    ],
+)
+def test_merged_userinfo_userinfo_wins(at_body, introspection, expected):
+    """Precedence follows flaat's UserInfos.__getitem__, so a claim already in
+    the userinfo endpoint is never overwritten by another source."""
+    merged, _ = _merged(
+        user_info={"sub": MOCK_SUB, "iss": MOCK_ISS, "email": "userinfo@x"},
+        at_body=at_body,
+        introspection=introspection,
+    )
+    assert merged["email"] == expected
+
+
+def test_merged_userinfo_introspection_beats_access_token():
+    merged, _ = _merged(
+        user_info={"sub": MOCK_SUB, "iss": MOCK_ISS},
+        at_body={"email": "at@x"},
+        introspection={"email": "intro@x"},
+    )
+    assert merged["email"] == "intro@x"
+
+
+def test_merged_userinfo_does_not_mutate_user_infos():
+    """flaat caches UserInfos per access token, so the merge must not write
+    back into the object it was built from."""
+    user_info = {"sub": MOCK_SUB, "iss": MOCK_ISS}
+    merged, user_infos = _merged(
+        user_info=user_info, at_body={"wlcg.groups": ["/wlcg"]}
+    )
+    assert "wlcg.groups" not in user_infos.user_info
+    assert user_infos.user_info == {"sub": MOCK_SUB, "iss": MOCK_ISS}
+    merged["injected"] = True
+    assert "injected" not in user_infos.user_info
+
+
+def test_merged_userinfo_handles_missing_sources():
+    merged, _ = _merged(user_info={"sub": MOCK_SUB, "iss": MOCK_ISS})
+    assert merged == {"sub": MOCK_SUB, "iss": MOCK_ISS}

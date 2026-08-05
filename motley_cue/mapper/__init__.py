@@ -134,13 +134,15 @@ class Mapper:
         OIDC Access Token should be found in request headers.
 
         The user's assurance claims are evaluated (per-OP) into a shell tier,
-        which is passed to the local user management / feudalAdapter.
+        which is passed to the local user management / feudalAdapter, together
+        with the user's claims merged from all available token sources.
         """
         user_infos = self.__authorisation.get_user_infos_from_request(request)
         if user_infos is None:
             raise Unauthorised(message="No user infos")
         shell_tier = self.__assurance.evaluate(user_infos)
-        return self.__lum.deploy(user_infos.user_info, shell_tier=shell_tier)
+        merged_userinfo = self.__authorisation.merged_userinfo(user_infos)
+        return self.__lum.deploy(merged_userinfo, shell_tier=shell_tier)
 
     def get_status(self, request: Request):
         """Get the status of a local account corresponding to the user identified by token.
