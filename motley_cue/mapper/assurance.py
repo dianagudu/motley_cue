@@ -17,6 +17,7 @@ from typing import Callable, Dict, Set
 
 from flaat.user_infos import UserInfos
 
+from motley_cue.logsetup import audit
 from motley_cue.mapper.config import ConfigAuthorisation, ConfigOPAuthZ, canonical_url
 from motley_cue.mapper.exceptions import InternalException
 
@@ -272,4 +273,13 @@ class AssuranceEvaluator:
         if op_assurance is None:
             logger.debug("No assurance configuration for OP %s, using defaults", op_key)
             op_assurance = self._fallback
-        return op_assurance.evaluate(user_infos)
+        tier = op_assurance.evaluate(user_infos)
+        # this decides the user's login shell, so record it whatever the log level
+        audit(
+            logger,
+            "Assurance tier '%s' for %s @ %s",
+            tier,
+            user_infos.subject,
+            user_infos.issuer,
+        )
+        return tier

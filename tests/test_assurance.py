@@ -1,8 +1,11 @@
+import logging
+
 import pytest
 
 from flaat.user_infos import UserInfos
 from flaat.access_tokens import AccessTokenInfo
 
+from motley_cue.logsetup import AUDIT, audit
 from motley_cue.mapper.assurance import AssuranceEvaluator, parse_requirement
 from motley_cue.mapper.config import Config, ConfigAuthorisation, ConfigOPAuthZ, canonical_url
 from motley_cue.mapper.exceptions import InternalException
@@ -530,3 +533,39 @@ assurance_based_shell_max_tier = limited
     assert op_authz.assurance_based_shell_tier_restricted == "*"
     assert op_authz.assurance_based_shell_default_tier == "restricted"
     assert op_authz.assurance_based_shell_max_tier == "limited"
+
+
+# ---------------------------------------------------------------------------
+# AUDIT level
+# ---------------------------------------------------------------------------
+def test_audit_record_survives_the_harshest_log_level(caplog):
+    """The tier decides the user's login shell, so it must be logged whatever
+    log_level is configured -- AUDIT sits above CRITICAL, which is the highest
+    level an operator can set."""
+    with caplog.at_level(logging.CRITICAL, logger="motley_cue.mapper.assurance"):
+        default_evaluator().evaluate(make_user_infos(HELMHOLTZ))
+    audit_records = [r for r in caplog.records if r.levelno == AUDIT]
+    assert len(audit_records) == 1
+    assert audit_records[0].levelname == "AUDIT"
+    assert "full" in audit_records[0].getMessage()
+    # ... while ordinary debug chatter at the same moment is not recorded
+    assert not [r for r in caplog.records if r.levelno == logging.DEBUG]
+
+
+def test_audit_record_is_attributed_to_its_caller():
+    """`stacklevel=2` must point the record at the calling module, not at the
+    audit() helper -- feudalAdapter's formatter prints pathname and lineno."""
+    log = logging.getLogger("test.audit.caller")
+    with pytest.MonkeyPatch.context():
+        records = []
+        handler = logging.Handler()
+        handler.emit = records.append  # pyright: ignore[reportAttributeAccessIssue]
+        log.addHandler(handler)
+        log.setLevel(logging.CRITICAL)
+        try:
+            audit(log, "hello")
+        finally:
+            log.removeHandler(handler)
+    assert len(records) == 1
+    assert records[0].filename == "test_assurance.py"
+    assert records[0].name == "test.audit.caller"
