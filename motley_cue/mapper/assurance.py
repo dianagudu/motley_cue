@@ -108,8 +108,6 @@ class _OPAssurance:
     def __init__(self, op_authz: ConfigOPAuthZ):
         self._op_url = op_authz.op_url
         self._claims = op_authz.assurance_claims
-        self._default_tier = op_authz.assurance_based_shell_default_tier
-        self._max_tier = op_authz.assurance_based_shell_max_tier
         expressions = {
             "full": op_authz.assurance_based_shell_tier_full,
             "limited": op_authz.assurance_based_shell_tier_limited,
@@ -124,6 +122,64 @@ class _OPAssurance:
                     f"Invalid assurance_based_shell_tier_{tier} for OP "
                     f"'{op_authz.op_url}': {expression!r} ({ex})"
                 ) from ex
+        # Is the feature switched on *for this OP*? Expressions set in [DEFAULT]
+        # are inherited by every OP, so a global policy enables all of them,
+        # while a policy on one [authorisation.<op>] section leaves the rest
+        # alone.
+        self._policy_configured = any(str(e).strip() for e in expressions.values())
+        # Validate the tier names. An unrecognised tier used to be ignored
+        # silently, which fails OPEN: a mistyped max_tier dropped the cap, and a
+        # mistyped default_tier was handed to feudalAdapter, which maps any
+        # unknown tier to its default (i.e. the *full*) shell. Both end in more
+        # privilege than the operator asked for, so refuse to start instead --
+        # consistent with how a malformed expression is handled.
+        self._default_tier = self._resolve_default_tier(
+            op_authz.assurance_based_shell_default_tier, op_authz.op_url
+        )
+        self._max_tier = self._validated_tier(
+            op_authz.assurance_based_shell_max_tier,
+            "assurance_based_shell_max_tier",
+            op_authz.op_url,
+            allow_empty=True,
+        )
+
+    def _resolve_default_tier(self, configured: str, op_url: str) -> str:
+        """The tier to use when no expression matches.
+
+        An explicit setting always wins. Left unset, it depends on whether this
+        OP has an assurance policy at all: without one the feature is off and
+        the tier is "full" (i.e. feudalAdapter's default shell, the behaviour
+        from before shell tiers existed); with one, it is the least privileged
+        tier, so that a policy which never matches cannot silently grant more
+        than the operator intended.
+        """
+        if configured is not None and configured != "":
+            return self._validated_tier(configured, "assurance_based_shell_default_tier", op_url)
+        if self._policy_configured:
+            logger.debug(
+                "No assurance_based_shell_default_tier for OP '%s'; a policy is "
+                "configured, so unmatched users get the least privileged tier '%s'",
+                op_url,
+                TIERS[-1],
+            )
+            return TIERS[-1]
+        return TIERS[0]
+
+    @staticmethod
+    def _validated_tier(tier: str, option: str, op_url: str, allow_empty: bool = False) -> str:
+        """Return `tier`, or raise if it is not one of TIERS.
+
+        `allow_empty` permits "" for options where empty means "unset".
+        """
+        if allow_empty and (tier is None or tier == ""):
+            return ""
+        if tier not in TIERS:
+            raise InternalException(
+                f"Invalid {option} for OP '{op_url}': {tier!r}. "
+                f"Must be one of {', '.join(TIERS)}"
+                f"{' (or empty)' if allow_empty else ''}."
+            )
+        return tier
 
     def _assurance_set(self, user_infos: UserInfos) -> Set[str]:
         """Collect the union of all configured claim values from every available
@@ -202,9 +258,12 @@ class AssuranceEvaluator:
             op_key: _OPAssurance(op_authz)
             for op_key, op_authz in authorisation.all_op_authz.items()
         }
-        # for an OP without its own section; such a user is not authorised
-        # anyway, but this keeps the evaluation total
-        self._fallback = _OPAssurance(ConfigOPAuthZ())
+        # For an OP without its own section. Such a user is not authorised
+        # anyway, but this keeps the evaluation total -- and it uses the
+        # operator's [DEFAULT] policy rather than the built-in defaults, so that
+        # a configured catch-all (assurance_based_shell_tier_restricted = *)
+        # also covers an unknown OP instead of silently granting "full".
+        self._fallback = _OPAssurance(authorisation.default_op_authz)
 
     def evaluate(self, user_infos: UserInfos) -> str:
         """Return the shell tier for the given user, per their OP's policy."""

@@ -4,8 +4,10 @@ from flaat.user_infos import UserInfos
 from flaat.access_tokens import AccessTokenInfo
 
 from motley_cue.mapper.assurance import AssuranceEvaluator, parse_requirement
-from motley_cue.mapper.config import Config, ConfigAuthorisation, ConfigOPAuthZ
+from motley_cue.mapper.config import Config, ConfigAuthorisation, ConfigOPAuthZ, canonical_url
 from motley_cue.mapper.exceptions import InternalException
+
+from .real_issuers import KIT, IRIS, HELMHOLTZ, EGI, ISSUERS
 
 from .configs import load_config, CONFIG_BASE
 from .utils import MOCK_ISS
@@ -21,11 +23,14 @@ def make_user_infos(user_info=None, at_body=None, introspection=None, iss=MOCK_I
     """Build a (flaat) UserInfos with the given claim sources."""
     access_token_info = None
     if at_body is not None:
-        access_token_info = AccessTokenInfo(
-            complete_decode={"payload": at_body}, verification=None
-        )
+        access_token_info = AccessTokenInfo(complete_decode={"payload": at_body}, verification=None)
     user_info = dict(user_info or {})
-    user_info.setdefault("iss", iss)
+    # NB: this *overrides* any `iss` the claims already carry. Real-world
+    # userinfos (see real_issuers.py) come with their own issuer; letting it
+    # through would make the evaluator miss the OP configured by
+    # `evaluator_for` and silently fall back to the built-in defaults, i.e.
+    # "full" -- so every test would pass for the wrong reason.
+    user_info["iss"] = iss
     return UserInfos(
         access_token_info=access_token_info,
         user_info=user_info,
@@ -117,6 +122,19 @@ def test_invalid_expression_fails_at_startup():
         ({}, "restricted"),
         # MFA but no profile -> neither full nor limited match -> fallback
         ({"acr": MFA}, "restricted"),
+        # real-world merged userinfos, against the policy in default_evaluator():
+        #   full      = <MFA> & profile/cappuccino
+        #   limited   = profile/cappuccino
+        #   restricted= *
+        # IRIS asserts MFA via acr, but only IAP/low -- no cappuccino profile,
+        # so `full` cannot match and neither can `limited`.
+        (IRIS, "restricted"),
+        # Helmholtz asserts both MFA and cappuccino.
+        (HELMHOLTZ, "full"),
+        # KIT asserts no REFEDS attributes at all (acr = "0").
+        (KIT, "restricted"),
+        # EGI asserts cappuccino but no MFA.
+        (EGI, "limited"),
     ],
 )
 def test_evaluate_matrix(user_info, expected):
@@ -199,9 +217,7 @@ assurance_based_shell_tier_restricted = *
 
 
 def config_with_two_ops(op2_extra: str = "") -> Config:
-    return Config(
-        load_config(
-            f"""
+    return Config(load_config(f"""
 {CONFIG_BASE}
 {ASSURANCE_DEFAULTS}
 
@@ -211,9 +227,7 @@ op_url = {MOCK_ISS}
 [authorisation.op2]
 op_url = {OTHER_ISS}
 {op2_extra}
-"""
-        )
-    )
+"""))
 
 
 def test_default_section_applies_to_every_op():
@@ -261,16 +275,31 @@ def test_op_overrides_claims_and_prefix():
     assert ev.evaluate(make_user_infos(claims, iss=OTHER_ISS)) == "restricted"
 
 
-def test_unknown_op_falls_back_to_defaults():
+def test_unknown_op_falls_back_to_configured_defaults():
     """A token from an OP without its own section (not authorised anyway) still
-    evaluates, using the built-in defaults -> full."""
+    evaluates, and it uses the operator's [DEFAULT] policy -- whose catch-all
+    `assurance_based_shell_tier_restricted = *` matches -> restricted."""
     ev = AssuranceEvaluator(config_with_two_ops().authorisation)
+    assert ev.evaluate(make_user_infos({}, iss="https://unknown.issuer/")) == "restricted"
+
+
+def test_unknown_op_without_configured_defaults_uses_builtin_defaults():
+    """With no assurance policy configured at all, the feature stays opt-out:
+    an unknown OP resolves to the built-in default tier."""
+    ev = AssuranceEvaluator(Config(load_config(CONFIG_BASE)).authorisation)
     assert ev.evaluate(make_user_infos({}, iss="https://unknown.issuer/")) == "full"
+
+
+def test_unknown_op_respects_default_max_tier():
+    """A cap set in [DEFAULT] also applies to an OP without its own section."""
+    config = Config(load_config(f"{CONFIG_BASE}assurance_based_shell_max_tier = limited\n"))
+    ev = AssuranceEvaluator(config.authorisation)
+    assert ev.evaluate(make_user_infos({}, iss="https://unknown.issuer/")) == "limited"
 
 
 @pytest.mark.parametrize(
     "max_tier,expected",
-    [("", "full"), ("limited", "limited"), ("restricted", "restricted"), ("bogus", "full")],
+    [("", "full"), ("limited", "limited"), ("restricted", "restricted")],
 )
 def test_max_tier_cap(max_tier, expected):
     ev = evaluator_for(
@@ -282,6 +311,155 @@ def test_max_tier_cap(max_tier, expected):
     )
     ui = make_user_infos({"eduperson_assurance": [CAPPUCCINO], "acr": MFA})
     assert ev.evaluate(ui) == expected
+
+
+# ---------------------------------------------------------------------------
+# Real issuers, evaluated under their own issuer URL (as in production)
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    "name,claims,expected",
+    [
+        ("IRIS", IRIS, "restricted"),
+        ("KIT", KIT, "restricted"),
+        ("HELMHOLTZ", HELMHOLTZ, "full"),
+        ("EGI", EGI, "limited"),
+    ],
+)
+def test_real_issuer_under_its_own_issuer_url(name, claims, expected):
+    """Same policy, but each OP configured under its real issuer URL, so the
+    per-OP lookup hits instead of falling back. This is the production path."""
+    op_url = ISSUERS[name]
+    ev = AssuranceEvaluator(
+        ConfigAuthorisation(
+            {
+                canonical_url(op_url): ConfigOPAuthZ(
+                    op_url=op_url,
+                    assurance_based_shell_tier_full=f"{MFA} & profile/cappuccino",
+                    assurance_based_shell_tier_limited="profile/cappuccino",
+                    assurance_based_shell_tier_restricted="*",
+                )
+            }
+        )
+    )
+    assert ev.evaluate(make_user_infos(claims, iss=op_url)) == expected
+
+
+def test_refeds_mfa_is_not_under_the_assurance_prefix():
+    """`https://refeds.org/profile/mfa` does NOT live under the default
+    assurance_prefix, so the relative token `profile/mfa` can never match it --
+    an expression written that way silently never fires. It must either be
+    given as an absolute URL, or the prefix must be widened.
+    """
+    relative = dict(
+        op_url=MOCK_ISS,
+        assurance_based_shell_tier_limited="profile/mfa",
+        assurance_based_shell_tier_restricted="*",
+    )
+    # with the default prefix (.../assurance/) the relative token cannot match
+    assert evaluator_for(**relative).evaluate(make_user_infos(IRIS)) == "restricted"
+    # widening the prefix to the refeds root makes it match
+    assert (
+        evaluator_for(assurance_prefix="https://refeds.org/", **relative).evaluate(
+            make_user_infos(IRIS)
+        )
+        == "limited"
+    )
+    # the absolute URL always works, whatever the prefix
+    assert (
+        evaluator_for(
+            op_url=MOCK_ISS,
+            assurance_based_shell_tier_limited=MFA,
+            assurance_based_shell_tier_restricted="*",
+        ).evaluate(make_user_infos(IRIS))
+        == "limited"
+    )
+
+
+@pytest.mark.parametrize("bad", ["bogus", "Limited", "LIMITED", "restrictd", "none"])
+def test_invalid_max_tier_fails_at_startup(bad):
+    """An unrecognised max_tier must not be ignored: doing so drops the cap and
+    hands the user MORE privilege than configured."""
+    with pytest.raises(InternalException) as excinfo:
+        evaluator_for(op_url=MOCK_ISS, assurance_based_shell_max_tier=bad)
+    assert "assurance_based_shell_max_tier" in str(excinfo.value)
+
+
+@pytest.mark.parametrize("bad", ["resticted", "Restricted", "nologin", "full "])
+def test_invalid_default_tier_fails_at_startup(bad):
+    """An unrecognised default_tier used to be passed to feudalAdapter verbatim,
+    which maps any unknown tier to its default (full) shell."""
+    with pytest.raises(InternalException) as excinfo:
+        evaluator_for(op_url=MOCK_ISS, assurance_based_shell_default_tier=bad)
+    assert "assurance_based_shell_default_tier" in str(excinfo.value)
+
+
+def test_invalid_tier_in_default_section_fails_at_startup():
+    """The same validation applies to the [DEFAULT] section."""
+    with pytest.raises(InternalException):
+        AssuranceEvaluator(
+            Config(
+                load_config(f"{CONFIG_BASE}assurance_based_shell_max_tier = bogus\n")
+            ).authorisation
+        )
+
+
+def test_default_tier_is_least_privileged_once_a_policy_exists():
+    """An OP with a policy whose expressions never match must NOT fall through
+    to "full". This is the MFA-prefix trap: `profile/mfa` expands to a URL no
+    provider asserts, so nothing matches."""
+    ev = evaluator_for(
+        op_url=MOCK_ISS,
+        # can never match: refeds MFA is not under the assurance prefix
+        assurance_based_shell_tier_full="profile/mfa",
+    )
+    assert ev.evaluate(make_user_infos(IRIS)) == "restricted"
+
+
+def test_explicit_default_tier_still_wins_over_the_automatic_one():
+    """An operator who deliberately wants fail-open can still say so."""
+    ev = evaluator_for(
+        op_url=MOCK_ISS,
+        assurance_based_shell_tier_full="profile/mfa",
+        assurance_based_shell_default_tier="full",
+    )
+    assert ev.evaluate(make_user_infos(IRIS)) == "full"
+
+
+def test_policy_on_one_op_does_not_affect_another():
+    """Configuring assurance for a single OP must leave the others alone."""
+    config = Config(load_config(f"""
+{CONFIG_BASE}
+[authorisation.op1]
+op_url = {MOCK_ISS}
+assurance_based_shell_tier_full = {MFA} & profile/cappuccino
+
+[authorisation.op2]
+op_url = {OTHER_ISS}
+"""))
+    ev = AssuranceEvaluator(config.authorisation)
+    # op1 has a policy: a user not matching it is NOT given a full shell
+    assert ev.evaluate(make_user_infos(IRIS, iss=MOCK_ISS)) == "restricted"
+    # op2 has none, so it is untouched -- feature stays off for it
+    assert ev.evaluate(make_user_infos(IRIS, iss=OTHER_ISS)) == "full"
+    assert ev.evaluate(make_user_infos(KIT, iss=OTHER_ISS)) == "full"
+
+
+def test_default_section_policy_applies_to_every_op_including_unknown():
+    """Anything set in [DEFAULT] applies to all OPs, configured or not."""
+    config = Config(load_config(f"""
+{CONFIG_BASE}
+assurance_based_shell_tier_full = {MFA} & profile/cappuccino
+
+[authorisation.op1]
+op_url = {MOCK_ISS}
+
+[authorisation.op2]
+op_url = {OTHER_ISS}
+"""))
+    ev = AssuranceEvaluator(config.authorisation)
+    for iss in (MOCK_ISS, OTHER_ISS, "https://unknown.issuer/"):
+        assert ev.evaluate(make_user_infos(HELMHOLTZ, iss=iss)) == "full"
+        assert ev.evaluate(make_user_infos(KIT, iss=iss)) == "restricted"
 
 
 def test_cap_never_raises_tier():
@@ -308,53 +486,47 @@ def test_assurance_config_defaults():
     op_authz = ConfigOPAuthZ()
     assert op_authz.assurance_prefix == "https://refeds.org/assurance/"
     assert op_authz.assurance_claims == ["assurance", "eduperson_assurance", "acr"]
-    # feature is opt-in: unset tier expressions + default tier "full"
+    # feature is opt-in: no tier expressions, and the default tier is left
+    # unset ("") so that it can be resolved per OP -- see
+    # test_default_tier_is_least_privileged_once_a_policy_exists
     assert op_authz.assurance_based_shell_tier_full == ""
     assert op_authz.assurance_based_shell_tier_limited == ""
     assert op_authz.assurance_based_shell_tier_restricted == ""
-    assert op_authz.assurance_based_shell_default_tier == "full"
+    assert op_authz.assurance_based_shell_default_tier == ""
     assert op_authz.assurance_based_shell_max_tier == ""
 
 
 def test_unconfigured_assurance_yields_full():
     """With no assurance configuration every user resolves to the full tier
     (backward compatible: feudalAdapter then uses its default shell)."""
-    config = Config(
-        load_config(
-            f"""
+    config = Config(load_config(f"""
 {CONFIG_BASE}
 [authorisation.op1]
 op_url = {MOCK_ISS}
-"""
-        )
-    )
+"""))
     ev = AssuranceEvaluator(config.authorisation)
     assert ev.evaluate(make_user_infos({})) == "full"
     assert ev.evaluate(make_user_infos({"eduperson_assurance": [CAPPUCCINO]})) == "full"
 
 
 def test_assurance_config_loaded():
-    config = Config(
-        load_config(
-            f"""
+    config = Config(load_config(f"""
 {CONFIG_BASE}
 [authorisation.op1]
 op_url = {MOCK_ISS}
 assurance_prefix = https://example.org/assurance/
 assurance_claims = [eduperson_assurance]
 assurance_based_shell_tier_full = {MFA} & profile/cappuccino
-assurance_based_shell_tier_limited = profile/cappuccino
+assurance_based_shell_tier_limited = {MFA} | profile/cappuccino 
 assurance_based_shell_tier_restricted = *
 assurance_based_shell_default_tier = restricted
 assurance_based_shell_max_tier = limited
-"""
-        )
-    )
+"""))
     op_authz = config.authorisation.all_op_authz["mock.issuer/oidc"]
     assert op_authz.assurance_prefix == "https://example.org/assurance/"
     assert op_authz.assurance_claims == ["eduperson_assurance"]
     assert op_authz.assurance_based_shell_tier_full == f"{MFA} & profile/cappuccino"
-    assert op_authz.assurance_based_shell_tier_limited == "profile/cappuccino"
+    assert op_authz.assurance_based_shell_tier_limited == f"{MFA} | profile/cappuccino"
     assert op_authz.assurance_based_shell_tier_restricted == "*"
     assert op_authz.assurance_based_shell_default_tier == "restricted"
     assert op_authz.assurance_based_shell_max_tier == "limited"

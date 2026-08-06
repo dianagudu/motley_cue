@@ -340,11 +340,19 @@ class ConfigOPAuthZ(ConfigSection):
     any assurance claim at all, ``"*"`` always matches.
 
     The feature is opt-in: with the defaults below (all tier expressions empty)
-    no expression matches, so every user resolves to
-    ``assurance_based_shell_default_tier`` = "full" and feudalAdapter uses its
-    default shell -- i.e. the same behaviour as before assurance-based shells
-    existed. Operators enable tiers by configuring the expressions (typically
-    with ``assurance_based_shell_tier_restricted = *`` as a catch-all).
+    no expression matches, so every user resolves to "full" and feudalAdapter
+    uses its default shell -- i.e. the same behaviour as before assurance-based
+    shells existed. Operators enable tiers by configuring the expressions
+    (typically with ``assurance_based_shell_tier_restricted = *`` as a
+    catch-all).
+
+    Enabling is per OP, and follows normal ``[DEFAULT]`` inheritance: a policy
+    in ``[DEFAULT]`` applies to every OP (including one with no section of its
+    own), while a policy in a single ``[authorisation.<op>]`` section leaves the
+    other OPs untouched. Once an OP *does* have a policy, a user matching none
+    of its expressions falls back to the least privileged tier rather than
+    "full", so an expression that can never match cannot silently grant a full
+    shell -- see ``assurance_based_shell_default_tier``.
     """
 
     op_url: str = ""
@@ -368,8 +376,14 @@ class ConfigOPAuthZ(ConfigSection):
     assurance_based_shell_tier_full: str = ""
     assurance_based_shell_tier_limited: str = ""
     assurance_based_shell_tier_restricted: str = ""
-    # tier used when no expression matches
-    assurance_based_shell_default_tier: str = "full"
+    # Tier used when no expression matches. Empty means "decide automatically",
+    # per OP: an OP with no tier expressions at all has the feature switched off
+    # and gets "full" (unchanged behaviour), while an OP that does have a policy
+    # falls back to the LEAST privileged tier -- otherwise an expression that
+    # never matches (a typo, or a relative token that cannot expand to anything
+    # a provider asserts) would silently hand out a full shell. Set it
+    # explicitly to override in either direction.
+    assurance_based_shell_default_tier: str = ""
     # optional cap on the resulting tier (e.g. an OP that cannot assert MFA caps
     # everyone at "limited"). Empty means no cap; it can only ever lower a tier.
     assurance_based_shell_max_tier: str = ""
@@ -436,6 +450,11 @@ class ConfigAuthorisation:
     """All authorisation configs for all supported OPs."""
 
     all_op_authz: Dict[str, ConfigOPAuthZ] = field(default_factory=dict)
+    # the bare [DEFAULT] section, i.e. the policy an OP inherits when it sets
+    # nothing itself. Kept separately so that code handling an OP *without* its
+    # own section (see AssuranceEvaluator) can apply the operator's defaults
+    # instead of the built-in ones.
+    default_op_authz: ConfigOPAuthZ = field(default_factory=ConfigOPAuthZ)
 
     @classmethod
     def load(cls, config: ConfigParser):
@@ -446,7 +465,8 @@ class ConfigAuthorisation:
             if section.startswith(f"{subsection_prefix}."):
                 op_config = ConfigOPAuthZ.load(config, section_name=section)
                 all_op_authz[canonical_url(op_config.op_url)] = op_config
-        return cls(all_op_authz)
+        # ConfigOPAuthZ does not override __section__name__, so this reads [DEFAULT]
+        return cls(all_op_authz, ConfigOPAuthZ.load(config))
 
     def to_dict(self) -> dict:
         """Converts the config to a dict"""
