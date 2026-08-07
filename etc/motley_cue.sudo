@@ -6,10 +6,16 @@
 ##         /etc/motley_cue/motley_cue.sudo /etc/sudoers.d/motley_cue
 ##     visudo -c -f /etc/sudoers.d/motley_cue      # always check before trusting it
 ##
-## This file is NOT installed automatically: the default deployment runs
-## motley_cue as root, where it is unnecessary. It is needed only when you switch
-## to the unprivileged unit (etc/examples/motley-cue-unprivileged.service) with
-## the local_unix backend, which also requires
+## The package ships this file to /etc/motley_cue/, where it does nothing. It is
+## deliberately NOT dropped straight into /etc/sudoers.d/: the default deployment
+## runs motley_cue as root and does not need these rules, so activating them on
+## every install would hand root-equivalent privileges to an account nothing uses
+## -- and a sudoers file that fails to parse breaks sudo for the whole host.
+## Copying it into place is therefore left to you, as a deliberate step.
+##
+## You need it only when switching to the unprivileged unit
+## (/etc/motley_cue/examples/motley-cue-unprivileged.service) with the local_unix
+## backend, which also requires
 ##
 ##     [backend.local_unix]
 ##     use_sudo = True
