@@ -285,15 +285,26 @@ class _OPAssurance:
             # actually carries is what makes that diagnosable. Names only, never
             # values -- those are the user's data, and the ones we care about are
             # logged individually above.
+            # The MERGED claim set is the thing to reason about: which of the
+            # three sources happens to carry a claim differs per OP and is not
+            # something a policy should care about (the same reason
+            # Authorisation.merged_userinfo exists for feudalAdapter). Report the
+            # union first, so a comparison between two tokens is a comparison of
+            # one list rather than of three.
+            merged_claims = set()
+            for _, src in sources:
+                if src:
+                    merged_claims.update(src)
+            logger.debug("MERGED claims available across all sources: %s", sorted(merged_claims))
             for source_name, src in sources:
                 if src is None:
-                    logger.debug("Assurance source %s: not present in this token", source_name)
+                    logger.debug("  (source %s: not present in this token)", source_name)
                 else:
-                    logger.debug("Assurance source %s carries claims: %s", source_name, sorted(src))
+                    logger.debug("  (source %s carries: %s)", source_name, sorted(src))
             missing = [claim for claim in self._claims if claim not in claims_found]
             if missing:
                 logger.debug(
-                    "Assurance claims configured but found in no source: %s "
+                    "Assurance claims configured but absent from the MERGED claim set: %s "
                     "(assurance_claims = %s for OP %s)",
                     missing,
                     self._claims,

@@ -658,7 +658,7 @@ def test_debug_lists_configured_claims_that_were_not_found(caplog):
         ev.evaluate(make_user_infos({"eduperson_assurance": [CAPPUCCINO]}))
     messages = "\n".join(r.getMessage() for r in caplog.records)
     assert "some_renamed_claim" in messages
-    assert "found in no source" in messages
+    assert "absent from the MERGED claim set" in messages
 
 
 def test_debug_lists_claim_names_present_in_the_token(caplog):
@@ -667,5 +667,5 @@ def test_debug_lists_claim_names_present_in_the_token(caplog):
     with caplog.at_level(logging.DEBUG, logger="motley_cue.mapper.assurance"):
         ev.evaluate(make_user_infos({"eduperson_assurance": [CAPPUCCINO], "acr": MFA}))
     messages = "\n".join(r.getMessage() for r in caplog.records)
-    assert "carries claims:" in messages
+    assert "MERGED claims available across all sources" in messages
     assert "eduperson_assurance" in messages
