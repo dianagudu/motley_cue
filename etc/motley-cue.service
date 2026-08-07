@@ -30,15 +30,17 @@ NoNewPrivileges=yes
 ## keyfile or token database, whatever [mapper.otp] is pointed at.
 PrivateTmp=yes
 PrivateDevices=yes
-## 'full' makes /usr, /boot AND /etc read-only. shadow-utils cannot work under
-## that -- useradd takes a lock file in /etc and rewrites passwd/shadow/group in
-## place, so it fails with "cannot lock /etc/passwd" -- hence /etc is handed
-## back explicitly below. /home, /var/log and /var/lib stay writable under
-## 'full' and need no entry.
-## If you switch the backend to ldap/bonsai_ldap/bwidm, no local account is
-## touched: drop the ReadWritePaths line and raise this to 'strict'.
-ProtectSystem=full
-ReadWritePaths=/etc
+## 'yes', NOT 'full': 'full' additionally mounts /etc read-only, and
+## shadow-utils cannot work under that -- useradd takes a lock file in /etc and
+## rewrites passwd/shadow/group in place, so it fails with
+##   useradd: cannot lock /etc/passwd; try again later
+## 'full' plus ReadWritePaths=/etc would also work, but 'yes' expresses the same
+## end state with one moving part instead of two. /usr and /boot -- where an
+## attacker would want to persist -- are read-only either way; /etc, /home,
+## /var/log and /var/lib stay writable and need no entry.
+## With the ldap/bonsai_ldap/bwidm backends no local account is touched, so
+## those deployments can raise this to 'strict' (see the unprivileged unit).
+ProtectSystem=yes
 ## Must stay off: home directories are created and populated here.
 ProtectHome=no
 ProtectKernelTunables=yes
