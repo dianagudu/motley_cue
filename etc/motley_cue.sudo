@@ -1,1 +1,77 @@
-motley_cue    ALL=(root) NOPASSWD: /usr/sbin/useradd, /usr/sbin/userdel, /usr/sbin/groupadd, /usr/bin/chage, /usr/bin/pkill, /usr/sbin/usermod
+## sudoers rules for running motley_cue unprivileged with the local_unix backend.
+##
+## Install as /etc/sudoers.d/motley_cue, mode 0440, root:root:
+##
+##     install -m0440 -o root -g root \
+##         /etc/motley_cue/motley_cue.sudo /etc/sudoers.d/motley_cue
+##     visudo -c -f /etc/sudoers.d/motley_cue      # always check before trusting it
+##
+## This file is NOT installed automatically: the default deployment runs
+## motley_cue as root, where it is unnecessary. It is needed only when you switch
+## to the unprivileged unit (etc/examples/motley-cue-unprivileged.service) with
+## the local_unix backend, which also requires
+##
+##     [backend.local_unix]
+##     use_sudo = True
+##
+## in feudal_adapter.conf. Without that setting feudalAdapter calls these
+## commands directly and they will fail for a non-root user.
+##
+## ---------------------------------------------------------------------------
+## READ THIS BEFORE ASSUMING IT CONTAINS THE BLAST RADIUS
+##
+## These rules bound *which binaries* run as root. They do not, and cannot,
+## bound what those binaries do. sudoers matches command arguments with
+## fnmatch(3), where a single `*` can span whitespace and therefore several
+## arguments -- so an argument pattern is not a reliable restriction, and this
+## file deliberately does not pretend otherwise by writing one.
+##
+## What that means concretely: an attacker who achieves code execution inside
+## motley_cue can still reach root through any of these, e.g.
+##
+##     useradd -o -u 0 -g 0 backdoor      # a second uid-0 account
+##     usermod -aG root <attacker>        # join the root group
+##     usermod -d /root -s /bin/bash nobody
+##     pkill -9 -f .                      # every process on the host
+##
+## So this is a real improvement over running the whole web application as root
+## -- the attacker now needs an extra step, and everything the service does
+## outside these seven commands is unprivileged -- but it is not a security
+## boundary. The boundary would be a small setuid helper that accepts a username
+## matching a strict pattern and nothing else, and calls shadow-utils itself.
+## Until that exists, treat this as defence in depth, not containment.
+##
+## Note also that the ldap, bonsai_ldap and bwidm backends need none of this:
+## they perform no local privileged operation at all, so with those backends the
+## unprivileged unit works with no sudoers rules whatsoever. Prefer that.
+## ---------------------------------------------------------------------------
+
+## Account and group management performed by feudalAdapter's local_unix backend
+## (ldf_adapter/backend/local_unix.py). Full paths only, so that a writable
+## directory earlier in PATH cannot substitute a binary.
+Cmnd_Alias MOTLEY_CUE_ACCOUNTS = /usr/sbin/useradd, \
+                                 /usr/sbin/usermod, \
+                                 /usr/sbin/userdel, \
+                                 /usr/sbin/groupadd, \
+                                 /usr/sbin/groupmod, \
+                                 /usr/bin/chage
+
+## Used on undeploy, to end sessions belonging to the account being removed.
+Cmnd_Alias MOTLEY_CUE_SESSIONS = /usr/bin/pkill
+
+## NOPASSWD is required: these run from a service with no terminal, and
+## feudalAdapter invokes sudo with -n so a password prompt fails fast.
+motley_cue ALL=(root) NOPASSWD: MOTLEY_CUE_ACCOUNTS, MOTLEY_CUE_SESSIONS
+
+## Keep the environment clean; the commands above need nothing from the caller.
+Defaults:motley_cue env_reset
+## No terminal, so do not demand one, and do not bother the log with lecture text.
+Defaults:motley_cue !requiretty
+Defaults:motley_cue !lecture
+
+## feudalAdapter invokes useradd/usermod/userdel/groupadd/groupmod/chage by bare
+## name, so sudo resolves them via its own secure_path. The distro default
+## already contains /usr/sbin on every target platform; if you have overridden
+## secure_path globally, make sure it still does, or those commands will not be
+## found. (secure_path is intentionally not set per-user here: older sudo only
+## accepts it as a global Defaults, and a rejected line invalidates the file.)

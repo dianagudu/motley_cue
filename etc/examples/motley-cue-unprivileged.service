@@ -1,0 +1,80 @@
+## Unprivileged drop-in for motley_cue.
+##
+## Use this INSTEAD of the shipped motley-cue.service to run the API as an
+## ordinary user rather than root.
+##
+## Common setup, for every backend:
+##     useradd --system --home-dir /var/lib/motley_cue --shell /usr/sbin/nologin motley_cue
+##     chown -R motley_cue:motley_cue /var/lib/motley_cue /var/log/motley_cue
+##     chmod 0700 /var/lib/motley_cue
+##     install -m644 /etc/motley_cue/examples/motley-cue-unprivileged.service \
+##             /etc/systemd/system/motley-cue.service
+##     systemctl daemon-reload && systemctl restart motley-cue
+##
+## /var/lib/motley_cue must end up owned by this user: motley_cue refuses to load
+## an OTP keyfile owned by anyone else.
+##
+## Then, depending on the feudalAdapter backend:
+##
+##   ldap / bonsai_ldap / bwidm
+##     Nothing further to do. These do all account management over the network
+##     and perform no local privileged operation, so the unit below runs with no
+##     capabilities and no sudo rules at all. This is the configuration to prefer.
+##
+##   local_unix
+##     Needs shadow-utils as root, so additionally:
+##       - install /etc/motley_cue/motley_cue.sudo as /etc/sudoers.d/motley_cue
+##         (read its header first -- it bounds which binaries run as root, not
+##         what they can do)
+##       - set  use_sudo = True  in [backend.local_unix] in feudal_adapter.conf
+##       - relax the confinement below: CapabilityBoundingSet must not be empty
+##         (sudo needs CAP_SETUID/CAP_SETGID), NoNewPrivileges must be removed
+##         entirely (it blocks setuid binaries, which is what sudo is), and
+##         ProtectSystem/ProtectHome must allow /etc and /home.
+##     Note that installing SSH keys into users' home directories
+##     (deploy_user_ssh_keys) still requires root and does NOT go through sudo.
+##     motley_cue never exercises that path -- it passes no credentials to
+##     feudalAdapter -- but a direct feudalAdapter caller would.
+
+[Unit]
+Description=motley_cue with gunicorn service (unprivileged)
+Before=nginx.service
+
+[Service]
+User=motley_cue
+Group=motley_cue
+RuntimeDirectory=motley_cue
+StateDirectory=motley_cue
+StateDirectoryMode=0700
+LogsDirectory=motley_cue
+WorkingDirectory=/usr/lib/motley-cue
+EnvironmentFile=/etc/motley_cue/motley_cue.env
+ExecStart=/usr/lib/motley-cue/bin/gunicorn motley_cue.api:api -k "uvicorn.workers.UvicornWorker" --config /usr/lib/motley-cue/etc/gunicorn/gunicorn.conf.py
+ExecReload=/bin/kill -s HUP $MAINPID
+
+## With no local account management to do, this can be confined much harder than
+## the root unit: no capabilities at all, and the whole filesystem read-only
+## apart from the service's own state and log directories.
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/motley_cue /var/log/motley_cue /run/motley_cue
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+ProtectHostname=yes
+ProtectClock=yes
+ProtectProc=invisible
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+LockPersonality=yes
+SystemCallArchitectures=native
+CapabilityBoundingSet=
+AmbientCapabilities=
+
+[Install]
+WantedBy=multi-user.target
