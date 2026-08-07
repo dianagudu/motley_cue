@@ -109,7 +109,7 @@ the creation, deletion, and information of a user-account.
 
 %prep
 %setup -q
-%patch -P 0 -p1
+# %patch -P 0 -p1
 
 %build
 
