@@ -167,6 +167,7 @@ class _OPAssurance:
     def __init__(self, op_authz: ConfigOPAuthZ):
         self._op_url = op_authz.op_url
         self._claims = op_authz.assurance_claims
+        self._prefix = op_authz.assurance_prefix
         expressions = {
             "full": op_authz.assurance_based_shell_tier_full,
             "limited": op_authz.assurance_based_shell_tier_limited,
@@ -312,6 +313,19 @@ class _OPAssurance:
         explainable at any log level -- not only when DEBUG happens to be on.
         """
         values = self._assurance_set(user_infos)
+        # State the inputs the expressions are resolved against. A stale prefix
+        # -- an old package, or an explicit setting left in a config file that
+        # upgrades do not touch -- makes every relative token expand to a URL no
+        # provider asserts, which fails closed with nothing else to show for it.
+        logger.debug(
+            "Assurance policy for OP %s: assurance_prefix=%r, assurance_claims=%s, "
+            "default_tier=%r, max_tier=%r",
+            self._op_url,
+            self._prefix,
+            self._claims,
+            self._default_tier,
+            self._max_tier or "<none>",
+        )
         tier = self._default_tier
         reason = ""
         for candidate in TIERS:
