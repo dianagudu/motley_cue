@@ -1,4 +1,5 @@
 from configparser import ConfigParser
+from io import StringIO
 from typing import Callable, Dict
 import pytest
 from starlette.testclient import TestClient
@@ -12,14 +13,43 @@ from .utils import (
 )
 
 
+def with_writable_otp_paths(config_file: ConfigParser, tmp_path) -> ConfigParser:
+    """Return a copy of `config_file` with [mapper.otp] pointed at tmp_path,
+    unless the test set those options itself.
+
+    The shipped defaults live under /var/lib/motley_cue, which only the service
+    user can create -- deliberately, since that directory holds the token
+    database and the key that decrypts the Access Tokens in it. Tests do not run
+    as that user, so give them somewhere writable instead of weakening the
+    default.
+
+    Returns a copy because the CONFIG_* parsers in configs.py are module-level
+    singletons shared by every test; mutating one here would leak these paths
+    into tests that assert on the defaults.
+    """
+    buffer = StringIO()
+    config_file.write(buffer)
+    config_copy = ConfigParser()
+    config_copy.read_string(buffer.getvalue())
+
+    if not config_copy.has_section("mapper.otp"):
+        config_copy.add_section("mapper.otp")
+    if not config_copy.has_option("mapper.otp", "keyfile"):
+        config_copy.set("mapper.otp", "keyfile", str(tmp_path / "motley_cue.key"))
+    if not config_copy.has_option("mapper.otp", "db_location"):
+        config_copy.set("mapper.otp", "db_location", str(tmp_path / "tokenmap.db"))
+    return config_copy
+
+
 @pytest.fixture()
 def test_api(
-    config_file, method_to_patch: str, callback: Callable[..., Dict], monkeypatch
+    config_file, method_to_patch: str, callback: Callable[..., Dict], monkeypatch, tmp_path
 ):
     with monkeypatch.context() as mp:
         # patch the config to return minimal config instead of reading through files
         from motley_cue.mapper import config
 
+        config_file = with_writable_otp_paths(config_file, tmp_path)
         mp.setattr(config.Config, "from_files", lambda x: config.Config(config_file))
 
         # monkeypatch global mapper to let all users through
@@ -69,9 +99,7 @@ def test_local_user_manager():
 
 
 @pytest.fixture()
-def test_local_user_manager_patched(
-    monkeypatch, mocker: Callable[[str, str], Callable]
-):
+def test_local_user_manager_patched(monkeypatch, mocker: Callable[[str, str], Callable]):
     with monkeypatch.context() as mp:
         # mock User class to only contain a mock reach_state method,
         # which returns a valid response, either successful or failed

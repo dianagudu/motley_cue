@@ -4,6 +4,7 @@ Module for managing one-time tokens and the (long) Access Tokens they are derive
 
 from abc import abstractmethod
 import os
+import stat
 from typing import Callable, Optional
 import hashlib
 import logging
@@ -32,10 +33,66 @@ class Encryption:
         self.fernet = Encryption.load_fernet(keyfile)
 
     @staticmethod
+    def _vet_keyfile(file_descriptor: int, keyfile: str) -> None:
+        """Refuse a key file that someone else could have planted or read.
+
+        This key decrypts every Access Token in the OTP database, so a key an
+        attacker was able to write is a key that lets them impersonate every
+        user of the service, and a key they could read is the same thing. Both
+        are worth refusing to start over -- a service that is down is a much
+        smaller problem than one silently using an attacker's key.
+
+        Checks are made against the already-open descriptor, so nothing can be
+        swapped between the check and the read.
+        """
+        info = os.fstat(file_descriptor)
+        if not stat.S_ISREG(info.st_mode):
+            raise InternalException(
+                message=f"Refusing to use the secret key in {keyfile}: not a regular file."
+            )
+        if info.st_uid != os.geteuid():
+            raise InternalException(
+                message=(
+                    f"Refusing to use the secret key in {keyfile}: it is owned by uid "
+                    f"{info.st_uid}, but this service runs as uid {os.geteuid()}. Whoever "
+                    "owns this file can read every Access Token in the OTP database."
+                )
+            )
+        if info.st_mode & 0o077:
+            raise InternalException(
+                message=(
+                    f"Refusing to use the secret key in {keyfile}: mode "
+                    f"{oct(info.st_mode & 0o777)} grants access to group or other. "
+                    f"Fix with: chmod 0400 {keyfile}"
+                )
+            )
+
+    @staticmethod
     def load_fernet(keyfile: str) -> Fernet:
-        """Loads a secret key from keyfile and returns a Fernet object."""
+        """Loads a secret key from keyfile and returns a Fernet object.
+
+        Opened with O_NOFOLLOW and vetted by `_vet_keyfile` before being
+        trusted: a symlink is never a key we put there ourselves.
+        """
         try:
-            key = open(keyfile, "rb").read()  # pylint: disable=consider-using-with
+            file_descriptor = os.open(keyfile, os.O_RDONLY | os.O_NOFOLLOW)
+        except OSError as ex:
+            logger.error("Could not open secret key in %s: %s", keyfile, ex)
+            raise InternalException(message=f"Could not open the secret key in {keyfile}") from ex
+        try:
+            Encryption._vet_keyfile(file_descriptor, keyfile)
+            with os.fdopen(file_descriptor, "rb") as key_file:
+                key = key_file.read()
+        except InternalException:
+            os.close(file_descriptor)
+            raise
+        except Exception as ex:
+            logger.error(
+                "Something went wrong when trying to load secret key in %s",
+                keyfile,
+            )
+            raise InternalException(message=f"Could not create secret key in {keyfile}") from ex
+        try:
             return Fernet(key)
         except Exception as ex:
             logger.error(
@@ -48,15 +105,32 @@ class Encryption:
     def create_key(keyfile: str) -> None:
         """Creates a fresh Fernet (secret) key and saves it to keyfile,
         only if key does not already exist. Sets appropriate permissions on keyfile.
+
+        O_EXCL|O_NOFOLLOW means we either create the file or lose the race --
+        never follow a symlink someone else planted at this path. open(2) applies
+        the mode itself, so unlike a chmod after the write there is no moment at
+        which the key sits on disk at the process umask.
         """
         try:
-            key = Fernet.generate_key()
             Path(keyfile).parent.mkdir(mode=0o700, parents=True, exist_ok=True)
-            open(keyfile, "xb").write(key)  # pylint: disable=consider-using-with
-            os.chmod(keyfile, 0o400)
-            logger.debug("Created secret key for encryption and saved it to %s.", keyfile)
+            file_descriptor = os.open(
+                keyfile, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW, 0o400
+            )
         except FileExistsError:
             logger.debug("Key already exists in %s, nothing to do here.", keyfile)
+            return
+        except Exception as ex:
+            logger.error(
+                "Something went wrong when trying to create secret key in %s",
+                keyfile,
+            )
+            raise InternalException(message=f"Could not create secret key in {keyfile}") from ex
+        try:
+            # belt and braces: the umask could have cleared bits from the mode above
+            os.fchmod(file_descriptor, 0o400)
+            with os.fdopen(file_descriptor, "wb") as key_file:
+                key_file.write(Fernet.generate_key())
+            logger.debug("Created secret key for encryption and saved it to %s.", keyfile)
         except Exception as ex:
             logger.error(
                 "Something went wrong when trying to create secret key in %s",

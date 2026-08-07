@@ -4,6 +4,10 @@
 
 case "$1" in
     configure|triggered|reconfigure)
+        # Holds the OTP token database and the key that decrypts the Access
+        # Tokens stored in it, so it must not be readable by anyone else.
+        # dh_installdirs creates it 0755; tighten it here.
+        [ -d /var/lib/motley_cue ] && chmod 0700 /var/lib/motley_cue || true
         systemctl enable motley-cue || update-rc.d motley-cue defaults || true
         systemctl restart motley-cue || service motley-cue restart || /etc/init.d/motley-cue restart || true
         # FIXME: Consider caddy here, too

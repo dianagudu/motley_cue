@@ -34,11 +34,54 @@ def test_encryption_keyfile_exists(test_encryption):
 
     key = Fernet.generate_key()
     open(keyfile, "wb").write(key)
+    os.chmod(keyfile, 0o400)
 
     encryption = test_encryption(keyfile)
     assert secret == encryption.decrypt(encryption.encrypt(secret))
 
     os.remove(keyfile)
+
+
+@pytest.mark.parametrize("mode", [0o444, 0o440, 0o600 | 0o004, 0o777])
+def test_encryption_refuses_keyfile_readable_by_others(test_encryption, mode):
+    """A key readable by group or other decrypts every Access Token in the OTP
+    database, so loading it must fail loudly rather than silently succeed."""
+    keyfile = "tmp_keyfile"
+    open(keyfile, "wb").write(Fernet.generate_key())
+    os.chmod(keyfile, mode)
+
+    with pytest.raises(Exception) as excinfo:
+        _ = test_encryption(keyfile)
+    assert "group or other" in str(excinfo.value)
+
+    os.remove(keyfile)
+
+
+def test_encryption_refuses_symlinked_keyfile(test_encryption, tmp_path):
+    """The keyfile is opened O_NOFOLLOW: a symlink at that path was planted by
+    someone else, since we only ever create the key with O_EXCL."""
+    real_key = tmp_path / "planted.key"
+    real_key.write_bytes(Fernet.generate_key())
+    real_key.chmod(0o400)
+    keyfile = str(tmp_path / "tmp_keyfile")
+    os.symlink(real_key, keyfile)
+
+    with pytest.raises(Exception):
+        _ = test_encryption(keyfile)
+
+
+def test_encryption_does_not_adopt_a_pre_created_key(test_encryption, tmp_path):
+    """The /tmp attack: a local user plants a key of their choosing before the
+    service first starts. create_key must not silently adopt it -- here it is
+    left world-readable, which is what makes the planting detectable."""
+    keyfile = str(tmp_path / "tmp_keyfile")
+    attacker_key = Fernet.generate_key()
+    with open(keyfile, "wb") as f:
+        f.write(attacker_key)
+    os.chmod(keyfile, 0o666)
+
+    with pytest.raises(Exception):
+        _ = test_encryption(keyfile)
 
 
 def test_encryption_keyfile_exists_not_a_key(test_encryption):
@@ -119,9 +162,7 @@ async def test_token_manager_inject_token_replace_otp(test_token_manager):
         return {"request_token": request_token, "header_token": header_token}
 
     test_token_manager.generate_otp(MOCK_TOKEN)
-    result = await mock_func(
-        request=MOCK_OTP_REQUEST, header=MOCK_OTP_HEADERS["Authorization"]
-    )
+    result = await mock_func(request=MOCK_OTP_REQUEST, header=MOCK_OTP_HEADERS["Authorization"])
     assert result["request_token"] == MOCK_TOKEN
     assert result["header_token"] == MOCK_TOKEN
 

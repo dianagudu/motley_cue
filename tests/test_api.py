@@ -13,6 +13,7 @@ from .utils import (
 from .utils import MOCK_HEADERS, MOCK_ISS
 from .configs import CONFIGS_AUTHENTICATED_USERS, CONFIG_NOT_SUPPORTED
 from .configs import CONFIG_DOC_ENABLED, CONFIG_CUSTOM_DOC, CONFIG_INVALID_CUSTOM_DOC
+from .conftest import with_writable_otp_paths
 
 
 @pytest.mark.parametrize(
@@ -46,9 +47,7 @@ def test_public_endpoints_no_patch(test_api, endpoint):
 @pytest.mark.parametrize("method_to_patch,callback", [("", Info.callback_valid)])
 def test_info_endpoint(test_api, supported_ops):
     response = test_api.get(Info.url)
-    assert [
-        url.rstrip("/") for url in response.json()["supported_OPs"]
-    ] == supported_ops
+    assert [url.rstrip("/") for url in response.json()["supported_OPs"]] == supported_ops
 
 
 @pytest.mark.parametrize(
@@ -159,11 +158,14 @@ def test_doc_apis(test_api, doc_url):
 
 
 @pytest.mark.parametrize("config_file", [CONFIG_INVALID_CUSTOM_DOC])
-def test_api_invalid_config(config_file, monkeypatch):
+def test_api_invalid_config(config_file, monkeypatch, tmp_path):
     with monkeypatch.context() as mp:
         # patch the config to return minimal config instead of reading through files
         from motley_cue.mapper import config
 
+        # the OTP keyfile is created before Settings are validated, so it needs a
+        # writable location or we never reach the ValidationError under test
+        config_file = with_writable_otp_paths(config_file, tmp_path)
         mp.setattr(config.Config, "from_files", lambda x: config.Config(config_file))
 
         with pytest.raises(ValidationError):

@@ -296,8 +296,12 @@ class ConfigOTP(ConfigSection):
 
     use_otp: bool = True
     backend: str = "memory"
-    db_location: str = "/tmp/tokenmap.db"
-    keyfile: str = "/tmp/motley_cue.key"
+    # NOT /tmp: the database holds users' Access Tokens and the keyfile decrypts
+    # them, so a world-writable directory means any local user can plant a key of
+    # their choosing before first start and then read every token. /var/lib is
+    # created 0700 and owned by the service (see debian/rules, rpm spec).
+    db_location: str = "/var/lib/motley_cue/tokenmap.db"
+    keyfile: str = "/var/lib/motley_cue/motley_cue.key"
 
     @classmethod
     def __section__name__(cls):
