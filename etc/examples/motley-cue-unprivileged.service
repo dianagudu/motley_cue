@@ -30,7 +30,9 @@
 ##       - relax the confinement below: CapabilityBoundingSet must not be empty
 ##         (sudo needs CAP_SETUID/CAP_SETGID), NoNewPrivileges must be removed
 ##         entirely (it blocks setuid binaries, which is what sudo is), and
-##         ProtectSystem/ProtectHome must allow /etc and /home.
+##         ProtectSystem must be lowered to 'full' with ReadWritePaths=/etc
+##         (shadow-utils locks and rewrites files there, and fails with
+##         "cannot lock /etc/passwd" otherwise) plus ProtectHome=no.
 ##     Note that installing SSH keys into users' home directories
 ##     (deploy_user_ssh_keys) still requires root and does NOT go through sudo.
 ##     motley_cue never exercises that path -- it passes no credentials to
@@ -49,6 +51,8 @@ StateDirectoryMode=0700
 LogsDirectory=motley_cue
 WorkingDirectory=/usr/lib/motley-cue
 EnvironmentFile=/etc/motley_cue/motley_cue.env
+## Tag journal lines as motley-cue rather than the executable name, gunicorn.
+SyslogIdentifier=motley-cue
 ExecStart=/usr/lib/motley-cue/bin/gunicorn motley_cue.api:api -k "uvicorn.workers.UvicornWorker" --config /usr/lib/motley-cue/etc/gunicorn/gunicorn.conf.py
 ExecReload=/bin/kill -s HUP $MAINPID
 
@@ -70,7 +74,10 @@ ProtectProc=invisible
 RestrictNamespaces=yes
 RestrictRealtime=yes
 RestrictSUIDSGID=yes
-RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+## AF_NETLINK is required: glibc's getaddrinfo() opens a netlink socket to
+## enumerate local interfaces, so DNS lookups (OIDC discovery, introspection,
+## LDAP) can fail without it.
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
 LockPersonality=yes
 SystemCallArchitectures=native
 CapabilityBoundingSet=

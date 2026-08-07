@@ -8,13 +8,16 @@ Before=nginx.service
 ## users' home directories with chown(2). None of that works unprivileged, and
 ## nothing here goes through sudo. If you use the ldap, bonsai_ldap or bwidm
 ## backend, no local privileged operation happens at all -- see
-## motley-cue-unprivileged.service.example for a drop-in that runs as its own
-## user. This is an internet-facing API, so prefer that whenever you can.
+## /etc/motley_cue/examples/motley-cue-unprivileged.service for a drop-in that
+## runs as its own user. This is an internet-facing API, so prefer that.
 User=root
 Group=root
 RuntimeDirectory=motley_cue
 WorkingDirectory=/usr/lib/motley-cue
 EnvironmentFile=/etc/motley_cue/motley_cue.env
+## Without this the journal tags every line with the executable name, so the
+## service's own log lines show up as "gunicorn[1234]:".
+SyslogIdentifier=motley-cue
 ExecStart=/usr/lib/motley-cue/bin/gunicorn motley_cue.api:api -k "uvicorn.workers.UvicornWorker" --config /usr/lib/motley-cue/etc/gunicorn/gunicorn.conf.py
 ExecReload=/bin/kill -s HUP $MAINPID
 
@@ -27,13 +30,15 @@ NoNewPrivileges=yes
 ## keyfile or token database, whatever [mapper.otp] is pointed at.
 PrivateTmp=yes
 PrivateDevices=yes
-## 'full' rather than 'strict': /usr and /boot become read-only, but /etc stays
-## writable, which shadow-utils requires (it takes lock files in /etc, and
-## rewrites passwd/shadow/group in place). 'strict' would need an explicit
-## ReadWritePaths covering /etc, /home, /var/log, /var/lib and the mail spool,
-## which is easy to get subtly wrong -- test it on a scratch host before
-## switching.
+## 'full' makes /usr, /boot AND /etc read-only. shadow-utils cannot work under
+## that -- useradd takes a lock file in /etc and rewrites passwd/shadow/group in
+## place, so it fails with "cannot lock /etc/passwd" -- hence /etc is handed
+## back explicitly below. /home, /var/log and /var/lib stay writable under
+## 'full' and need no entry.
+## If you switch the backend to ldap/bonsai_ldap/bwidm, no local account is
+## touched: drop the ReadWritePaths line and raise this to 'strict'.
 ProtectSystem=full
+ReadWritePaths=/etc
 ## Must stay off: home directories are created and populated here.
 ProtectHome=no
 ProtectKernelTunables=yes
@@ -44,7 +49,10 @@ ProtectClock=yes
 RestrictNamespaces=yes
 RestrictRealtime=yes
 RestrictSUIDSGID=yes
-RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+## AF_NETLINK is required: glibc's getaddrinfo() opens a netlink socket to
+## enumerate local interfaces, so DNS lookups (OIDC discovery, introspection,
+## LDAP) can fail without it.
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
 LockPersonality=yes
 SystemCallArchitectures=native
 ## Only what account provisioning actually needs: chown/mode changes on new home
