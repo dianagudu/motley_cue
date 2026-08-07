@@ -368,7 +368,11 @@ class ConfigOPAuthZ(ConfigSection):
     authorised_admins: list = field(default_factory=list)
     authorise_admins_for_all_ops: bool = False
     # assurance-based shell tiers
-    assurance_prefix: str = "https://refeds.org/assurance/"
+    # The refeds *root*, not the /assurance/ subtree: the REFEDS MFA profile is
+    # https://refeds.org/profile/mfa, which does not live under /assurance/. A
+    # prefix of the subtree would leave `profile/mfa` expanding to a URL no OP
+    # ever asserts, so MFA could only be matched as an absolute URL.
+    assurance_prefix: str = "https://refeds.org"
     # claims whose values are unioned into the evaluated assurance set
     assurance_claims: list = field(
         default_factory=lambda: ["assurance", "eduperson_assurance", "acr"]

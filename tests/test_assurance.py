@@ -15,7 +15,7 @@ from .real_issuers import KIT, IRIS, HELMHOLTZ, EGI, ISSUERS
 from .configs import load_config, CONFIG_BASE
 from .utils import MOCK_ISS
 
-PREFIX = "https://refeds.org/assurance/"
+PREFIX = "https://refeds.org/"
 MFA = "https://refeds.org/profile/mfa"
 CAPPUCCINO = "https://refeds.org/assurance/profile/cappuccino"
 
@@ -51,8 +51,8 @@ def evaluator_for(**op_kwargs) -> AssuranceEvaluator:
 def default_evaluator() -> AssuranceEvaluator:
     return evaluator_for(
         op_url=MOCK_ISS,
-        assurance_based_shell_tier_full=f"{MFA} & profile/cappuccino",
-        assurance_based_shell_tier_limited="profile/cappuccino",
+        assurance_based_shell_tier_full=f"{MFA} & assurance/profile/cappuccino",
+        assurance_based_shell_tier_limited="assurance/profile/cappuccino",
         assurance_based_shell_tier_restricted="*",
     )
 
@@ -64,8 +64,8 @@ def default_evaluator() -> AssuranceEvaluator:
     "expr,values,expected",
     [
         # relative claim expanded with prefix
-        ("profile/cappuccino", {CAPPUCCINO}, True),
-        ("profile/cappuccino", set(), False),
+        ("assurance/profile/cappuccino", {CAPPUCCINO}, True),
+        ("assurance/profile/cappuccino", set(), False),
         # absolute URL kept as-is
         (MFA, {MFA}, True),
         (MFA, {CAPPUCCINO}, False),
@@ -78,13 +78,17 @@ def default_evaluator() -> AssuranceEvaluator:
         # an absolute token is NOT matched by a bare value of the same name
         (MFA, {"mfa"}, False),
         # conjunction / disjunction / precedence
-        (f"{MFA} & profile/cappuccino", {MFA, CAPPUCCINO}, True),
-        (f"{MFA} & profile/cappuccino", {CAPPUCCINO}, False),
-        (f"{MFA} | profile/cappuccino", {CAPPUCCINO}, True),
+        (f"{MFA} & assurance/profile/cappuccino", {MFA, CAPPUCCINO}, True),
+        (f"{MFA} & assurance/profile/cappuccino", {CAPPUCCINO}, False),
+        (f"{MFA} | assurance/profile/cappuccino", {CAPPUCCINO}, True),
         # '&' binds stronger than '|'
-        (f"{MFA} & profile/cappuccino | profile/cappuccino", {CAPPUCCINO}, True),
+        (
+            f"{MFA} & assurance/profile/cappuccino | assurance/profile/cappuccino",
+            {CAPPUCCINO},
+            True,
+        ),
         # parentheses
-        (f"{MFA} & (profile/cappuccino | profile/espresso)", {MFA, CAPPUCCINO}, True),
+        (f"{MFA} & (assurance/profile/cappuccino | profile/espresso)", {MFA, CAPPUCCINO}, True),
         # special tokens
         ("+", {CAPPUCCINO}, True),
         ("+", set(), False),
@@ -126,8 +130,8 @@ def test_invalid_expression_fails_at_startup():
         # MFA but no profile -> neither full nor limited match -> fallback
         ({"acr": MFA}, "restricted"),
         # real-world merged userinfos, against the policy in default_evaluator():
-        #   full      = <MFA> & profile/cappuccino
-        #   limited   = profile/cappuccino
+        #   full      = <MFA> & assurance/profile/cappuccino
+        #   limited   = assurance/profile/cappuccino
         #   restricted= *
         # IRIS asserts MFA via acr, but only IAP/low -- no cappuccino profile,
         # so `full` cannot match and neither can `limited`.
@@ -213,8 +217,8 @@ def test_same_claim_in_several_sources_is_unioned():
 # Per-OP policy: [DEFAULT] inheritance and overrides
 # ---------------------------------------------------------------------------
 ASSURANCE_DEFAULTS = f"""
-assurance_based_shell_tier_full = {MFA} & profile/cappuccino
-assurance_based_shell_tier_limited = profile/cappuccino
+assurance_based_shell_tier_full = {MFA} & assurance/profile/cappuccino
+assurance_based_shell_tier_limited = assurance/profile/cappuccino
 assurance_based_shell_tier_restricted = *
 """
 
@@ -237,7 +241,7 @@ def test_default_section_applies_to_every_op():
     """An OP that sets no assurance option at all inherits the [DEFAULT] one."""
     config = config_with_two_ops()
     for op_authz in config.authorisation.all_op_authz.values():
-        assert op_authz.assurance_based_shell_tier_full == f"{MFA} & profile/cappuccino"
+        assert op_authz.assurance_based_shell_tier_full == f"{MFA} & assurance/profile/cappuccino"
 
     ev = AssuranceEvaluator(config.authorisation)
     claims = {"eduperson_assurance": [CAPPUCCINO], "acr": MFA}
@@ -307,8 +311,8 @@ def test_unknown_op_respects_default_max_tier():
 def test_max_tier_cap(max_tier, expected):
     ev = evaluator_for(
         op_url=MOCK_ISS,
-        assurance_based_shell_tier_full=f"{MFA} & profile/cappuccino",
-        assurance_based_shell_tier_limited="profile/cappuccino",
+        assurance_based_shell_tier_full=f"{MFA} & assurance/profile/cappuccino",
+        assurance_based_shell_tier_limited="assurance/profile/cappuccino",
         assurance_based_shell_tier_restricted="*",
         assurance_based_shell_max_tier=max_tier,
     )
@@ -337,8 +341,8 @@ def test_real_issuer_under_its_own_issuer_url(name, claims, expected):
             {
                 canonical_url(op_url): ConfigOPAuthZ(
                     op_url=op_url,
-                    assurance_based_shell_tier_full=f"{MFA} & profile/cappuccino",
-                    assurance_based_shell_tier_limited="profile/cappuccino",
+                    assurance_based_shell_tier_full=f"{MFA} & assurance/profile/cappuccino",
+                    assurance_based_shell_tier_limited="assurance/profile/cappuccino",
                     assurance_based_shell_tier_restricted="*",
                 )
             }
@@ -347,25 +351,29 @@ def test_real_issuer_under_its_own_issuer_url(name, claims, expected):
     assert ev.evaluate(make_user_infos(claims, iss=op_url)) == expected
 
 
-def test_refeds_mfa_is_not_under_the_assurance_prefix():
-    """`https://refeds.org/profile/mfa` does NOT live under the default
-    assurance_prefix, so the relative token `profile/mfa` can never match it --
-    an expression written that way silently never fires. It must either be
-    given as an absolute URL, or the prefix must be widened.
+def test_refeds_mfa_is_reachable_relatively_under_the_default_prefix():
+    """`https://refeds.org/profile/mfa` does not live under `/assurance/`, which
+    is why the default assurance_prefix is the refeds ROOT: the relative token
+    `profile/mfa` has to resolve, or an expression written that way would
+    silently never fire.
+
+    The flip side is that narrowing the prefix breaks it again -- a relative
+    token that no longer resolves expands to a URL no provider asserts and fails
+    closed, without complaining.
     """
     relative = dict(
         op_url=MOCK_ISS,
         assurance_based_shell_tier_limited="profile/mfa",
         assurance_based_shell_tier_restricted="*",
     )
-    # with the default prefix (.../assurance/) the relative token cannot match
-    assert evaluator_for(**relative).evaluate(make_user_infos(IRIS)) == "restricted"
-    # widening the prefix to the refeds root makes it match
+    # with the default prefix (the refeds root) the relative token resolves
+    assert evaluator_for(**relative).evaluate(make_user_infos(IRIS)) == "limited"
+    # narrowing the prefix to the /assurance/ subtree makes it unmatchable again
     assert (
-        evaluator_for(assurance_prefix="https://refeds.org/", **relative).evaluate(
+        evaluator_for(assurance_prefix="https://refeds.org/assurance/", **relative).evaluate(
             make_user_infos(IRIS)
         )
-        == "limited"
+        == "restricted"
     )
     # the absolute URL always works, whatever the prefix
     assert (
@@ -408,12 +416,11 @@ def test_invalid_tier_in_default_section_fails_at_startup():
 
 def test_default_tier_is_least_privileged_once_a_policy_exists():
     """An OP with a policy whose expressions never match must NOT fall through
-    to "full". This is the MFA-prefix trap: `profile/mfa` expands to a URL no
-    provider asserts, so nothing matches."""
+    to "full"."""
     ev = evaluator_for(
         op_url=MOCK_ISS,
-        # can never match: refeds MFA is not under the assurance prefix
-        assurance_based_shell_tier_full="profile/mfa",
+        # cannot match: IRIS asserts MFA and IAP/low, but no cappuccino profile
+        assurance_based_shell_tier_full="assurance/profile/cappuccino",
     )
     assert ev.evaluate(make_user_infos(IRIS)) == "restricted"
 
@@ -422,7 +429,7 @@ def test_explicit_default_tier_still_wins_over_the_automatic_one():
     """An operator who deliberately wants fail-open can still say so."""
     ev = evaluator_for(
         op_url=MOCK_ISS,
-        assurance_based_shell_tier_full="profile/mfa",
+        assurance_based_shell_tier_full="assurance/profile/cappuccino",
         assurance_based_shell_default_tier="full",
     )
     assert ev.evaluate(make_user_infos(IRIS)) == "full"
@@ -434,7 +441,7 @@ def test_policy_on_one_op_does_not_affect_another():
 {CONFIG_BASE}
 [authorisation.op1]
 op_url = {MOCK_ISS}
-assurance_based_shell_tier_full = {MFA} & profile/cappuccino
+assurance_based_shell_tier_full = {MFA} & assurance/profile/cappuccino
 
 [authorisation.op2]
 op_url = {OTHER_ISS}
@@ -451,7 +458,7 @@ def test_default_section_policy_applies_to_every_op_including_unknown():
     """Anything set in [DEFAULT] applies to all OPs, configured or not."""
     config = Config(load_config(f"""
 {CONFIG_BASE}
-assurance_based_shell_tier_full = {MFA} & profile/cappuccino
+assurance_based_shell_tier_full = {MFA} & assurance/profile/cappuccino
 
 [authorisation.op1]
 op_url = {MOCK_ISS}
@@ -469,8 +476,8 @@ def test_cap_never_raises_tier():
     # a user who only qualifies for limited is not raised to full by max_tier=full
     ev = evaluator_for(
         op_url=MOCK_ISS,
-        assurance_based_shell_tier_full=f"{MFA} & profile/cappuccino",
-        assurance_based_shell_tier_limited="profile/cappuccino",
+        assurance_based_shell_tier_full=f"{MFA} & assurance/profile/cappuccino",
+        assurance_based_shell_tier_limited="assurance/profile/cappuccino",
         assurance_based_shell_tier_restricted="*",
         assurance_based_shell_max_tier="full",
     )
@@ -487,7 +494,7 @@ def test_default_tier_when_no_expression_matches():
 # ---------------------------------------------------------------------------
 def test_assurance_config_defaults():
     op_authz = ConfigOPAuthZ()
-    assert op_authz.assurance_prefix == "https://refeds.org/assurance/"
+    assert op_authz.assurance_prefix == "https://refeds.org"
     assert op_authz.assurance_claims == ["assurance", "eduperson_assurance", "acr"]
     # feature is opt-in: no tier expressions, and the default tier is left
     # unset ("") so that it can be resolved per OP -- see
@@ -519,8 +526,8 @@ def test_assurance_config_loaded():
 op_url = {MOCK_ISS}
 assurance_prefix = https://example.org/assurance/
 assurance_claims = [eduperson_assurance]
-assurance_based_shell_tier_full = {MFA} & profile/cappuccino
-assurance_based_shell_tier_limited = {MFA} | profile/cappuccino 
+assurance_based_shell_tier_full = {MFA} & assurance/profile/cappuccino
+assurance_based_shell_tier_limited = {MFA} | assurance/profile/cappuccino 
 assurance_based_shell_tier_restricted = *
 assurance_based_shell_default_tier = restricted
 assurance_based_shell_max_tier = limited
@@ -528,8 +535,8 @@ assurance_based_shell_max_tier = limited
     op_authz = config.authorisation.all_op_authz["mock.issuer/oidc"]
     assert op_authz.assurance_prefix == "https://example.org/assurance/"
     assert op_authz.assurance_claims == ["eduperson_assurance"]
-    assert op_authz.assurance_based_shell_tier_full == f"{MFA} & profile/cappuccino"
-    assert op_authz.assurance_based_shell_tier_limited == f"{MFA} | profile/cappuccino"
+    assert op_authz.assurance_based_shell_tier_full == f"{MFA} & assurance/profile/cappuccino"
+    assert op_authz.assurance_based_shell_tier_limited == f"{MFA} | assurance/profile/cappuccino"
     assert op_authz.assurance_based_shell_tier_restricted == "*"
     assert op_authz.assurance_based_shell_default_tier == "restricted"
     assert op_authz.assurance_based_shell_max_tier == "limited"

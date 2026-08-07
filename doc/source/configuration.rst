@@ -99,7 +99,7 @@ Below, a configuration block for one OP with default values.
     authorised_admins = []
 
     ## assurance-based shell tiers (opt-in, see below)
-    assurance_prefix = https://refeds.org/assurance/
+    assurance_prefix = https://refeds.org
     assurance_claims = [assurance, eduperson_assurance, acr]
     assurance_based_shell_tier_full =
     assurance_based_shell_tier_limited =
@@ -143,8 +143,8 @@ The feature is **opt-in**: with no tier expression configured, every user resolv
 .. code-block:: ini
 
     [DEFAULT]
-    assurance_based_shell_tier_full = https://refeds.org/profile/mfa & profile/cappuccino
-    assurance_based_shell_tier_limited = profile/cappuccino
+    assurance_based_shell_tier_full = https://refeds.org/profile/mfa & assurance/profile/cappuccino
+    assurance_based_shell_tier_limited = assurance/profile/cappuccino
     assurance_based_shell_tier_restricted = *
 
     [authorisation.google]
@@ -152,7 +152,7 @@ The feature is **opt-in**: with no tier expression configured, every user resolv
     ## this OP cannot assert MFA -- cap it, rather than restating the expressions
     assurance_based_shell_max_tier = restricted
 
-The three ``assurance_based_shell_tier_*`` options hold **expressions**, evaluated highest privilege first; the first one that matches wins. The grammar is ``E -> E "&" E | E "|" E | "(" E ")" | string``, where ``&`` binds stronger than ``|``. A string matches if the user's assurance set contains it verbatim **or** prefixed with ``assurance_prefix``, so both full REFEDS URLs and bare values (such as an ``acr`` of ``1``) can be matched. ``+`` matches if the user has any assurance claim at all, and ``*`` always matches -- use it for ``assurance_based_shell_tier_restricted`` so that no user falls through unclassified.
+The three ``assurance_based_shell_tier_*`` options hold **expressions**, evaluated highest privilege first; the first one that matches wins. The grammar is ``E -> E "&" E | E "|" E | "(" E ")" | string``, where ``&`` binds stronger than ``|``. A string matches if the user's assurance set contains it verbatim **or** prefixed with ``assurance_prefix``, so both full REFEDS URLs and bare values (such as an ``acr`` of ``1``) can be matched. ``assurance_prefix`` defaults to the REFEDS *root*, ``https://refeds.org``, because the RAF profiles live under ``/assurance/`` while MFA does not -- a prefix of the ``/assurance/`` subtree alone would leave ``profile/mfa`` expanding to a URL no OP asserts. Note that a relative token which does not resolve never matches and fails silently, so if you narrow ``assurance_prefix``, re-check every expression; an absolute URL always works whatever the prefix. ``+`` matches if the user has any assurance claim at all, and ``*`` always matches -- use it for ``assurance_based_shell_tier_restricted`` so that no user falls through unclassified.
 
 The remaining two options hold a **tier name** (``full``, ``limited`` or ``restricted``): ``assurance_based_shell_default_tier`` is used when no expression matches, and ``assurance_based_shell_max_tier`` caps the result. The cap can only ever lower a tier, never raise one.
 
