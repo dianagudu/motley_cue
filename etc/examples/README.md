@@ -8,8 +8,8 @@ which shell they get.
 
 | Signals (evaluated in motley_cue)   | Tier         | Shell                              |
 |-------------------------------------|--------------|------------------------------------|
-| MFA **and** `profile/cappuccino`    | `full`       | `/bin/bash`                        |
-| `profile/cappuccino`, no MFA        | `limited`    | `/etc/motley_cue/shells/mc-rbash`  |
+| MFA **and** cappuccino              | `full`       | `/bin/bash`                        |
+| cappuccino, no MFA                  | `limited`    | `/etc/motley_cue/shells/mc-rbash`  |
 | neither                             | `restricted` | `/etc/motley_cue/shells/mc-message`|
 
 The two tier shells are shipped as part of the package in
@@ -93,3 +93,22 @@ The SSH/mccli functional tests live in the sibling project
 
 Those token fixtures and assertions must be added in `test-ssh-oidc`; this
 directory provides the configuration they consume.
+
+## If everyone lands in `restricted`
+
+Relative tokens are resolved against `assurance_prefix`, which defaults to the
+REFEDS **root** (`https://refeds.org`). So the cappuccino profile has to be
+written `assurance/profile/cappuccino` — it lives under `/assurance/`, while
+MFA (`profile/mfa`) does not. A relative token that does not resolve expands to
+a URL no provider asserts and then silently never matches, dropping every user
+to the fallback tier.
+
+If you wrote a policy before the prefix defaulted to the root, it will still say
+`profile/cappuccino`, and your config file is preserved across package upgrades
+— so the shipped example changing does not change yours. Set
+`log_level = DEBUG` in `[mapper]` and look for the per-token verdict:
+
+```
+Tier 'limited' ... no match | expression: profile/cappuccino |
+  'profile/cappuccino' = False (tried 'profile/cappuccino' and 'https://refeds.org/profile/cappuccino')
+```
