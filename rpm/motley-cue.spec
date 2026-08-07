@@ -6,8 +6,8 @@ Summary: Mapper Oidc To Local idEntitY with loCal User managEment
 License: MIT
 URL: https://github.com/dianagudu/motley_cue
 Source0: motley-cue.tar.gz
-Patch0: logfiles.patch
-Patch1: otp.patch
+# Patch0: logfiles.patch
+# Patch1: otp.patch
 AutoReq: no
 
 # OpenSUSE likes to have a Group
@@ -136,7 +136,9 @@ install %{installroot}/etc/init.d/motley-cue %{buildroot}/etc/init.d/
 %dir %{etc_dir}
 %dir %{log_dir}
 %dir %{run_dir}
-%dir %{lib_dir}
+## 0700: holds the OTP token database and the key that decrypts the Access
+## Tokens in it -- see [mapper.otp] in motley_cue.conf
+%attr(0700,root,root) %dir %{lib_dir}
 %dir %{cache_dir}
 %if 0%{?centos}
 %dir %{share_dir}
