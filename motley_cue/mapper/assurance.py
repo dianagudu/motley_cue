@@ -13,7 +13,7 @@ The policy is configured per OP, in the ``[authorisation.<op>]`` sections (with
 
 import logging
 import re
-from typing import Callable, Dict, Set
+from typing import Callable, Dict, Set, Tuple
 
 from flaat.user_infos import UserInfos
 
@@ -30,6 +30,56 @@ TIERS = ["full", "limited", "restricted"]
 _TOKEN_RE = re.compile(r"&|\||\(|\)|[^\s()&|]+")
 
 
+class _Expression:
+    """A parsed assurance expression.
+
+    Callable exactly like the bare predicate it replaced -- ``expr(values)``
+    returns a bool -- but it also keeps the atoms it was built from, so the
+    evaluator can report which individual tokens were looked for and which of
+    them the user actually had.
+
+    That matters because a tier which fails to match is otherwise completely
+    opaque: the only observable output is the tier that came out at the end,
+    with no indication of whether the expression was wrong, the claim was
+    missing, or the OP simply renamed something.
+    """
+
+    def __init__(self, source: str, predicate, atoms):
+        self.source = source
+        self._predicate = predicate
+        # (token, expanded_form_or_None), in the order written
+        self.atoms = atoms
+
+    def __call__(self, values: Set[str]) -> bool:
+        return self._predicate(values)
+
+    def explain(self, values: Set[str]) -> str:
+        """Per-token breakdown of this expression against `values`, for logging.
+
+        Shows both forms a relative token was tried as, which is the usual
+        surprise: `profile/cappuccino` does not resolve under an
+        assurance_prefix of the REFEDS root, `assurance/profile/cappuccino`
+        does.
+        """
+        if not self.atoms:
+            return "no tokens"
+        parts = []
+        for token, expanded in self.atoms:
+            if token == "+":
+                parts.append(f"'+' (any claim present) = {bool(values)}")
+            elif token == "*":
+                parts.append("'*' (always) = True")
+            elif token in values:
+                parts.append(f"{token!r} = True")
+            elif expanded is not None and expanded in values:
+                parts.append(f"{token!r} = True (matched as {expanded!r})")
+            elif expanded is not None:
+                parts.append(f"{token!r} = False (tried {token!r} and {expanded!r})")
+            else:
+                parts.append(f"{token!r} = False")
+        return "; ".join(parts)
+
+
 def parse_requirement(expression: str, prefix: str) -> Callable[[Set[str]], bool]:
     """Parse a boolean assurance expression into a predicate over a set of claim values.
 
@@ -40,12 +90,16 @@ def parse_requirement(expression: str, prefix: str) -> Callable[[Set[str]], bool
     reachable. Absolute ``http[s]://`` strings are only matched verbatim.
     ``"+"`` matches if the user has any claim at all; ``"*"`` always matches. An
     empty expression never matches.
+
+    Returns an :class:`_Expression`, which is callable and returns a bool, and
+    additionally carries the parsed atoms so the result can be explained.
     """
     if not expression or expression.strip() == "":
-        return lambda values: False
+        return _Expression(expression, lambda values: False, [])
 
     prefix = prefix.rstrip("/") + "/"
     tokens = _TOKEN_RE.findall(expression)
+    atoms = []
 
     # Recursive-descent parser building a tree of predicates (ported from feudal).
     def parse_expr(seq):
@@ -90,17 +144,21 @@ def parse_requirement(expression: str, prefix: str) -> Callable[[Set[str]], bool
             raise ValueError("Unexpected end of assurance expression")
         value = seq.pop(0)
         if value == "+":
+            atoms.append((value, None))
             return lambda values: len(values) > 0
         if value == "*":
+            atoms.append((value, None))
             return lambda values: True
         if re.match("https?://", value):
+            atoms.append((value, None))
             return lambda values: value in values
         # a relative value matches verbatim or expanded with the prefix, so that
         # non-REFEDS claim values (acr = 1, amr = mfa, ...) are reachable too
         prefixed = prefix + value
+        atoms.append((value, prefixed))
         return lambda values: value in values or prefixed in values
 
-    return parse_expr(tokens)
+    return _Expression(expression, parse_expr(tokens), atoms)
 
 
 class _OPAssurance:
@@ -197,6 +255,7 @@ class _OPAssurance:
             ("access_token_info.body", getattr(access_token_info, "body", None)),
             ("introspection_info", getattr(user_infos, "introspection_info", None)),
         ]
+        claims_found = set()
         for claim in self._claims:
             for source_name, src in sources:
                 if not src:
@@ -214,19 +273,70 @@ class _OPAssurance:
                     found.update(str(v) for v in val)
                 else:
                     found.add(str(val))
+                claims_found.add(claim)
                 logger.debug("Assurance claim '%s' from %s: %s", claim, source_name, sorted(found))
                 values.update(found)
+
+        if logger.isEnabledFor(logging.DEBUG):
+            # An OP that renames or relocates a claim is otherwise invisible:
+            # the configured claim simply stops being found and everyone quietly
+            # drops to the fallback tier. Listing the claim NAMES each source
+            # actually carries is what makes that diagnosable. Names only, never
+            # values -- those are the user's data, and the ones we care about are
+            # logged individually above.
+            for source_name, src in sources:
+                if src is None:
+                    logger.debug("Assurance source %s: not present in this token", source_name)
+                else:
+                    logger.debug("Assurance source %s carries claims: %s", source_name, sorted(src))
+            missing = [claim for claim in self._claims if claim not in claims_found]
+            if missing:
+                logger.debug(
+                    "Assurance claims configured but found in no source: %s "
+                    "(assurance_claims = %s for OP %s)",
+                    missing,
+                    self._claims,
+                    self._op_url,
+                )
+            logger.debug(
+                "Assurance set for OP %s: %s",
+                self._op_url,
+                sorted(values) if values else "<empty>",
+            )
         return values
 
-    def evaluate(self, user_infos: UserInfos) -> str:
-        """Return the shell tier for the given user."""
+    def evaluate(self, user_infos: UserInfos) -> Tuple[str, str]:
+        """Return (shell tier, one-line reason) for the given user.
+
+        The reason travels back to the AUDIT record, so the decision is
+        explainable at any log level -- not only when DEBUG happens to be on.
+        """
         values = self._assurance_set(user_infos)
         tier = self._default_tier
+        reason = ""
         for candidate in TIERS:
             req = self._tier_reqs.get(candidate)
-            if req is not None and req(values):
+            if req is None:
+                continue
+            matched = req(values)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(
+                    "Tier '%s' for OP %s: %s | expression: %s | %s",
+                    candidate,
+                    self._op_url,
+                    "MATCH" if matched else "no match",
+                    req.source if req.source else "<not configured>",
+                    req.explain(values),
+                )
+            if matched:
                 tier = candidate
+                reason = f"matched assurance_based_shell_tier_{candidate}"
                 break
+        if not reason:
+            reason = f"no tier expression matched, using default tier '{tier}'"
+            logger.debug(
+                "No tier expression matched for OP %s; falling back to '%s'", self._op_url, tier
+            )
         capped = self._cap(tier, self._max_tier)
         if capped != tier:
             logger.debug(
@@ -235,8 +345,9 @@ class _OPAssurance:
                 capped,
                 self._op_url,
             )
-        logger.debug("Evaluated assurance tier: %s", capped)
-        return capped
+            reason += f", then capped to '{capped}' by assurance_based_shell_max_tier"
+        logger.debug("Evaluated assurance tier: %s (%s)", capped, reason)
+        return capped, reason
 
     @staticmethod
     def _cap(tier: str, max_tier: str) -> str:
@@ -273,13 +384,16 @@ class AssuranceEvaluator:
         if op_assurance is None:
             logger.debug("No assurance configuration for OP %s, using defaults", op_key)
             op_assurance = self._fallback
-        tier = op_assurance.evaluate(user_infos)
-        # this decides the user's login shell, so record it whatever the log level
+        tier, reason = op_assurance.evaluate(user_infos)
+        # this decides the user's login shell, so record it whatever the log
+        # level -- including *why*, since a tier on its own does not say whether
+        # the policy fired or the user just fell through to the default
         audit(
             logger,
-            "Assurance tier '%s' for %s @ %s",
+            "Assurance tier '%s' for %s @ %s (%s)",
             tier,
             user_infos.subject,
             user_infos.issuer,
+            reason,
         )
         return tier

@@ -576,3 +576,96 @@ def test_audit_record_is_attributed_to_its_caller():
     assert len(records) == 1
     assert records[0].filename == "test_assurance.py"
     assert records[0].name == "test.audit.caller"
+
+
+# ---------------------------------------------------------------------------
+# Diagnostics: an unmatched tier must be explainable
+# ---------------------------------------------------------------------------
+def test_expression_reports_its_atoms():
+    """Each token is recorded with the expanded form it will also be tried as."""
+    expr = parse_requirement(f"{MFA} & assurance/profile/cappuccino", PREFIX)
+    assert expr.atoms == [
+        (MFA, None),
+        ("assurance/profile/cappuccino", CAPPUCCINO),
+    ]
+    assert expr.source == f"{MFA} & assurance/profile/cappuccino"
+
+
+def test_explain_names_the_token_that_failed():
+    """The point of the whole thing: say which token was missing, and show both
+    forms it was looked for as."""
+    expr = parse_requirement(f"{MFA} & assurance/profile/cappuccino", PREFIX)
+    explanation = expr.explain({MFA})
+    assert f"{MFA!r} = True" in explanation
+    assert "'assurance/profile/cappuccino' = False" in explanation
+    assert CAPPUCCINO in explanation  # the expanded form that was tried
+
+
+def test_explain_reports_a_prefix_expanded_match():
+    expr = parse_requirement("assurance/profile/cappuccino", PREFIX)
+    assert f"matched as {CAPPUCCINO!r}" in expr.explain({CAPPUCCINO})
+
+
+def test_empty_expression_explains_itself():
+    assert parse_requirement("", PREFIX).explain(set()) == "no tokens"
+
+
+@pytest.mark.parametrize(
+    "op_kwargs,claims,expected_reason",
+    [
+        (
+            {"assurance_based_shell_tier_limited": "assurance/profile/cappuccino"},
+            {"eduperson_assurance": [CAPPUCCINO]},
+            "matched assurance_based_shell_tier_limited",
+        ),
+        (
+            {"assurance_based_shell_tier_full": "assurance/profile/cappuccino"},
+            {"eduperson_assurance": []},
+            "no tier expression matched",
+        ),
+        (
+            {
+                "assurance_based_shell_tier_full": "*",
+                "assurance_based_shell_max_tier": "restricted",
+            },
+            {},
+            "capped to 'restricted'",
+        ),
+    ],
+    ids=["matched", "fell-through", "capped"],
+)
+def test_audit_record_says_why(caplog, op_kwargs, claims, expected_reason):
+    """The AUDIT line survives any log level, so the reason for a tier has to
+    travel with it -- a bare tier does not say whether the policy fired or the
+    user just fell through to the default."""
+    ev = evaluator_for(op_url=MOCK_ISS, **op_kwargs)
+    with caplog.at_level(logging.CRITICAL, logger="motley_cue.mapper.assurance"):
+        ev.evaluate(make_user_infos(claims))
+    audit_records = [r for r in caplog.records if r.levelno == AUDIT]
+    assert len(audit_records) == 1
+    assert expected_reason in audit_records[0].getMessage()
+
+
+def test_debug_lists_configured_claims_that_were_not_found(caplog):
+    """An OP that renames a claim is otherwise invisible: the claim simply stops
+    being found and everyone quietly drops to the fallback tier."""
+    ev = evaluator_for(
+        op_url=MOCK_ISS,
+        assurance_claims=["eduperson_assurance", "some_renamed_claim"],
+        assurance_based_shell_tier_restricted="*",
+    )
+    with caplog.at_level(logging.DEBUG, logger="motley_cue.mapper.assurance"):
+        ev.evaluate(make_user_infos({"eduperson_assurance": [CAPPUCCINO]}))
+    messages = "\n".join(r.getMessage() for r in caplog.records)
+    assert "some_renamed_claim" in messages
+    assert "found in no source" in messages
+
+
+def test_debug_lists_claim_names_present_in_the_token(caplog):
+    """Names only -- enough to spot a renamed claim, without logging values."""
+    ev = evaluator_for(op_url=MOCK_ISS, assurance_based_shell_tier_restricted="*")
+    with caplog.at_level(logging.DEBUG, logger="motley_cue.mapper.assurance"):
+        ev.evaluate(make_user_infos({"eduperson_assurance": [CAPPUCCINO], "acr": MFA}))
+    messages = "\n".join(r.getMessage() for r in caplog.records)
+    assert "carries claims:" in messages
+    assert "eduperson_assurance" in messages

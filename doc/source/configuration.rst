@@ -156,7 +156,29 @@ The three ``assurance_based_shell_tier_*`` options hold **expressions**, evaluat
 
 The remaining two options hold a **tier name** (``full``, ``limited`` or ``restricted``): ``assurance_based_shell_default_tier`` is used when no expression matches, and ``assurance_based_shell_max_tier`` caps the result. The cap can only ever lower a tier, never raise one.
 
-The assurance set itself is the union of the values of every claim in ``assurance_claims``, collected from **all** available sources: the userinfo endpoint, the access token body (when it is a JWT) and token introspection. Run motley_cue at ``log_level = DEBUG`` to see which claim was found in which source.
+The assurance set itself is the union of the values of every claim in ``assurance_claims``, collected from **all** available sources: the userinfo endpoint, the access token body (when it is a JWT) and token introspection.
+
+Debugging a policy
+~~~~~~~~~~~~~~~~~~
+
+Every deployment logs one ``AUDIT`` record with the tier and the reason for it, whatever ``log_level`` is set to -- whether an expression matched, the user fell through to the default tier, or a cap lowered the result::
+
+    AUDIT - Assurance tier 'restricted' for <sub> @ <iss> (no tier expression matched, using default tier 'restricted')
+
+When that is not enough -- typically after an OP changes what it asserts -- set ``log_level = DEBUG`` in ``[mapper]``. The evaluation then reports, per deployment:
+
+- which of the ``assurance_claims`` was found in which source, and its values;
+- the **claim names** each source carries, so a claim the OP has renamed or moved is visible (names only, never values);
+- any configured claim found in **no** source;
+- the resulting assurance set;
+- for each tier in turn, its expression, whether it matched, and the verdict on every individual token.
+
+That last line is usually the one that answers the question, because it shows both forms a relative token was tried as::
+
+    DEBUG - Tier 'limited' for OP https://example.org: no match | expression: profile/cappuccino |
+            'profile/cappuccino' = False (tried 'profile/cappuccino' and 'https://refeds.org/profile/cappuccino')
+
+Here the token silently never matches: the cappuccino profile lives under ``/assurance/``, so it has to be written ``assurance/profile/cappuccino``. A relative token that does not resolve fails closed and says nothing at the default log level -- which is exactly what this output is for.
 
 A complete, working example -- along with two ready-made tier shells -- is installed under ``/etc/motley_cue/examples/``.
 
