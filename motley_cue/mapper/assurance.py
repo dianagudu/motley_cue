@@ -299,6 +299,23 @@ class _OPAssurance:
                     self._claims,
                     self._op_url,
                 )
+                # The usual reason a claim is absent is that the token was never
+                # issued with the scope that releases it. Different clients ask
+                # for different scopes, so the very same user evaluates
+                # differently depending on which client obtained the token --
+                # which is otherwise only visible by diffing two runs.
+                for source_name, src in sources:
+                    if not src:
+                        continue
+                    scope = src.get("scope") or src.get("scp")
+                    if scope:
+                        logger.debug(
+                            "Scopes on this token (%s): %s -- a claim that is missing "
+                            "everywhere is usually a scope the token was not issued with",
+                            source_name,
+                            scope,
+                        )
+                        break
             logger.debug(
                 "Assurance set for OP %s: %s",
                 self._op_url,
