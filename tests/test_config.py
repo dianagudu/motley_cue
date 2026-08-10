@@ -185,3 +185,77 @@ def test_op_sections_without_op_url_are_skipped_not_collided(test_config):
         }
     )
     assert test_config.Config(config_parser).trusted_ops == ["https://aai.egi.com/oidc"]
+
+
+### An indented option is swallowed by the value above it
+
+
+SWALLOWED = """
+[mapper]
+[authorisation.egi]
+op_url = https://aai.egi.com/oidc
+authorised_vos = []
+
+  assurance_based_shell_tier_full = profile/mfa
+  assurance_based_shell_tier_restricted = *
+"""
+
+SWALLOWED_QUIETLY = """
+[mapper]
+[authorisation.egi]
+op_url = https://aai.egi.com/oidc
+vo_claim = eduperson_entitlement
+
+  assurance_based_shell_tier_full = profile/mfa
+  assurance_based_shell_tier_restricted = *
+"""
+
+
+def test_swallowed_options_are_named_in_the_error(test_config):
+    """The value that fails to parse belongs to the option ABOVE the mistake,
+    so the raw message points at the wrong place entirely."""
+    from configparser import ConfigParser
+
+    config_parser = ConfigParser()
+    config_parser.read_string(SWALLOWED)
+    with pytest.raises(Exception) as excinfo:
+        test_config.Config(config_parser)
+
+    message = str(excinfo.value)
+    assert "[authorisation.egi]" in message  # which section
+    assert "authorised_vos" in message  # which option failed
+    assert "assurance_based_shell_tier_full" in message  # what was swallowed
+    assert "leading whitespace" in message  # what to do about it
+
+
+def test_quietly_swallowed_options_are_warned_about(test_config, caplog):
+    """The dangerous case: absorbed into a free-form string, so nothing fails
+    and the tier policy is simply never in effect -- which for assurance means
+    every user of that OP gets a full shell."""
+    import logging
+    from configparser import ConfigParser
+
+    config_parser = ConfigParser()
+    config_parser.read_string(SWALLOWED_QUIETLY)
+    with caplog.at_level(logging.WARNING):
+        test_config.Config(config_parser)  # loads fine, which is the problem
+
+    warnings = "\n".join(rec.getMessage() for rec in caplog.records)
+    assert "assurance_based_shell_tier_full" in warnings
+    assert "NOT in effect" in warnings
+
+
+def test_ordinary_multiline_values_are_not_flagged(test_config, caplog):
+    """Lists are routinely written across several lines; only a line that looks
+    like its own option is a mistake."""
+    import logging
+    from configparser import ConfigParser
+
+    config_parser = ConfigParser()
+    config_parser.read_string(
+        "[mapper]\n[authorisation.egi]\nop_url = https://aai.egi.com/oidc\n"
+        "authorised_vos = [\n    vo1,\n    vo2\n    ]\n"
+    )
+    with caplog.at_level(logging.WARNING):
+        test_config.Config(config_parser)
+    assert "swallowed" not in "\n".join(rec.getMessage() for rec in caplog.records)
