@@ -121,6 +121,28 @@ class Authorisation(Flaat):
             AccessLevel("authorised_user", AuthorisedUserRequirement(self.__authorisation)),
             AccessLevel("authorised_admin", AuthorisedAdminRequirement(self.__authorisation)),
         ]
+        self.__warn_about_unbound_audience()
+
+    def __warn_about_unbound_audience(self) -> None:
+        """Say so when a token issued for another service is accepted here.
+
+        An empty `audience` means no audience check at all, so a token is
+        accepted whatever service it was issued for -- every other relying party
+        of that OP holds a credential that works here too. Combined with
+        `authorise_all`, that credential is a shell account on this host.
+
+        That is a legitimate configuration, and how ssh-oidc is often deployed,
+        so this is a warning rather than a refusal. But it is a decision, and
+        nothing in the config made it visible as one.
+        """
+        for op_authz in self.__authorisation.all_op_authz.values():
+            if op_authz.authorise_all and not op_authz.audience:
+                logger.warning(
+                    "OP %s has authorise_all set but no audience: a token issued for any "
+                    "other service of this OP is accepted here, and grants a local account. "
+                    "Set 'audience' to bind tokens to this service.",
+                    op_authz.op_url,
+                )
 
     def info(self, request: Request) -> dict:
         """Return authorisation information for issuer of token.

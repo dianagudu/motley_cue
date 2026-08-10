@@ -297,3 +297,30 @@ async def test_require_authorised_admin_without_an_iss_is_unaffected(test_author
     assert await test_authorisation.authorised_admin_required(view_func)(
         request=MOCK_REQUEST
     ) == {"message": "Success"}
+
+
+### F6: an unbound audience is a decision, and should be visible as one
+
+
+@pytest.mark.parametrize(
+    "config_file",
+    [CONFIGS["AUTHORISE_ALL"]],
+    ids=["AUTHORISE_ALL"],
+)
+def test_authorise_all_without_audience_warns(test_authorisation, caplog):
+    """With no audience check a token issued for any other service of the same
+    OP is accepted here -- and under authorise_all that is a local account. The
+    warning is emitted when the Authorisation is built, i.e. during setup."""
+    warnings = [rec.getMessage() for rec in caplog.get_records("setup")]
+    assert any("no audience" in message for message in warnings)
+
+
+@pytest.mark.parametrize(
+    "config_file",
+    [CONFIGS["INDIVIDUAL"], CONFIGS["VO_BASED"]],
+    ids=["INDIVIDUAL", "VO_BASED"],
+)
+def test_no_audience_warning_without_authorise_all(test_authorisation, caplog):
+    """Only authorise_all turns "any token from this OP" into "an account"."""
+    warnings = [rec.getMessage() for rec in caplog.get_records("setup")]
+    assert not any("no audience" in message for message in warnings)
