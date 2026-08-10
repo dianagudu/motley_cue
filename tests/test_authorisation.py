@@ -312,7 +312,11 @@ def test_authorise_all_without_audience_warns(test_authorisation, caplog):
     OP is accepted here -- and under authorise_all that is a local account. The
     warning is emitted when the Authorisation is built, i.e. during setup."""
     warnings = [rec.getMessage() for rec in caplog.get_records("setup")]
-    assert any("no audience" in message for message in warnings)
+    matching = [message for message in warnings if "no audience bound" in message]
+    # exactly one line for the whole config, however many OPs are affected --
+    # a dozen identical warnings per worker per start is how a message earns
+    # being ignored
+    assert len(matching) == 1
 
 
 @pytest.mark.parametrize(
@@ -323,4 +327,4 @@ def test_authorise_all_without_audience_warns(test_authorisation, caplog):
 def test_no_audience_warning_without_authorise_all(test_authorisation, caplog):
     """Only authorise_all turns "any token from this OP" into "an account"."""
     warnings = [rec.getMessage() for rec in caplog.get_records("setup")]
-    assert not any("no audience" in message for message in warnings)
+    assert not any("no audience bound" in message for message in warnings)

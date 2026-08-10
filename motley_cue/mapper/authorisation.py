@@ -134,15 +134,24 @@ class Authorisation(Flaat):
         That is a legitimate configuration, and how ssh-oidc is often deployed,
         so this is a warning rather than a refusal. But it is a decision, and
         nothing in the config made it visible as one.
+
+        One line for the whole config, not one per OP: a service with a dozen
+        trusted OPs was producing a dozen identical warnings per worker on every
+        start, which is how a message earns being ignored.
         """
-        # for op_authz in self.__authorisation.all_op_authz.values():
-        #     if op_authz.authorise_all and not op_authz.audience:
-        #         logger.warning(
-        #             "OP %s has authorise_all set but no audience: a token issued for any "
-        #             "other service of this OP is accepted here, and grants a local account. "
-        #             "Set 'audience' to bind tokens to this service.",
-        #             op_authz.op_url,
-        #         )
+        unbound = [
+            op_authz.op_url
+            for op_authz in self.__authorisation.all_op_authz.values()
+            if op_authz.authorise_all and not op_authz.audience
+        ]
+        if unbound:
+            logger.warning(
+                "%d OP(s) authorise every user with no audience bound (%s): a token issued "
+                "for any other service of those OPs is accepted here, and grants a local "
+                "account. Set 'audience' per OP to bind tokens to this service.",
+                len(unbound),
+                ", ".join(unbound),
+            )
 
     def info(self, request: Request) -> dict:
         """Return authorisation information for issuer of token.
