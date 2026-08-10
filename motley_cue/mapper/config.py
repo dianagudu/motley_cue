@@ -474,6 +474,18 @@ class ConfigAuthorisation:
             if section.startswith(f"{subsection_prefix}."):
                 op_config = ConfigOPAuthZ.load(config, section_name=section)
                 key = canonical_url(op_config.op_url)
+                if key == "":
+                    # A section with no op_url matches no issuer -- it used to be
+                    # registered under the empty string, which was meaningless.
+                    # Skip it, and do NOT treat a second one as a collision: they
+                    # are a separate (and much older) misconfiguration, and
+                    # refusing to start over one would be a regression.
+                    logging.getLogger(__name__).warning(
+                        "Ignoring config section [%s]: it sets no op_url, so it can never "
+                        "apply to any token.",
+                        section,
+                    )
+                    continue
                 # canonical_url drops the scheme, a trailing slash and a leading
                 # "www.", so two sections can collapse onto one key. That used to
                 # be silent, and the loser kept none of its own authorisation:

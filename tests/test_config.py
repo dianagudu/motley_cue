@@ -168,3 +168,20 @@ def test_distinct_op_sections_are_kept(test_config):
         }
     )
     assert len(test_config.Config(config_parser).trusted_ops) == 2
+
+
+def test_op_sections_without_op_url_are_skipped_not_collided(test_config):
+    """A section with no op_url matches no issuer and used to be registered
+    under the empty string. Two of them are a separate, much older
+    misconfiguration -- refusing to start over that would be a regression."""
+    from configparser import ConfigParser
+
+    config_parser = ConfigParser()
+    config_parser.read_dict(
+        {
+            "authorisation.egi": {"op_url": "https://aai.egi.com/oidc"},
+            "authorisation.leftover": {"authorise_all": "True"},
+            "authorisation.another_leftover": {"authorise_all": "True"},
+        }
+    )
+    assert test_config.Config(config_parser).trusted_ops == ["https://aai.egi.com/oidc"]
