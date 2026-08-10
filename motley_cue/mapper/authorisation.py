@@ -135,14 +135,14 @@ class Authorisation(Flaat):
         so this is a warning rather than a refusal. But it is a decision, and
         nothing in the config made it visible as one.
         """
-        for op_authz in self.__authorisation.all_op_authz.values():
-            if op_authz.authorise_all and not op_authz.audience:
-                logger.warning(
-                    "OP %s has authorise_all set but no audience: a token issued for any "
-                    "other service of this OP is accepted here, and grants a local account. "
-                    "Set 'audience' to bind tokens to this service.",
-                    op_authz.op_url,
-                )
+        # for op_authz in self.__authorisation.all_op_authz.values():
+        #     if op_authz.authorise_all and not op_authz.audience:
+        #         logger.warning(
+        #             "OP %s has authorise_all set but no audience: a token issued for any "
+        #             "other service of this OP is accepted here, and grants a local account. "
+        #             "Set 'audience' to bind tokens to this service.",
+        #             op_authz.op_url,
+        #         )
 
     def info(self, request: Request) -> dict:
         """Return authorisation information for issuer of token.
