@@ -14,8 +14,6 @@ cat <<'MSG'
   This account did not meet the identity-assurance level required for shell
   access on this host (for example: multi-factor authentication and/or a
   sufficient REFEDS assurance profile were not asserted by your token).
-
-  If you believe this is an error, please contact the service administrators.
 ==============================================================================
 MSG
 

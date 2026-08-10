@@ -11,6 +11,7 @@ from .utils import (
     MOCK_OTP,
     MOCK_OTP_REQUEST,
     MOCK_OTP_HEADERS,
+    build_request,
     mock_exception,
 )
 
@@ -251,3 +252,193 @@ def test_token_db_store_collision(test_token_db):
     assert test_token_db.store(mock_otp, mock_at) == True
     assert test_token_db.store(mock_otp, "another at") == False
     assert test_token_db.get(mock_otp) == mock_at
+
+
+### F2: no credential may reach the log, at any level
+
+
+def test_fingerprint_does_not_contain_the_secret():
+    """The point of the helper: what goes in must not come out."""
+    from motley_cue.mapper.token_manager import fingerprint
+
+    assert MOCK_TOKEN not in fingerprint(MOCK_TOKEN)
+
+
+def test_fingerprint_is_stable_and_short():
+    """Log lines have to be correlatable across a request, and readable."""
+    from motley_cue.mapper.token_manager import fingerprint
+
+    assert fingerprint(MOCK_TOKEN) == fingerprint(MOCK_TOKEN)
+    assert len(fingerprint(MOCK_TOKEN)) == 8
+
+
+def test_fingerprint_distinguishes_a_token_from_its_otp():
+    """An OTP is derived from its token, so if the two fingerprinted alike the
+    log could no longer tell which of them a line was about."""
+    from motley_cue.mapper.token_manager import TokenManager, fingerprint
+
+    assert fingerprint(MOCK_TOKEN) != fingerprint(TokenManager._new_otp(MOCK_TOKEN))
+
+
+def test_fingerprint_handles_a_missing_secret():
+    from motley_cue.mapper.token_manager import fingerprint
+
+    assert fingerprint(None) == "<none>"
+    assert fingerprint("") == "<none>"
+
+
+@pytest.mark.parametrize("backend", DB_BACKENDS)
+def test_no_token_or_otp_is_logged_while_storing(test_token_db, caplog):
+    """`log_level = DEBUG` is the documented way to diagnose an assurance tier,
+    so DEBUG must not put bearer credentials into the journal.
+
+    Run against every backend: each has its own copy of the store/collision log
+    lines, so redacting one of them proves nothing about the others.
+    """
+    import logging
+
+    mock_otp = "mock_otp"
+
+    with caplog.at_level(logging.DEBUG):
+        test_token_db.store(mock_otp, MOCK_TOKEN)
+        # a second, different token for the same OTP takes the collision path,
+        # which logs the token too
+        test_token_db.store(mock_otp, "a different token")
+
+    logged = "\n".join(rec.getMessage() for rec in caplog.records)
+    assert logged, "expected the store path to log something at DEBUG"
+    assert MOCK_TOKEN not in logged
+    assert mock_otp not in logged
+
+
+async def test_no_token_or_otp_is_logged_while_injecting(test_token_manager, caplog):
+    """The inject path handles both halves of the mapping at once: it is given
+    an OTP and resolves it to an Access Token."""
+    import logging
+
+    from motley_cue.mapper.token_manager import TokenManager
+
+    real_otp = TokenManager._new_otp(MOCK_TOKEN)
+    test_token_manager.generate_otp(MOCK_TOKEN)
+
+    @test_token_manager.inject_token
+    async def mock_func(request: Request):
+        return request.headers.get("authorization")
+
+    with caplog.at_level(logging.DEBUG):
+        await mock_func(request=build_request(real_otp))
+
+    logged = "\n".join(rec.getMessage() for rec in caplog.records)
+    assert MOCK_TOKEN not in logged
+    assert real_otp not in logged
+
+
+@pytest.mark.parametrize(
+    "log_level,expected",
+    [
+        ("DEBUG", "INFO"),
+        ("INFO", "INFO"),
+        ("WARNING", "WARNING"),
+        ("ERROR", "ERROR"),
+        ("nonsense", "WARNING"),
+    ],
+)
+def test_flaat_logger_is_clamped_to_info(log_level, expected):
+    """flaat logs the raw Access Token at DEBUG, and Config.verbosity hands our
+    log_level straight to it -- so DEBUG on our side must not become DEBUG on
+    flaat's. Above INFO the level is passed through untouched."""
+    import logging
+
+    from motley_cue.mapper import clamp_flaat_logging
+
+    flaat_logger = logging.getLogger("flaat")
+    previous = flaat_logger.level
+    try:
+        clamp_flaat_logging(log_level)
+        assert logging.getLevelName(flaat_logger.level) == expected
+    finally:
+        flaat_logger.setLevel(previous)
+
+
+### F5: the stored form of an OTP must not itself be a credential
+
+
+@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict"])
+def test_otp_is_not_stored_verbatim(test_token_db):
+    """An OTP is the SSH password, so a readable database must not hand out
+    working logins. Encrypting only the token column left the key column as a
+    complete credential."""
+    mock_otp = "mock_otp"
+    test_token_db.insert(mock_otp, MOCK_TOKEN)
+
+    with open(f"{test_token_db.backend}_tmp.db", "rb") as f:
+        raw = f.read()
+    assert mock_otp.encode() not in raw
+    assert MOCK_TOKEN.encode() not in raw
+
+
+@pytest.mark.parametrize("backend", DB_BACKENDS)
+def test_lookup_still_works_through_the_digest(test_token_db):
+    mock_otp = "mock_otp"
+    test_token_db.insert(mock_otp, MOCK_TOKEN)
+    assert test_token_db.get(mock_otp) == MOCK_TOKEN
+    assert test_token_db.get("some other otp") is None
+
+
+def test_pop_is_one_time_across_concurrent_workers(tmp_path):
+    """ "One-time" is the whole security property of an OTP.
+
+    A plain SELECT opens no transaction in sqlite3's default mode, so two
+    gunicorn workers on the same file could both read the row before either
+    deleted it, and the same OTP would authenticate twice. The interleaving is
+    forced here by making the first worker slow between its read and its delete.
+    """
+    import threading
+    import time
+
+    from motley_cue.mapper import token_manager
+
+    keyfile = str(tmp_path / "key")
+    location = str(tmp_path / "tmp.db")
+    worker1 = token_manager.SQLiteTokenDB(location, keyfile)
+    worker2 = token_manager.SQLiteTokenDB(location, keyfile)
+    worker1.insert("mock_otp", MOCK_TOKEN)
+
+    slow_decrypt = worker1.encryption.decrypt
+
+    def decrypt_slowly(secret):
+        time.sleep(0.3)  # hold the pop open between its read and its delete
+        return slow_decrypt(secret)
+
+    worker1.encryption.decrypt = decrypt_slowly
+
+    results = {}
+    thread = threading.Thread(target=lambda: results.__setitem__("w1", worker1.pop("mock_otp")))
+    thread.start()
+    time.sleep(0.1)  # worker2 arrives while worker1 is mid-pop
+    results["w2"] = worker2.pop("mock_otp")
+    thread.join()
+
+    assert sorted(results.values(), key=str) == [None, MOCK_TOKEN]
+
+
+@pytest.mark.parametrize("backend", ["sqlite"])
+def test_legacy_cleartext_table_is_dropped(test_token_db, tmp_path):
+    """The old table was keyed by the plaintext OTP; leaving it behind would
+    leave those credentials on disk."""
+    import sqlite3
+
+    with test_token_db.connect() as conn:
+        conn.execute("create table if not exists tokenmap (otp text primary key, at text)")
+        conn.execute("insert into tokenmap(otp, at) values ('plaintext_otp', 'x')")
+
+    from motley_cue.mapper import token_manager
+
+    token_manager.SQLiteTokenDB("tmp.db", "tmp_keyfile")  # a restart
+
+    with test_token_db.connect() as conn:
+        tables = [
+            row[0] for row in conn.execute("select name from sqlite_master where type='table'")
+        ]
+    assert "tokenmap" not in tables
+    assert "otpmap" in tables

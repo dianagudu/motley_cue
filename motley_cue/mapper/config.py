@@ -32,6 +32,7 @@ class Config:
         Raises:
             InternalException: if configuration does not contain mandatory section [mapper]
         """
+        warn_about_swallowed_options(config_parser)
         self.CONFIG = Configuration.load(config_parser)
 
         self.__trusted_ops = [
@@ -210,6 +211,73 @@ def to_loglevel(loglevel_str):
     raise InternalException(f"Error reading config file: unrecognised loglevel {loglevel_str}.")
 
 
+def warn_about_swallowed_options(config: ConfigParser) -> None:
+    """Warn about any option that has been folded into the value above it.
+
+    The loud version of this failure is a value that no longer parses, and
+    `swallowed_options_hint` explains that one. The dangerous version is the
+    quiet one: when the option above happens to take a free-form string, the
+    indented line is absorbed with no error at all, and whatever it configured
+    simply never takes effect.
+
+    For the assurance tiers that is a security-relevant silence -- an OP whose
+    tier expressions were all swallowed has no policy at all, so every one of
+    its users falls through to the "full" tier and a full login shell, which is
+    the opposite of what the operator wrote down.
+    """
+    for section in [config.default_section, *config.sections()]:
+        for option, value in config[section].items():
+            if not isinstance(value, str) or "\n" not in value:
+                continue
+            swallowed = [
+                line.split("=", 1)[0].strip()
+                for line in value.splitlines()[1:]
+                if "=" in line and line.strip()
+            ]
+            if swallowed:
+                logging.getLogger(__name__).warning(
+                    "In [%s], the value of '%s' spans several lines and has swallowed these "
+                    "options: %s. An indented line continues the previous option's value, so "
+                    "these are NOT in effect. Remove their leading whitespace.",
+                    section,
+                    option,
+                    ", ".join(swallowed),
+                )
+
+
+def swallowed_options_hint(value) -> str:
+    """Name the options an indented line has silently folded into `value`.
+
+    In an INI file a line indented by even one space continues the previous
+    option's value, and blank lines in between do not end it. So indenting
+
+        authorised_vos = []
+          assurance_based_shell_tier_full = ...
+
+    makes the second line part of the first one's value: the option is never
+    parsed as an option, the policy it configures is silently inert, and the
+    only symptom is that the value above it no longer parses.
+
+    The error that surfaces is about the *wrong* option, and prints a blob with
+    no indication of where it came from -- so say what actually happened.
+    """
+    if not isinstance(value, str) or "\n" not in value:
+        return ""
+    swallowed = [
+        line.split("=", 1)[0].strip()
+        for line in value.splitlines()[1:]
+        if "=" in line and line.strip()
+    ]
+    if not swallowed:
+        return ""
+    return (
+        f". The value spans several lines and appears to have swallowed these options: "
+        f"{', '.join(swallowed)}. In an INI file an indented line continues the previous "
+        "option's value -- remove the leading whitespace from them so they are read as "
+        "options in their own right."
+    )
+
+
 def canonical_url(url: str) -> str:
     """Strip URL of protocol info and ending slashes"""
     url = url.lower()
@@ -237,7 +305,13 @@ class ConfigSection:
             if section_name is None:
                 section_name = cls.__section__name__()
             field_names = set(f.name for f in fields(cls))
-            return cls(**{k: v for k, v in {**config[section_name]}.items() if k in field_names})
+            try:
+                return cls(
+                    **{k: v for k, v in {**config[section_name]}.items() if k in field_names}
+                )
+            except InternalException as ex:
+                # __post_init__ knows the option, only load() knows the section
+                raise InternalException(f"[{section_name}] {ex.message}") from ex
         except KeyError:
             # logger.debug(
             #     "Missing config section %s, using default values.", cls.__section__name__()
@@ -262,12 +336,18 @@ class ConfigSection:
                     return  # no conversion
             # if the field does not have the hinted type, convert it if possible
             if not isinstance(value, field_type):  # pyright: ignore
-                if field_type == int:
-                    setattr(self, field.name, to_int(value))
-                if field_type == bool:
-                    setattr(self, field.name, to_bool(value))
-                if field_type in [List, List[str], list]:
-                    setattr(self, field.name, to_list(value))
+                try:
+                    if field_type == int:
+                        setattr(self, field.name, to_int(value))
+                    if field_type == bool:
+                        setattr(self, field.name, to_bool(value))
+                    if field_type in [List, List[str], list]:
+                        setattr(self, field.name, to_list(value))
+                except InternalException as ex:
+                    raise InternalException(
+                        f"In config option '{field.name}': {ex.message}"
+                        f"{swallowed_options_hint(value)}"
+                    ) from ex
 
     def to_dict(self) -> dict:
         """Converts the config to a dict"""
@@ -469,10 +549,36 @@ class ConfigAuthorisation:
         """Loads all config sub-sections that start with the given section name"""
         subsection_prefix = "authorisation"
         all_op_authz = {}
+        section_for_key = {}
         for section in config.sections():
             if section.startswith(f"{subsection_prefix}."):
                 op_config = ConfigOPAuthZ.load(config, section_name=section)
-                all_op_authz[canonical_url(op_config.op_url)] = op_config
+                key = canonical_url(op_config.op_url)
+                if key == "":
+                    # A section with no op_url matches no issuer -- it used to be
+                    # registered under the empty string, which was meaningless.
+                    # Skip it, and do NOT treat a second one as a collision: they
+                    # are a separate (and much older) misconfiguration, and
+                    # refusing to start over one would be a regression.
+                    logging.getLogger(__name__).warning(
+                        "Ignoring config section [%s]: it sets no op_url, so it can never "
+                        "apply to any token.",
+                        section,
+                    )
+                    continue
+                # canonical_url drops the scheme, a trailing slash and a leading
+                # "www.", so two sections can collapse onto one key. That used to
+                # be silent, and the loser kept none of its own authorisation:
+                # its users were evaluated against the winner's rules. Refuse to
+                # start instead, the same way a mistyped shell tier does.
+                if key in section_for_key:
+                    raise InternalException(
+                        f"Config sections [{section_for_key[key]}] and [{section}] both "
+                        f"resolve to the same OP '{key}'. Their authorisation settings "
+                        "would silently override one another; give them distinct op_urls."
+                    )
+                section_for_key[key] = section
+                all_op_authz[key] = op_config
         # ConfigOPAuthZ does not override __section__name__, so this reads [DEFAULT]
         return cls(all_op_authz, ConfigOPAuthZ.load(config))
 
