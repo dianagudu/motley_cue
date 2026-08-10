@@ -358,3 +358,87 @@ def test_flaat_logger_is_clamped_to_info(log_level, expected):
         assert logging.getLevelName(flaat_logger.level) == expected
     finally:
         flaat_logger.setLevel(previous)
+
+
+### F5: the stored form of an OTP must not itself be a credential
+
+
+@pytest.mark.parametrize("backend", ["sqlite", "sqlitedict"])
+def test_otp_is_not_stored_verbatim(test_token_db):
+    """An OTP is the SSH password, so a readable database must not hand out
+    working logins. Encrypting only the token column left the key column as a
+    complete credential."""
+    mock_otp = "mock_otp"
+    test_token_db.insert(mock_otp, MOCK_TOKEN)
+
+    with open(f"{test_token_db.backend}_tmp.db", "rb") as f:
+        raw = f.read()
+    assert mock_otp.encode() not in raw
+    assert MOCK_TOKEN.encode() not in raw
+
+
+@pytest.mark.parametrize("backend", DB_BACKENDS)
+def test_lookup_still_works_through_the_digest(test_token_db):
+    mock_otp = "mock_otp"
+    test_token_db.insert(mock_otp, MOCK_TOKEN)
+    assert test_token_db.get(mock_otp) == MOCK_TOKEN
+    assert test_token_db.get("some other otp") is None
+
+
+def test_pop_is_one_time_across_concurrent_workers(tmp_path):
+    """ "One-time" is the whole security property of an OTP.
+
+    A plain SELECT opens no transaction in sqlite3's default mode, so two
+    gunicorn workers on the same file could both read the row before either
+    deleted it, and the same OTP would authenticate twice. The interleaving is
+    forced here by making the first worker slow between its read and its delete.
+    """
+    import threading
+    import time
+
+    from motley_cue.mapper import token_manager
+
+    keyfile = str(tmp_path / "key")
+    location = str(tmp_path / "tmp.db")
+    worker1 = token_manager.SQLiteTokenDB(location, keyfile)
+    worker2 = token_manager.SQLiteTokenDB(location, keyfile)
+    worker1.insert("mock_otp", MOCK_TOKEN)
+
+    slow_decrypt = worker1.encryption.decrypt
+
+    def decrypt_slowly(secret):
+        time.sleep(0.3)  # hold the pop open between its read and its delete
+        return slow_decrypt(secret)
+
+    worker1.encryption.decrypt = decrypt_slowly
+
+    results = {}
+    thread = threading.Thread(target=lambda: results.__setitem__("w1", worker1.pop("mock_otp")))
+    thread.start()
+    time.sleep(0.1)  # worker2 arrives while worker1 is mid-pop
+    results["w2"] = worker2.pop("mock_otp")
+    thread.join()
+
+    assert sorted(results.values(), key=str) == [None, MOCK_TOKEN]
+
+
+@pytest.mark.parametrize("backend", ["sqlite"])
+def test_legacy_cleartext_table_is_dropped(test_token_db, tmp_path):
+    """The old table was keyed by the plaintext OTP; leaving it behind would
+    leave those credentials on disk."""
+    import sqlite3
+
+    with test_token_db.connect() as conn:
+        conn.execute("create table if not exists tokenmap (otp text primary key, at text)")
+        conn.execute("insert into tokenmap(otp, at) values ('plaintext_otp', 'x')")
+
+    from motley_cue.mapper import token_manager
+
+    token_manager.SQLiteTokenDB("tmp.db", "tmp_keyfile")  # a restart
+
+    with test_token_db.connect() as conn:
+        tables = [
+            row[0] for row in conn.execute("select name from sqlite_master where type='table'")
+        ]
+    assert "tokenmap" not in tables
+    assert "otpmap" in tables
