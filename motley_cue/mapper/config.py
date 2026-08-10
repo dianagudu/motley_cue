@@ -215,7 +215,7 @@ def warn_about_swallowed_options(config: ConfigParser) -> None:
     """Warn about any option that has been folded into the value above it.
 
     The loud version of this failure is a value that no longer parses, and
-    `swallowed_options_hint` explains that one. The dangerous version is the
+    `swallowed_options_error` explains that one. The dangerous version is the
     quiet one: when the option above happens to take a free-form string, the
     indented line is absorbed with no error at all, and whatever it configured
     simply never takes effect.
@@ -229,11 +229,7 @@ def warn_about_swallowed_options(config: ConfigParser) -> None:
         for option, value in config[section].items():
             if not isinstance(value, str) or "\n" not in value:
                 continue
-            swallowed = [
-                line.split("=", 1)[0].strip()
-                for line in value.splitlines()[1:]
-                if "=" in line and line.strip()
-            ]
+            swallowed = swallowed_options(value)
             if swallowed:
                 logging.getLogger(__name__).warning(
                     "In [%s], the value of '%s' spans several lines and has swallowed these "
@@ -245,8 +241,8 @@ def warn_about_swallowed_options(config: ConfigParser) -> None:
                 )
 
 
-def swallowed_options_hint(value) -> str:
-    """Name the options an indented line has silently folded into `value`.
+def swallowed_options(value) -> List[str]:
+    """Name the options an indented line has folded into `value`.
 
     In an INI file a line indented by even one space continues the previous
     option's value, and blank lines in between do not end it. So indenting
@@ -255,26 +251,31 @@ def swallowed_options_hint(value) -> str:
           assurance_based_shell_tier_full = ...
 
     makes the second line part of the first one's value: the option is never
-    parsed as an option, the policy it configures is silently inert, and the
-    only symptom is that the value above it no longer parses.
-
-    The error that surfaces is about the *wrong* option, and prints a blob with
-    no indication of where it came from -- so say what actually happened.
+    parsed as an option, and the policy it configures is silently inert. The
+    only symptom is that the value ABOVE it stops parsing -- so the error names
+    the wrong option, and prints a blob with no clue where it came from.
     """
     if not isinstance(value, str) or "\n" not in value:
-        return ""
-    swallowed = [
+        return []
+    return [
         line.split("=", 1)[0].strip()
         for line in value.splitlines()[1:]
         if "=" in line and line.strip()
     ]
+
+
+def swallowed_options_error(option: str, value, reason: str) -> str:
+    """Explain a conversion failure, blaming the indentation when that is the cause."""
+    swallowed = swallowed_options(value)
     if not swallowed:
-        return ""
+        return f"Option '{option}': {reason}"
+    first_line = value.splitlines()[0].strip()
     return (
-        f". The value spans several lines and appears to have swallowed these options: "
-        f"{', '.join(swallowed)}. In an INI file an indented line continues the previous "
-        "option's value -- remove the leading whitespace from them so they are read as "
-        "options in their own right."
+        f"Option '{option}' could not be parsed: its value runs on for "
+        f"{len(value.splitlines())} lines and has swallowed these options: "
+        f"{', '.join(swallowed)}. An indented line continues the previous option's value, "
+        f"so those lines are part of this value instead of being options of their own. "
+        f"Remove their leading whitespace. (Value up to the first line break: {first_line!r}.)"
     )
 
 
@@ -345,8 +346,7 @@ class ConfigSection:
                         setattr(self, field.name, to_list(value))
                 except InternalException as ex:
                     raise InternalException(
-                        f"In config option '{field.name}': {ex.message}"
-                        f"{swallowed_options_hint(value)}"
+                        swallowed_options_error(field.name, value, ex.message)
                     ) from ex
 
     def to_dict(self) -> dict:
