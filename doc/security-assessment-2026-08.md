@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-10
 **Scope:** `motley_cue` and `feudalAdapterLdf` (`ldf_adapter`), branch `security-assessment` in both.
-**Status:** F1, F2 and F3 fixed (see the status column and the per-finding notes).
-F4–F7 recorded, not yet addressed.
+**Status:** F1, F2, F3, F5, F6 and F7 fixed (see the status column and the per-finding
+notes). F4 is the only one outstanding.
 
 All `file:line` references below are to the tree as it was when the assessment was
 made, i.e. *before* the three fixes.
@@ -28,14 +28,13 @@ requires exploiting a bug — they are what the code does in normal operation:
 | F1 | A `groups` claim becomes local group membership, unfiltered | **Critical** | feudalAdapter (`local_unix`) | **Fixed** — `a2d800a` |
 | F2 | Access tokens and OTPs written to the log at DEBUG | **High** | motley_cue | **Fixed** — `654fe13` |
 | F3 | `install_ssh_keys` follows symlinks while running as root | **High** | feudalAdapter (`local_unix`) | **Fixed** — `fda6642` |
-| F4 | Name and group existence checks bypass NSS | Medium | feudalAdapter (`local_unix`) | Open |
-| F5 | The OTP is stored in cleartext as the database key | Medium | motley_cue | Open |
-| F6 | No audience restriction by default; tokens replay across services | Medium | motley_cue (config) | Open |
-| F7 | Five smaller issues | Low | both | Open |
+| F4 | Name and group existence checks bypass NSS | Medium | feudalAdapter (`local_unix`) | **Open** |
+| F5 | The OTP is stored in cleartext as the database key | Medium | motley_cue | **Fixed** — `8664790` |
+| F6 | No audience restriction by default; tokens replay across services | Medium | motley_cue (config) | **Fixed** — `5ef1478` |
+| F7 | Five smaller issues | Low | both | **Fixed** — `e3caa4a`, `5a1ac79` (4 of 5; the fifth needed no change) |
 
-The three fixed findings are described below as they were found; each section
-ends with a note on what was done. The commits are on the `security-assessment`
-branch of each repository.
+Findings are described below as they were found; the fixed ones end with a note on
+what was done. The commits are on the `security-assessment` branch of each repository.
 
 A list of things that were checked and found sound is at the end, so the next round
 does not re-derive them.
@@ -341,6 +340,16 @@ password is usable twice.
 
 **Recommendation: 1 and 3.**
 
+### Fixed in `8664790`
+
+Both. The table is keyed by `sha256(otp)` and renamed, with the old cleartext-keyed one
+dropped so those OTPs leave the disk. `pop` wraps its select and delete in `BEGIN
+IMMEDIATE` (not `DELETE ... RETURNING`, which needs SQLite 3.35 while rockylinux-8 ships
+3.26); a test forces the interleaving and fails without it, both workers getting the
+same token. The `sqlitedict` backend cannot be given the same guarantee — it exposes a
+mapping whose `__delitem__` is a separate statement on its writer thread — so that is
+now documented where the race is.
+
 ---
 
 ## F6 — No audience restriction by default; tokens replay across services
@@ -366,6 +375,11 @@ but it is a deliberate trade-off, and nothing in the configuration currently say
 3. Require `audience` whenever `authorise_all` is set. Breaking, and not proportionate.
 
 **Recommendation: 1 and 2.**
+
+### Fixed in `5ef1478`
+
+Both. `Authorisation.__init__` warns for any OP with `authorise_all` and no `audience`,
+and the `audience` setting in `motley_cue.conf` now says what leaving it empty means.
 
 ---
 
