@@ -469,10 +469,24 @@ class ConfigAuthorisation:
         """Loads all config sub-sections that start with the given section name"""
         subsection_prefix = "authorisation"
         all_op_authz = {}
+        section_for_key = {}
         for section in config.sections():
             if section.startswith(f"{subsection_prefix}."):
                 op_config = ConfigOPAuthZ.load(config, section_name=section)
-                all_op_authz[canonical_url(op_config.op_url)] = op_config
+                key = canonical_url(op_config.op_url)
+                # canonical_url drops the scheme, a trailing slash and a leading
+                # "www.", so two sections can collapse onto one key. That used to
+                # be silent, and the loser kept none of its own authorisation:
+                # its users were evaluated against the winner's rules. Refuse to
+                # start instead, the same way a mistyped shell tier does.
+                if key in section_for_key:
+                    raise InternalException(
+                        f"Config sections [{section_for_key[key]}] and [{section}] both "
+                        f"resolve to the same OP '{key}'. Their authorisation settings "
+                        "would silently override one another; give them distinct op_urls."
+                    )
+                section_for_key[key] = section
+                all_op_authz[key] = op_config
         # ConfigOPAuthZ does not override __section__name__, so this reads [DEFAULT]
         return cls(all_op_authz, ConfigOPAuthZ.load(config))
 

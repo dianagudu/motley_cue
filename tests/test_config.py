@@ -126,3 +126,45 @@ def test_otp(test_config, config_parser, use_otp, backend, db_location, keyfile)
     assert otp_config.backend == backend
     assert otp_config.db_location == db_location
     assert otp_config.keyfile == keyfile
+
+
+### F7: two config sections must not silently collapse onto one OP
+
+
+@pytest.mark.parametrize(
+    "second_url",
+    [
+        "https://aai.egi.com/oidc/",  # trailing slash
+        "http://aai.egi.com/oidc",  # scheme
+        "https://www.aai.egi.com/oidc",  # www.
+    ],
+)
+def test_colliding_op_sections_are_refused(test_config, second_url):
+    """canonical_url drops the scheme, a trailing slash and a leading "www.",
+    so these all key the same. Silently keeping one meant the other OP's users
+    were authorised by rules written for somebody else."""
+    from configparser import ConfigParser
+
+    config_parser = ConfigParser()
+    config_parser.read_dict(
+        {
+            "authorisation.egi": {"op_url": "https://aai.egi.com/oidc", "authorise_all": "True"},
+            "authorisation.egi_again": {"op_url": second_url, "authorise_all": "False"},
+        }
+    )
+    with pytest.raises(Exception) as excinfo:
+        test_config.Config(config_parser)
+    assert "same OP" in str(excinfo.value)
+
+
+def test_distinct_op_sections_are_kept(test_config):
+    from configparser import ConfigParser
+
+    config_parser = ConfigParser()
+    config_parser.read_dict(
+        {
+            "authorisation.egi": {"op_url": "https://aai.egi.com/oidc"},
+            "authorisation.other": {"op_url": "https://other.example.org/oidc"},
+        }
+    )
+    assert len(test_config.Config(config_parser).trusted_ops) == 2

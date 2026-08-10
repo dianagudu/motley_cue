@@ -190,6 +190,12 @@ class Authorisation(Flaat):
 
         def _check_request(user_infos: UserInfos, *_, **kwargs) -> CheckResult:
             user_iss = kwargs.get("iss", "")
+            if "iss" in kwargs and user_iss == "":
+                # an endpoint that takes an iss and was given an empty one used
+                # to skip the same-issuer check entirely. Nothing matches an
+                # empty issuer today, so this changed no outcome -- but a check
+                # that is skipped by passing "" is not a check.
+                return CheckResult(False, "Empty 'iss' given")
             if user_iss != "":
                 op_authz = self.__authorisation.get_op_authz(user_infos)
                 if op_authz is None:
