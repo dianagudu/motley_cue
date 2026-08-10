@@ -18,6 +18,28 @@ from motley_cue.mapper.token_manager import TokenManager
 from motley_cue.static import md_to_html
 
 
+def clamp_flaat_logging(log_level) -> None:
+    """Keep flaat from logging raw Access Tokens, whatever our log_level is.
+
+    flaat logs the bearer token verbatim at DEBUG (`logger.debug("Access token:
+    %s", access_token)`), and `Config.verbosity` hands our log_level straight to
+    it. So setting `log_level = DEBUG` -- which is exactly what diagnosing an
+    assurance tier asks for -- would put every user's credential into the
+    journal, where the systemd-journal group can read it, and from where it is
+    forwarded to collectors and kept in backups.
+
+    Nothing flaat logs at INFO or above is a credential, so INFO is the floor.
+    motley_cue's own DEBUG diagnostics are untouched: this narrows one
+    third-party logger, not the root logger.
+    """
+    level = logging.getLevelName(str(log_level).upper())
+    if not isinstance(level, int):
+        # a level basicConfig would already have rejected; this only keeps a
+        # surprising value from quietly disabling the clamp.
+        level = logging.WARNING
+    logging.getLogger("flaat").setLevel(max(level, logging.INFO))
+
+
 class Mapper:
     """Mapping component that deals with authN & authZ,
     as well as interfacing with the local user management
@@ -45,6 +67,7 @@ class Mapper:
             format=log_format,
             datefmt="%Y-%m-%d %H:%M:%S",
         )
+        clamp_flaat_logging(self.__config.log_level)
 
         self.__user_security = HTTPBearer(description="OIDC Access Token")
         self.__admin_security = HTTPBearer(description="OIDC Access Token")

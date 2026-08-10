@@ -11,6 +11,7 @@ from .utils import (
     MOCK_OTP,
     MOCK_OTP_REQUEST,
     MOCK_OTP_HEADERS,
+    build_request,
     mock_exception,
 )
 
@@ -251,3 +252,109 @@ def test_token_db_store_collision(test_token_db):
     assert test_token_db.store(mock_otp, mock_at) == True
     assert test_token_db.store(mock_otp, "another at") == False
     assert test_token_db.get(mock_otp) == mock_at
+
+
+### F2: no credential may reach the log, at any level
+
+
+def test_fingerprint_does_not_contain_the_secret():
+    """The point of the helper: what goes in must not come out."""
+    from motley_cue.mapper.token_manager import fingerprint
+
+    assert MOCK_TOKEN not in fingerprint(MOCK_TOKEN)
+
+
+def test_fingerprint_is_stable_and_short():
+    """Log lines have to be correlatable across a request, and readable."""
+    from motley_cue.mapper.token_manager import fingerprint
+
+    assert fingerprint(MOCK_TOKEN) == fingerprint(MOCK_TOKEN)
+    assert len(fingerprint(MOCK_TOKEN)) == 8
+
+
+def test_fingerprint_distinguishes_a_token_from_its_otp():
+    """An OTP is derived from its token, so if the two fingerprinted alike the
+    log could no longer tell which of them a line was about."""
+    from motley_cue.mapper.token_manager import TokenManager, fingerprint
+
+    assert fingerprint(MOCK_TOKEN) != fingerprint(TokenManager._new_otp(MOCK_TOKEN))
+
+
+def test_fingerprint_handles_a_missing_secret():
+    from motley_cue.mapper.token_manager import fingerprint
+
+    assert fingerprint(None) == "<none>"
+    assert fingerprint("") == "<none>"
+
+
+@pytest.mark.parametrize("backend", DB_BACKENDS)
+def test_no_token_or_otp_is_logged_while_storing(test_token_db, caplog):
+    """`log_level = DEBUG` is the documented way to diagnose an assurance tier,
+    so DEBUG must not put bearer credentials into the journal.
+
+    Run against every backend: each has its own copy of the store/collision log
+    lines, so redacting one of them proves nothing about the others.
+    """
+    import logging
+
+    mock_otp = "mock_otp"
+
+    with caplog.at_level(logging.DEBUG):
+        test_token_db.store(mock_otp, MOCK_TOKEN)
+        # a second, different token for the same OTP takes the collision path,
+        # which logs the token too
+        test_token_db.store(mock_otp, "a different token")
+
+    logged = "\n".join(rec.getMessage() for rec in caplog.records)
+    assert logged, "expected the store path to log something at DEBUG"
+    assert MOCK_TOKEN not in logged
+    assert mock_otp not in logged
+
+
+async def test_no_token_or_otp_is_logged_while_injecting(test_token_manager, caplog):
+    """The inject path handles both halves of the mapping at once: it is given
+    an OTP and resolves it to an Access Token."""
+    import logging
+
+    from motley_cue.mapper.token_manager import TokenManager
+
+    real_otp = TokenManager._new_otp(MOCK_TOKEN)
+    test_token_manager.generate_otp(MOCK_TOKEN)
+
+    @test_token_manager.inject_token
+    async def mock_func(request: Request):
+        return request.headers.get("authorization")
+
+    with caplog.at_level(logging.DEBUG):
+        await mock_func(request=build_request(real_otp))
+
+    logged = "\n".join(rec.getMessage() for rec in caplog.records)
+    assert MOCK_TOKEN not in logged
+    assert real_otp not in logged
+
+
+@pytest.mark.parametrize(
+    "log_level,expected",
+    [
+        ("DEBUG", "INFO"),
+        ("INFO", "INFO"),
+        ("WARNING", "WARNING"),
+        ("ERROR", "ERROR"),
+        ("nonsense", "WARNING"),
+    ],
+)
+def test_flaat_logger_is_clamped_to_info(log_level, expected):
+    """flaat logs the raw Access Token at DEBUG, and Config.verbosity hands our
+    log_level straight to it -- so DEBUG on our side must not become DEBUG on
+    flaat's. Above INFO the level is passed through untouched."""
+    import logging
+
+    from motley_cue.mapper import clamp_flaat_logging
+
+    flaat_logger = logging.getLogger("flaat")
+    previous = flaat_logger.level
+    try:
+        clamp_flaat_logging(log_level)
+        assert logging.getLevelName(flaat_logger.level) == expected
+    finally:
+        flaat_logger.setLevel(previous)

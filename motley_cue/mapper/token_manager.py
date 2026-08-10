@@ -22,6 +22,25 @@ from motley_cue.mapper.exceptions import InternalException
 logger = logging.getLogger(__name__)
 
 
+def fingerprint(secret: Optional[str]) -> str:
+    """Return a short, stable stand-in for a secret, safe to write to a log.
+
+    Both halves of the OTP mapping are credentials: the Access Token is a bearer
+    token at every relying party of its OP, and the OTP is the SSH password --
+    `inject_token` exchanges it for the Access Token before authorisation runs.
+    Neither belongs in a log that the systemd-journal group can read, that gets
+    forwarded to a central collector, and that ends up in backups.
+
+    What the log lines actually need is to be able to follow one token through a
+    request, and to tell "this token" from "that token" -- a fingerprint does
+    both. A token and its OTP fingerprint differently, so the two stay
+    distinguishable in the log.
+    """
+    if not secret:
+        return "<none>"
+    return hashlib.sha256(secret.encode()).hexdigest()[:8]
+
+
 class Encryption:
     """Class for encrypting/decrypting strings using symmetric keys."""
 
@@ -228,7 +247,7 @@ class SQLiteTokenDB(TokenDB):
             if len(result) == 0:
                 return None
             if len(result) > 1:
-                logger.warning("Multiple entries found in token db for OTP: %s", otp)
+                logger.warning("Multiple entries found in token db for OTP: %s", fingerprint(otp))
             token = self.encryption.decrypt(result[0][0])
             conn.execute(sql_del, [otp])
         return token
@@ -242,16 +261,16 @@ class SQLiteTokenDB(TokenDB):
             if len(result) > 0:  # if already in db
                 stored_token = self.encryption.decrypt(result[0][0])
                 if stored_token == token:  # for the same token
-                    logger.debug("OTP already exists for token %s", token)
+                    logger.debug("OTP already exists for token %s", fingerprint(token))
                     return True
                 # else:  # for another token => collision
                 logger.debug(
                     "Collision error: OTP for token %s collides with OTP for another token",
-                    token,
+                    fingerprint(token),
                 )
                 return False
             # when not found in db, insert new mapping; only encrypt access token
-            logger.debug("Storing OTP [%s] for token [%s]", otp, token)
+            logger.debug("Storing OTP [%s] for token [%s]", fingerprint(otp), fingerprint(token))
             conn.execute(
                 sql_insert,
                 (otp, self.encryption.encrypt(token)),
@@ -265,7 +284,7 @@ class SQLiteTokenDB(TokenDB):
             if len(result) == 0:
                 return None
             if len(result) > 1:
-                logger.warning("Multiple entries found in token db for OTP: %s", otp)
+                logger.warning("Multiple entries found in token db for OTP: %s", fingerprint(otp))
             return self.encryption.decrypt(result[0][0])
 
     def remove(self, otp: str) -> None:
@@ -305,7 +324,7 @@ class MemorySQLiteTokenDB(TokenDB):
         if len(result) == 0:
             return None
         if len(result) > 1:
-            logger.warning("Multiple entries found in token db for OTP: %s", otp)
+            logger.warning("Multiple entries found in token db for OTP: %s", fingerprint(otp))
         token = self.encryption.decrypt(result[0][0])
         self.connection.cursor().execute(sql_del, [otp])
         return token
@@ -318,16 +337,16 @@ class MemorySQLiteTokenDB(TokenDB):
         if len(result) > 0:  # if already in db
             stored_token = self.encryption.decrypt(result[0][0])
             if stored_token == token:  # for the same token
-                logger.debug("OTP already exists for token %s", token)
+                logger.debug("OTP already exists for token %s", fingerprint(token))
                 return True
             # else:  # for another token => collision
             logger.debug(
                 "Collision error: OTP for token %s collides with OTP for another token",
-                token,
+                fingerprint(token),
             )
             return False
         # when not found in db, insert new mapping; only encrypt access token
-        logger.debug("Storing OTP [%s] for token [%s]", otp, token)
+        logger.debug("Storing OTP [%s] for token [%s]", fingerprint(otp), fingerprint(token))
         self.connection.cursor().execute(
             sql_insert,
             (otp, self.encryption.encrypt(token)),
@@ -340,7 +359,7 @@ class MemorySQLiteTokenDB(TokenDB):
         if len(result) == 0:
             return None
         if len(result) > 1:
-            logger.warning("Multiple entries found in token db for OTP: %s", otp)
+            logger.warning("Multiple entries found in token db for OTP: %s", fingerprint(otp))
         return self.encryption.decrypt(result[0][0])
 
     def remove(self, otp: str) -> None:
@@ -389,16 +408,16 @@ class SQLiteDictTokenDB(TokenDB):
         if otp in self.database:
             stored_token = str(self.database[otp])
         if not stored_token:
-            logger.debug("Storing OTP [%s] for token [%s]", otp, token)
+            logger.debug("Storing OTP [%s] for token [%s]", fingerprint(otp), fingerprint(token))
             self.database[otp] = token
             success = True
         elif stored_token == token:
-            logger.debug("OTP already exists for token %s", token)
+            logger.debug("OTP already exists for token %s", fingerprint(token))
             success = True
         else:
             logger.debug(
                 "Collision error: OTP for token %s collides with OTP for another token",
-                token,
+                fingerprint(token),
             )
             success = False
         self.database.commit()
@@ -467,7 +486,9 @@ class TokenManager:
         try:
             return self.database.pop(otp)
         except Exception as ex:  # pylint: disable=broad-except
-            logger.debug("Failed to get or remove token mapping for otp %s: %s", otp, ex)
+            logger.debug(
+                "Failed to get or remove token mapping for otp %s: %s", fingerprint(otp), ex
+            )
             return None
 
     def generate_otp(self, token: str) -> dict:
@@ -478,7 +499,7 @@ class TokenManager:
         except Exception as ex:  # pylint: disable=broad-except
             logger.debug(
                 "Failed to create or store an otp for token [%s]: %s",
-                token,
+                fingerprint(token),
                 ex,
             )
             success = False
@@ -524,15 +545,15 @@ class TokenManager:
         async def wrapper(*args, **kwargs):
             otp = _get_token_from_kwargs(kwargs)
             if otp:
-                logger.debug("Found token in kwargs: %s", otp)
+                logger.debug("Found token in kwargs: %s", fingerprint(otp))
                 access_token = self.get_token(otp)
                 if access_token:
-                    logger.debug("OTP %s found in token DB", otp)
+                    logger.debug("OTP %s found in token DB", fingerprint(otp))
                     kwargs = _replace_token_in_kwargs(kwargs, access_token)
                     logger.debug(
                         "Injected Access Token %s corresponding to given OTP %s",
-                        access_token,
-                        otp,
+                        fingerprint(access_token),
+                        fingerprint(otp),
                     )
             return await func(*args, **kwargs)
 
