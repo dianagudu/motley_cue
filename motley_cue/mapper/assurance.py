@@ -295,7 +295,7 @@ class _OPAssurance:
             for _, src in sources:
                 if src:
                     merged_claims.update(src)
-            logger.debug("MERGED claims available across all sources: %s", sorted(merged_claims))
+            logger.info("MERGED claims available across all sources: %s", sorted(merged_claims))
             for source_name, src in sources:
                 if src is None:
                     logger.debug("  (source %s: not present in this token)", source_name)
