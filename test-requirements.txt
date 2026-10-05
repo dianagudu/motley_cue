@@ -1,9 +1,9 @@
 pylint
-pytest>=5.4.3
-pytest-cov>=2.10.0
+pytest>=8.0
+pytest-cov>=6.0
 pytest-env
 python-dotenv
 pytest-asyncio
 pytest-httpx
-# to fix coverage-badge
+# to fix coverage-badge (1.1.2, unmaintained, needs pkg_resources)
 setuptools<82.0.0
