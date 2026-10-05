@@ -13,6 +13,7 @@ jobs:
         include:
           - python-version: "3.15"
             experimental: true
+            allow-prereleases: true
     continue-on-error: ${{ matrix.experimental || false }}
     steps:
       - uses: actions/checkout@v6
@@ -20,6 +21,11 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
+          allow-prereleases: ${{ matrix.allow-prereleases || false }}
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsasl2-dev libldap2-dev
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
