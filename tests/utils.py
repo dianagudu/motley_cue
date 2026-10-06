@@ -174,7 +174,10 @@ MOCK_TOKEN_INFO = AccessTokenInfo(
     complete_decode={
         "payload": {"sub": MOCK_SUB, "iss": MOCK_ISS, "wlcg.groups": ["another_group"]},
     },
-    verification=None,
+    # flaat>=1.3 rejects UserInfos with unverified AT info in
+    # get_user_infos_from_request (_reject_unusable_user_infos), so the mock
+    # must look like a verified token.
+    verification={"algorithm": "mock"},
 )
 
 MOCK_BAD_TOKEN = "badtoken"
