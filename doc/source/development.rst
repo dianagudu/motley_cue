@@ -67,6 +67,22 @@ Release checklist
 5. Create a release on GitHub from the tag, with release notes describing
    the changes since the previous release.
 
+Documentation versions
+----------------------
+
+This documentation is published on `Read the Docs
+<https://motley-cue.readthedocs.io/>`_, which builds each version
+separately:
+
+- ``/en/latest/`` tracks ``master`` (released documentation),
+- ``/en/prerel/`` tracks ``prerel`` (upcoming documentation),
+- ``/en/stable/`` tracks the latest ``vX.Y.Z`` tag.
+
+Document new ``prerel`` features directly on ``prerel`` — they show up
+under ``/en/prerel/`` before the release, while ``/en/latest/`` keeps
+showing ``master``. Rebuilds happen automatically on every push; nothing
+needs to be configured in this repository for that.
+
 
 Docker for SSH-OIDC
 -------------------
