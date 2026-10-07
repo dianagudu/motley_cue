@@ -100,14 +100,14 @@ def test_docs_url(test_config, config_parser, docs_url):
         (
             CONFIG_NOT_SUPPORTED,
             True,
-            "memory",
+            "sqlite",
             "/var/lib/motley_cue/tokenmap.db",
             "/var/lib/motley_cue/motley_cue.key",
         ),
         (
             CONFIG_OTP_NOT_SUPPORTED,
             False,
-            "memory",
+            "sqlite",
             "/var/lib/motley_cue/tokenmap.db",
             "/var/lib/motley_cue/motley_cue.key",
         ),

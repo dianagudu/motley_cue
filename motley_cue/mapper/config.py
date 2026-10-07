@@ -375,7 +375,7 @@ class ConfigOTP(ConfigSection):
     """Config section for OTP."""
 
     use_otp: bool = True
-    backend: str = "memory"
+    backend: str = "sqlite"
     # NOT /tmp: the database holds users' Access Tokens and the keyfile decrypts
     # them, so a world-writable directory means any local user can plant a key of
     # their choosing before first start and then read every token. /var/lib is
