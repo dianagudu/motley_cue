@@ -232,9 +232,11 @@ You can also configure the location of the token database, the backend used, as 
   ##
   ## location for storing token database -- default: /var/lib/motley_cue/tokenmap.db
   ## only used when backend is sqlite or sqlitedict
+  ## non-root processes fall back to ~/.config/motley_cue/tokenmap.db
   # db_location = /var/lib/motley_cue/tokenmap.db
   ## path to file containing key for encrypting token db -- default: /var/lib/motley_cue/motley_cue.key
   ## key must be a URL-safe base64-encoded 32-byte key, and it will be created if it doesn't exist
+  ## non-root processes fall back to ~/.config/motley_cue/motley_cue.key
   # keyfile = /var/lib/motley_cue/motley_cue.key
 
 

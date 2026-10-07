@@ -387,6 +387,22 @@ class ConfigOTP(ConfigSection):
     def __section__name__(cls):
         return "mapper.otp"
 
+    def __post_init__(self):
+        super().__post_init__()
+        if os.geteuid() != 0:
+            # A non-root process (e.g. a pip install run by a developer for
+            # testing) cannot write /var/lib: fall back to a user-owned
+            # directory for the paths that were left at their defaults.
+            # Parent directories are still created 0700 and the keyfile is
+            # vetted exactly as before, so the security posture is unchanged.
+            # Explicitly configured paths are honoured as-is and still fail
+            # loudly when unusable.
+            user_dir = Path("~/.config/motley_cue").expanduser()
+            if self.db_location == "/var/lib/motley_cue/tokenmap.db":
+                self.db_location = str(user_dir / "tokenmap.db")
+            if self.keyfile == "/var/lib/motley_cue/motley_cue.key":
+                self.keyfile = str(user_dir / "motley_cue.key")
+
 
 @dataclass
 class ConfigPrivacy(ConfigSection):
