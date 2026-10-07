@@ -27,17 +27,6 @@ Follow the instructions there to support the repository on your system. Then ins
 
 This will ensure that all the dependencies are installed as well, and ``motley_cue`` is up and running as a systemd service.
 
-.. warning::
-
-   On Centos 7, you'll need to install two additional repositories for ``motley_cue``'s dependencies:
-
-   - Extra Packages for Enterprise Linux (EPEL): for ``nginx``
-   - Software Collections (SCL): for ``rh-python38``
-
-   .. code-block:: bash
-
-      yum install epel-release centos-release-scl
-
 
 Installation from pypi
 -----------------------
@@ -55,14 +44,14 @@ This will fetch the stable version from pip. You will need to set-up and run the
 Installing the development version
 ----------------------------------
 
-The development version of ``motley_cue`` can be installed from the ``master`` branch
+The development version of ``motley_cue`` can be installed from the ``prerel`` branch
 of the `GitHub motley_cue repository <https://github.com/ssh-oidc/motley_cue>`_ and
 can be installed as follows (note the ``-e`` switch to install it in editable
 or "develop mode"):
 
 .. code-block:: bash
 
-   git clone https://github.com/ssh-oidc/motley_cue
+   git clone -b prerel https://github.com/ssh-oidc/motley_cue
    cd motley_cue
    pip install -e .
 

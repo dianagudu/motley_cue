@@ -35,7 +35,7 @@ For client-side software, see `mccli <https://mccli.readthedocs.io/>`_.
 Compatibility
 -------------
 
-motley_cue works with Python 3 (>= 3.7), and only on Linux.
+motley_cue works with Python 3 (>= 3.10), and only on Linux.
 
 Documentation
 -------------

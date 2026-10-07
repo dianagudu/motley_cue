@@ -8,9 +8,12 @@ A detailed documentation of all the required components to enable SSH access via
 PAM
 ---
 
-You'll need `this <https://git.man.poznan.pl/stash/scm/pracelab/pam.git>`_ PAM module that supports OIDC authentication by prompting the user for a token instead of a password.
+SSH access with an OIDC access token as password is handled on the server side
+by the ``pam-ssh-oidc`` module. See the `SSH-OIDC documentation
+<https://ssh-oidc-doc.data.kit.edu/ssh/access-token-password/>`_ for the login
+flows and how the components fit together.
 
-You can also install it from the http://repo.data.kit.edu/ repo:
+You can install the module from the http://repo.data.kit.edu/ repo:
 
 .. code-block:: bash
 
@@ -49,6 +52,22 @@ Finally, make sure you have in your ``/etc/ssh/sshd_config``:
     KbdInteractiveAuthentication yes
 
 Note that this may enable password based logins that you need to disable separately.
+
+oinit (SSH certificates)
+------------------------
+
+As an alternative to PAM, SSH logins can use short-lived SSH certificates
+via `oinit <https://ssh-oidc-doc.data.kit.edu/ssh/ssh-certificates/>`_.
+This needs no PAM module on the SSH server: ``oinit-ca`` validates the
+user's OIDC token against ``motley_cue`` (through ``/verify_user``,
+i.e. the same authorisation and deployment state as any other login)
+and issues a certificate for the local username ``motley_cue`` reports.
+No extra ``motley_cue`` configuration is required for this flow.
+
+See the `SSH certificates documentation
+<https://ssh-oidc-doc.data.kit.edu/ssh/ssh-certificates/>`_ for setting up
+``oinit`` (client), ``oinit-ca`` and the SSH server, and the `demos
+<https://ssh-oidc-doc.data.kit.edu/demos/>`_ for a walk-through.
 
 Client
 ------

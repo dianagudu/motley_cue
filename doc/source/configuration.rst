@@ -104,7 +104,10 @@ Below, a configuration block for one OP with default values.
     assurance_based_shell_tier_full =
     assurance_based_shell_tier_limited =
     assurance_based_shell_tier_restricted =
-    assurance_based_shell_default_tier = full
+    ## tier used when no expression matches -- default: empty, i.e. decided
+    ## automatically (full when the OP has no policy, least privileged tier
+    ## otherwise)
+    assurance_based_shell_default_tier =
     assurance_based_shell_max_tier =
 
 - The section name has to start with ``authorisation.``
