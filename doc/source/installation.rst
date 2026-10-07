@@ -56,13 +56,13 @@ Installing the development version
 ----------------------------------
 
 The development version of ``motley_cue`` can be installed from the ``master`` branch
-of the `GitHub motley_cue repository <https://github.com/dianagudu/motley_cue>`_ and
+of the `GitHub motley_cue repository <https://github.com/ssh-oidc/motley_cue>`_ and
 can be installed as follows (note the ``-e`` switch to install it in editable
 or "develop mode"):
 
 .. code-block:: bash
 
-   git clone https://github.com/dianagudu/motley_cue
+   git clone https://github.com/ssh-oidc/motley_cue
    cd motley_cue
    pip install -e .
 

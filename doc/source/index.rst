@@ -24,8 +24,8 @@ method, this part of the documentation is for you.
    api
 
 
-motley_cue is developed on `Github <https://github.com/dianagudu/motley_cue>`_.
-Please report `issues <https://github.com/dianagudu/motley_cue/issues>`_ there as well.
+motley_cue is developed on `Github <https://github.com/ssh-oidc/motley_cue>`_.
+Please report `issues <https://github.com/ssh-oidc/motley_cue/issues>`_ there as well.
 
 
 Indices and tables

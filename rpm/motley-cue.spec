@@ -4,7 +4,7 @@ Release: 1%{?dist}
 
 Summary: Mapper Oidc To Local idEntitY with loCal User managEment
 License: MIT
-URL: https://github.com/dianagudu/motley_cue
+URL: https://github.com/ssh-oidc/motley_cue
 Source0: motley-cue.tar.gz
 # Patch0: logfiles.patch
 # Patch1: otp.patch

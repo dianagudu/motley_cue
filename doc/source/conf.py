@@ -109,7 +109,7 @@ html_show_sourcelink = True
 html_theme_options = {
     "description": "A service for mapping OIDC identities to local identities",
     "logo": "logos/motley-cue.png",
-    "github_user": "dianagudu",
+    "github_user": "ssh-oidc",
     "github_repo": "motley_cue",
     "canonical_url": "https://motley-cue.readthedocs.io",
     "touch_icon": "logos/motley-cue-notext.png",
