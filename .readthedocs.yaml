@@ -10,6 +10,11 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.10"
+  # feudalAdapter pulls in bonsai, which compiles a C extension against
+  # the OpenLDAP/SASL headers (same as CI's libldap2-dev/libsasl2-dev).
+  apt_packages:
+    - libldap2-dev
+    - libsasl2-dev
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
