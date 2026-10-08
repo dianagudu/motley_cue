@@ -34,6 +34,11 @@ jobs:
           # install pip=>20.1 to use "pip cache dir"
           python3 -m pip install --upgrade pip
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsasl2-dev libldap2-dev
+
       - name: Install dependencies
         run: |
           python3 -m pip install -r ./requirements.txt
