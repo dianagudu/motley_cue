@@ -28,17 +28,10 @@ variables:
   # MTEAM_CI_ADDITIONAL_PACKAGES_YUM: cyrus-sasl-devel openldap-devel python3-devel
   # MTEAM_CI_ADDITIONAL_PACKAGES_ZYPPER: cyrus-sasl-devel openldap2-devel python3-devel
 
-# bullseye ships python3.9, too old for motley_cue (>= 3.10). local-before-
-# script.sh installs python3.10 from the pascalroeleven repo; point
-# dh_virtualenv at it here.
-build-debian-bullseye:
-  extends:
-    - .build-debian-bullseye
-  script:
-    - |
-      sed -i s/"dh_virtualenv --python python3"/"dh_virtualenv --python python3.10"/ debian/rules
-      make debsource
-      dpkg-buildpackage -uc -us
+# NOTE: there is deliberately no build-debian-bullseye job. bullseye is
+# end-of-life and not in target-distributions.txt; its python3.9 is too old
+# for motley_cue (>= 3.10) and its security mirror rots (404s), which broke
+# the release pipeline. Do not re-add without a supported python.
 
 ##########################################################################
 # Integration (These might to to a central job def)
