@@ -179,10 +179,20 @@ rewrites the version at build time via
 automatically).</p></li>
 <li><p>Open pull request <code class="docutils literal notranslate"><span class="pre">prerel</span></code> → <code class="docutils literal notranslate"><span class="pre">master</span></code> titled <code class="docutils literal notranslate"><span class="pre">vX.Y.Z</span></code>, review,
 merge.</p></li>
-<li><p>Create tag <code class="docutils literal notranslate"><span class="pre">vX.Y.Z</span></code> on <code class="docutils literal notranslate"><span class="pre">master</span></code> and push it.</p></li>
+<li><p>Create tag <code class="docutils literal notranslate"><span class="pre">vX.Y.Z</span></code> on <code class="docutils literal notranslate"><span class="pre">master</span></code> and push it — but only once the
+GitLab pipeline for the merge (step 3) is fully green, <strong>including the
+integration tests</strong> (see below).</p></li>
 <li><p>Create a release on GitHub from the tag, with release notes describing
 the changes since the previous release.</p></li>
 </ol>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Never tag before the GitLab integration tests pass. Merging to
+<code class="docutils literal notranslate"><span class="pre">master</span></code> starts the GitLab pipeline automatically via the mirror, but
+pushing the tag triggers the PyPI publish, which cannot be undone
+cleanly — tagging a broken <code class="docutils literal notranslate"><span class="pre">master</span></code> publishes a broken release. Wait
+for builds <em>and</em> integration tests, then tag.</p>
+</div>
 </section>
 </section>
 <section id="documentation-versions">
