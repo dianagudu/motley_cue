@@ -98,6 +98,18 @@ Below, a configuration block for one OP with default values.
     ## list of authorised admins specified by OIDC 'sub'
     authorised_admins = []
 
+    ## assurance-based shell tiers (opt-in, see below)
+    assurance_prefix = https://refeds.org
+    assurance_claims = [assurance, eduperson_assurance, acr]
+    assurance_based_shell_tier_full =
+    assurance_based_shell_tier_limited =
+    assurance_based_shell_tier_restricted =
+    ## tier used when no expression matches -- default: empty, i.e. decided
+    ## automatically (full when the OP has no policy, least privileged tier
+    ## otherwise)
+    assurance_based_shell_default_tier =
+    assurance_based_shell_max_tier =
+
 - The section name has to start with ``authorisation.``
 - The OP URL must be specified
 - A VO must be specified as a string or an entitlement according to the AARC guideline `AARC-G002 <https://aarc-community.org/guidelines/aarc-g002>`_ (or `AARC-G069 <https://aarc-community.org/guidelines/aarc-g069>`_, once it is published)
@@ -110,6 +122,69 @@ Furthermore, you can also configure an **audience** for the service in order to 
 
   Most OPs do not support requesting a specific audience for access tokens, in which case this setting is ignored. So far, only IAM allows requesting the audience.
 
+.. _assurance-based shell tiers:
+
+Assurance-based shell tiers
+---------------------------
+
+motley_cue can give users a different login shell depending on the identity assurance their token asserts (according to the `REFEDS Assurance Framework <https://refeds.org/assurance>`_, including MFA). It classifies each deployment into a **tier** and passes that tier to the feudal adapter, which maps it to a shell.
+
+This does **not** reject anyone: every authorised user is still deployed, the tier only decides which shell they get.
+
++--------------------------------------+----------------+----------------------------------------------+
+| Signals                              | Tier           | feudal_adapter.conf ``[backend.local_unix]`` |
++======================================+================+==============================================+
+| MFA **and** ``profile/cappuccino``   | ``full``       | ``shell``                                    |
++--------------------------------------+----------------+----------------------------------------------+
+| ``profile/cappuccino``, no MFA       | ``limited``    | ``shell_limited``                            |
++--------------------------------------+----------------+----------------------------------------------+
+| neither                              | ``restricted`` | ``shell_restricted``                         |
++--------------------------------------+----------------+----------------------------------------------+
+
+The feature is **opt-in**: with no tier expression configured, every user resolves to ``full`` and gets the default shell, i.e. behaviour is unchanged. All options live in the authorisation sections, so they can be set once in ``[DEFAULT]`` and overridden for any individual OP -- which is the point, since OPs differ in what assurance they can actually assert.
+
+.. code-block:: ini
+
+    [DEFAULT]
+    assurance_based_shell_tier_full = https://refeds.org/profile/mfa & assurance/profile/cappuccino
+    assurance_based_shell_tier_limited = assurance/profile/cappuccino
+    assurance_based_shell_tier_restricted = *
+
+    [authorisation.google]
+    op_url = https://accounts.google.com/
+    ## this OP cannot assert MFA -- cap it, rather than restating the expressions
+    assurance_based_shell_max_tier = restricted
+
+The three ``assurance_based_shell_tier_*`` options hold **expressions**, evaluated highest privilege first; the first one that matches wins. The grammar is ``E -> E "&" E | E "|" E | "(" E ")" | string``, where ``&`` binds stronger than ``|``. A string matches if the user's assurance set contains it verbatim **or** prefixed with ``assurance_prefix``, so both full REFEDS URLs and bare values (such as an ``acr`` of ``1``) can be matched. ``assurance_prefix`` defaults to the REFEDS *root*, ``https://refeds.org``, because the RAF profiles live under ``/assurance/`` while MFA does not -- a prefix of the ``/assurance/`` subtree alone would leave ``profile/mfa`` expanding to a URL no OP asserts. Note that a relative token which does not resolve never matches and fails silently, so if you narrow ``assurance_prefix``, re-check every expression; an absolute URL always works whatever the prefix. ``+`` matches if the user has any assurance claim at all, and ``*`` always matches -- use it for ``assurance_based_shell_tier_restricted`` so that no user falls through unclassified.
+
+The remaining two options hold a **tier name** (``full``, ``limited`` or ``restricted``): ``assurance_based_shell_default_tier`` is used when no expression matches, and ``assurance_based_shell_max_tier`` caps the result. The cap can only ever lower a tier, never raise one.
+
+The assurance set itself is the union of the values of every claim in ``assurance_claims``, collected from **all** available sources: the userinfo endpoint, the access token body (when it is a JWT) and token introspection.
+
+Debugging a policy
+~~~~~~~~~~~~~~~~~~
+
+Every deployment logs one ``AUDIT`` record with the tier and the reason for it, whatever ``log_level`` is set to -- whether an expression matched, the user fell through to the default tier, or a cap lowered the result::
+
+    AUDIT - Assurance tier 'restricted' for <sub> @ <iss> (no tier expression matched, using default tier 'restricted')
+
+When that is not enough -- typically after an OP changes what it asserts -- set ``log_level = DEBUG`` in ``[mapper]``. The evaluation then reports, per deployment:
+
+- which of the ``assurance_claims`` was found in which source, and its values;
+- the **claim names** each source carries, so a claim the OP has renamed or moved is visible (names only, never values);
+- any configured claim found in **no** source;
+- the resulting assurance set;
+- for each tier in turn, its expression, whether it matched, and the verdict on every individual token.
+
+That last line is usually the one that answers the question, because it shows both forms a relative token was tried as::
+
+    DEBUG - Tier 'limited' for OP https://example.org: no match | expression: profile/cappuccino |
+            'profile/cappuccino' = False (tried 'profile/cappuccino' and 'https://refeds.org/profile/cappuccino')
+
+Here the token silently never matches: the cappuccino profile lives under ``/assurance/``, so it has to be written ``assurance/profile/cappuccino``. A relative token that does not resolve fails closed and says nothing at the default log level -- which is exactly what this output is for.
+
+A complete, working example -- along with two ready-made tier shells -- is installed under ``/etc/motley_cue/examples/``.
+
 .. _account creation:
 
 Account creation configuration
@@ -120,8 +195,8 @@ This is handled by the feudal adapter in ``feudal_adapter.conf`` (see the `docum
 Pay close attention to the following configurations:
 
 - **backend**: how are the users managed locally (e.g. local UNIX accounts, `LDAP <https://codebase.helmholtz.cloud/m-team/feudal/feudalAdapterLdf/-/blob/master/LDAP.md>`_, ...)
-- **assurance**: specifying minimum acceptable assurance (according to the `REFEDS Assurance Framework <https://refeds.org/assurance>`_)
 - **username generator**: how local usernames are generated for users (e.g. trying to honour incoming ``preferred username`` from the OP, or using pooled accounts with a custom prefix)
+- **shell**: the login shell given to new accounts, including the ``shell_limited`` and ``shell_restricted`` variants used by `assurance-based shell tiers`_
 
 An `approval workflow <https://codebase.helmholtz.cloud/m-team/feudal/feudalAdapterLdf/-/tree/master#approval-workflow>`_ is supported as well, where local admins can approve or reject account creation requests. The notification system supported so far is email.
 
@@ -143,19 +218,29 @@ You can also configure the location of the token database, the backend used, as 
   ############
   [mapper.otp]
   ############
-  ## use one-time passwords (OTP) instead of tokens as ssh password -- default: False
+  ## use one-time passwords (OTP) instead of tokens as ssh password -- default: True
   ## this can be used when access tokens are too long to be used as passwords (>1k)
   use_otp = True
   ##
   ## backend for storing the OTP-AT mapping -- default: sqlite
-  ## supported backends: sqlite, sqlitedict
+  ## supported backends: memory, sqlite, sqlitedict
   # backend = sqlite
   ##
-  ## location for storing token database -- default: /run/motley_cue/tokenmap.db
-  # db_location = /run/motley_cue/tokenmap.db
-  ## path to file containing key for encrypting token db -- default: /run/motley_cue/motley_cue.key
+  ## WARNING: memory keeps the mapping in the process that created it, so it
+  ## must not be used with gunicorn (or any multi-process server, minimum 2
+  ## workers): an OTP generated by one worker is invisible to the others and
+  ## logins fail depending on which worker answers. sqlite is the default
+  ## because it is the only backend with an atomic, cross-process one-time
+  ## pop.
+  ##
+  ## location for storing token database -- default: /var/lib/motley_cue/tokenmap.db
+  ## only used when backend is sqlite or sqlitedict
+  ## non-root processes fall back to ~/.config/motley_cue/tokenmap.db
+  # db_location = /var/lib/motley_cue/tokenmap.db
+  ## path to file containing key for encrypting token db -- default: /var/lib/motley_cue/motley_cue.key
   ## key must be a URL-safe base64-encoded 32-byte key, and it will be created if it doesn't exist
-  # keyfile = /run/motley_cue/motley_cue.key
+  ## non-root processes fall back to ~/.config/motley_cue/motley_cue.key
+  # keyfile = /var/lib/motley_cue/motley_cue.key
 
 
 .. rubric:: Swagger docs

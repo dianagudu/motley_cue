@@ -3,23 +3,24 @@
 <html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>motley-cue.service &#8212; motley_cue</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=7d08decb" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=6c7590d8" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/fonts.css?v=09a796e2" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8fd29722" />
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=7af948fa"></script>
     <link rel="icon" href="../_static/motley-cue.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="nginx.motley_cue" href="nginx_motley_cue.html" />
+    <link rel="next" title="gunicorn.conf.py" href="gunicorn_conf.html" />
     <link rel="prev" title="Templates" href="templates.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -35,7 +36,7 @@
   </head><body>
   <div class="document">
     
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <p class="logo">
   <a href="../index.html">
@@ -52,7 +53,7 @@
 
 
 <p>
-<iframe src="https://ghbtns.com/github-btn.html?user=dianagudu&repo=motley_cue&type=watch&count=true&size=large&v=2"
+<iframe src="https://ghbtns.com/github-btn.html?user=ssh-oidc&repo=motley_cue&type=watch&count=true&size=large&v=2"
   allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
 </p>
 
@@ -60,7 +61,16 @@
 
 
 
-<h3>Navigation</h3>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
@@ -69,6 +79,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../running.html#production">Production</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../running.html#gunicorn">gunicorn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../running.html#systemd">systemd</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../running.html#caddy">caddy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../running.html#nginx">nginx</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../running.html#config-files">Config files</a></li>
 </ul>
@@ -89,21 +100,11 @@
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="../running.html">Running</a><ul>
       <li>Previous: <a href="templates.html" title="previous chapter">Templates</a></li>
-      <li>Next: <a href="nginx_motley_cue.html" title="next chapter">nginx.motley_cue</a></li>
+      <li>Next: <a href="gunicorn_conf.html" title="next chapter">gunicorn.conf.py</a></li>
   </ul></li>
   </ul></li>
 </ul>
 </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -127,13 +128,64 @@
 <span class="nv">Before</span><span class="o">=</span>nginx.service
 
 <span class="o">[</span>Service<span class="o">]</span>
+<span class="c1">## Why root: with the local_unix backend, feudalAdapter invokes shadow-utils</span>
+<span class="c1">## (useradd/usermod/userdel/chage) directly and writes authorized_keys into other</span>
+<span class="c1">## users' home directories with chown(2). None of that works unprivileged, and</span>
+<span class="c1">## nothing here goes through sudo. If you use the ldap, bonsai_ldap or bwidm</span>
+<span class="c1">## backend, no local privileged operation happens at all -- see</span>
+<span class="c1">## /etc/motley_cue/examples/motley-cue-unprivileged.service for a drop-in that</span>
+<span class="c1">## runs as its own user. This is an internet-facing API, so prefer that.</span>
 <span class="nv">User</span><span class="o">=</span>root
 <span class="nv">Group</span><span class="o">=</span>root
 <span class="nv">RuntimeDirectory</span><span class="o">=</span>motley_cue
 <span class="nv">WorkingDirectory</span><span class="o">=</span>/usr/lib/motley-cue
 <span class="nv">EnvironmentFile</span><span class="o">=</span>/etc/motley_cue/motley_cue.env
-<span class="nv">ExecStart</span><span class="o">=</span>/usr/lib/motley-cue/bin/gunicorn<span class="w"> </span>motley_cue.api:api<span class="w"> </span>-k<span class="w"> </span><span class="s2">&quot;uvicorn.workers.UvicornWorker&quot;</span><span class="w"> </span>--config<span class="w"> </span>/usr/lib/motley-cue/etc/gunicorn/gunicorn.conf.py
+<span class="c1">## Without this the journal tags every line with the executable name, so the</span>
+<span class="c1">## service's own log lines show up as "gunicorn[1234]:".</span>
+<span class="nv">SyslogIdentifier</span><span class="o">=</span>motley-cue
+<span class="nv">ExecStart</span><span class="o">=</span>/usr/lib/motley-cue/bin/gunicorn<span class="w"> </span>motley_cue.api:api<span class="w"> </span>-k<span class="w"> </span><span class="s2">"uvicorn.workers.UvicornWorker"</span><span class="w"> </span>--config<span class="w"> </span>/usr/lib/motley-cue/etc/gunicorn/gunicorn.conf.py
 <span class="nv">ExecReload</span><span class="o">=</span>/bin/kill<span class="w"> </span>-s<span class="w"> </span>HUP<span class="w"> </span><span class="nv">$MAINPID</span>
+
+<span class="c1">## Confinement. Since the service runs as root, these are what stands between a</span>
+<span class="c1">## bug in the public API and a fully compromised host.</span>
+<span class="c1">## On systemd &lt; 242 (RHEL/Rocky 8) a few of these are unknown and get logged as</span>
+<span class="c1">## "Unknown lvalue" and ignored -- the unit still starts, just less confined.</span>
+<span class="nv">NoNewPrivileges</span><span class="o">=</span>yes
+<span class="c1">## A private /tmp also removes any chance of a local user pre-creating the OTP</span>
+<span class="c1">## keyfile or token database, whatever [mapper.otp] is pointed at.</span>
+<span class="nv">PrivateTmp</span><span class="o">=</span>yes
+<span class="nv">PrivateDevices</span><span class="o">=</span>yes
+<span class="c1">## 'yes', NOT 'full': 'full' additionally mounts /etc read-only, and</span>
+<span class="c1">## shadow-utils cannot work under that -- useradd takes a lock file in /etc and</span>
+<span class="c1">## rewrites passwd/shadow/group in place, so it fails with</span>
+<span class="c1">##   useradd: cannot lock /etc/passwd; try again later</span>
+<span class="c1">## 'full' plus ReadWritePaths=/etc would also work, but 'yes' expresses the same</span>
+<span class="c1">## end state with one moving part instead of two. /usr and /boot -- where an</span>
+<span class="c1">## attacker would want to persist -- are read-only either way; /etc, /home,</span>
+<span class="c1">## /var/log and /var/lib stay writable and need no entry.</span>
+<span class="c1">## With the ldap/bonsai_ldap/bwidm backends no local account is touched, so</span>
+<span class="c1">## those deployments can raise this to 'strict' (see the unprivileged unit).</span>
+<span class="nv">ProtectSystem</span><span class="o">=</span>yes
+<span class="c1">## Must stay off: home directories are created and populated here.</span>
+<span class="nv">ProtectHome</span><span class="o">=</span>no
+<span class="nv">ProtectKernelTunables</span><span class="o">=</span>yes
+<span class="nv">ProtectKernelModules</span><span class="o">=</span>yes
+<span class="nv">ProtectControlGroups</span><span class="o">=</span>yes
+<span class="nv">ProtectHostname</span><span class="o">=</span>yes
+<span class="nv">ProtectClock</span><span class="o">=</span>yes
+<span class="nv">RestrictNamespaces</span><span class="o">=</span>yes
+<span class="nv">RestrictRealtime</span><span class="o">=</span>yes
+<span class="nv">RestrictSUIDSGID</span><span class="o">=</span>yes
+<span class="c1">## AF_NETLINK is required: glibc's getaddrinfo() opens a netlink socket to</span>
+<span class="c1">## enumerate local interfaces, so DNS lookups (OIDC discovery, introspection,</span>
+<span class="c1">## LDAP) can fail without it.</span>
+<span class="nv">RestrictAddressFamilies</span><span class="o">=</span>AF_UNIX<span class="w"> </span>AF_INET<span class="w"> </span>AF_INET6<span class="w"> </span>AF_NETLINK
+<span class="nv">LockPersonality</span><span class="o">=</span>yes
+<span class="nv">SystemCallArchitectures</span><span class="o">=</span>native
+<span class="c1">## Only what account provisioning actually needs: chown/mode changes on new home</span>
+<span class="c1">## directories, dropping privileges, and pkill on undeploy. Everything else --</span>
+<span class="c1">## loading modules, changing time, raw sockets, ptrace -- is dropped.</span>
+<span class="nv">CapabilityBoundingSet</span><span class="o">=</span>CAP_CHOWN<span class="w"> </span>CAP_DAC_OVERRIDE<span class="w"> </span>CAP_FOWNER<span class="w"> </span>CAP_FSETID<span class="w"> </span>CAP_SETUID<span class="w"> </span>CAP_SETGID<span class="w"> </span>CAP_KILL<span class="w"> </span>CAP_AUDIT_WRITE
 
 <span class="o">[</span>Install<span class="o">]</span>
 <span class="nv">WantedBy</span><span class="o">=</span>multi-user.target
@@ -152,7 +204,7 @@
           <a href="templates.html" title="Previous document">Templates</a>
         </li>
         <li>
-          <a href="nginx_motley_cue.html" title="Next document">nginx.motley_cue</a>
+          <a href="gunicorn_conf.html" title="Next document">gunicorn.conf.py</a>
           &rarr;
         </li>
     </ul>

@@ -3,17 +3,18 @@
 <html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Templates &#8212; motley_cue</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=7d08decb" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=6c7590d8" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/fonts.css?v=09a796e2" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8fd29722" />
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=7af948fa"></script>
     <link rel="icon" href="../_static/motley-cue.ico"/>
@@ -35,7 +36,7 @@
   </head><body>
   <div class="document">
     
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <p class="logo">
   <a href="../index.html">
@@ -52,7 +53,7 @@
 
 
 <p>
-<iframe src="https://ghbtns.com/github-btn.html?user=dianagudu&repo=motley_cue&type=watch&count=true&size=large&v=2"
+<iframe src="https://ghbtns.com/github-btn.html?user=ssh-oidc&repo=motley_cue&type=watch&count=true&size=large&v=2"
   allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
 </p>
 
@@ -60,7 +61,16 @@
 
 
 
-<h3>Navigation</h3>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
@@ -69,6 +79,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../running.html#production">Production</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../running.html#gunicorn">gunicorn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../running.html#systemd">systemd</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../running.html#caddy">caddy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../running.html#nginx">nginx</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../running.html#config-files">Config files</a></li>
 </ul>
@@ -94,16 +105,6 @@
   </ul></li>
 </ul>
 </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -137,7 +138,7 @@
 <p>Below an example template for <code class="docutils literal notranslate"><span class="pre">admin.deploy.template</span></code>:</p>
 <div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>Dear<span class="w"> </span>admin,
 
-The<span class="w"> </span>following<span class="w"> </span>user<span class="w"> </span>requests<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>host<span class="w"> </span>&#39;<span class="cp">${</span><span class="n">hostname</span><span class="cp">}</span>&#39;:
+The<span class="w"> </span>following<span class="w"> </span>user<span class="w"> </span>requests<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>host<span class="w"> </span>'<span class="cp">${</span><span class="n">hostname</span><span class="cp">}</span>':
 
 <span class="w">    </span>unique_id:<span class="w"> </span><span class="cp">${</span><span class="n">unique_id</span><span class="cp">}</span>
 <span class="w">    </span>name:<span class="w"> </span><span class="cp">${</span><span class="n">full_name</span><span class="cp">}</span>
@@ -160,33 +161,33 @@ Adding<span class="w"> </span>the<span class="w"> </span>user<span class="w"> </
 <span class="cp">${</span><span class="n">memberships_cmd</span><span class="cp">}</span>
 ====
 
-You<span class="w"> </span>are<span class="w"> </span>free<span class="w"> </span>to<span class="w"> </span>change<span class="w"> </span>the<span class="w"> </span>user&#39;s<span class="w"> </span>local<span class="w"> </span>username<span class="w"> </span>as<span class="w"> </span>needed,<span class="w"> </span>and<span class="w"> </span>fill<span class="w"> </span>in<span class="w"> </span>any<span class="w"> </span>necessary<span class="w"> </span>information.
+You<span class="w"> </span>are<span class="w"> </span>free<span class="w"> </span>to<span class="w"> </span>change<span class="w"> </span>the<span class="w"> </span>user's<span class="w"> </span>local<span class="w"> </span>username<span class="w"> </span>as<span class="w"> </span>needed,<span class="w"> </span>and<span class="w"> </span>fill<span class="w"> </span>in<span class="w"> </span>any<span class="w"> </span>necessary<span class="w"> </span>information.
 
 If<span class="w"> </span>you<span class="w"> </span>wish<span class="w"> </span>to<span class="w"> </span>accept<span class="w"> </span>this<span class="w"> </span>deployment<span class="w"> </span>as<span class="w"> </span>it<span class="w"> </span>is<span class="w"> </span>using<span class="w"> </span>feudal-adapter:
 ====
-echo<span class="w"> </span>&#39;{
-<span class="w">    </span>&quot;state_target&quot;:<span class="w"> </span>&quot;accepted&quot;,
-<span class="w">    </span>&quot;user&quot;:<span class="w"> </span>{
-<span class="w">        </span>&quot;userinfo&quot;:<span class="w"> </span>{
-<span class="w">            </span>&quot;sub&quot;:<span class="w"> </span>&quot;<span class="cp">${</span><span class="n">sub</span><span class="cp">}</span>&quot;,
-<span class="w">            </span>&quot;iss&quot;:<span class="w"> </span>&quot;<span class="cp">${</span><span class="n">iss</span><span class="cp">}</span>&quot;
+echo<span class="w"> </span>'{
+<span class="w">    </span>"state_target":<span class="w"> </span>"accepted",
+<span class="w">    </span>"user":<span class="w"> </span>{
+<span class="w">        </span>"userinfo":<span class="w"> </span>{
+<span class="w">            </span>"sub":<span class="w"> </span>"<span class="cp">${</span><span class="n">sub</span><span class="cp">}</span>",
+<span class="w">            </span>"iss":<span class="w"> </span>"<span class="cp">${</span><span class="n">iss</span><span class="cp">}</span>"
 <span class="w">        </span>}
 <span class="w">    </span>}
-}&#39;<span class="w"> </span>|<span class="w"> </span>feudal-adapter
+}'<span class="w"> </span>|<span class="w"> </span>feudal-adapter
 ====
 
 If<span class="w"> </span>you<span class="w"> </span>wish<span class="w"> </span>to<span class="w"> </span>reject<span class="w"> </span>the<span class="w"> </span>deployment,<span class="w"> </span>fill<span class="w"> </span>in<span class="w"> </span>the<span class="w"> </span>reason<span class="w"> </span>for<span class="w"> </span>rejection<span class="w"> </span>in<span class="w"> </span>the<span class="w"> </span>command<span class="w"> </span>below<span class="w"> </span>and<span class="w"> </span>execute<span class="w"> </span>it:
 ====
-echo<span class="w"> </span>&#39;{
-<span class="w">    </span>&quot;state_target&quot;:<span class="w"> </span>&quot;rejected&quot;,
-<span class="w">    </span>&quot;reason&quot;:<span class="w"> </span>&quot;&quot;,
-<span class="w">    </span>&quot;user&quot;:<span class="w"> </span>{
-<span class="w">        </span>&quot;userinfo&quot;:<span class="w"> </span>{
-<span class="w">            </span>&quot;sub&quot;:<span class="w"> </span>&quot;<span class="cp">${</span><span class="n">sub</span><span class="cp">}</span>&quot;,
-<span class="w">            </span>&quot;iss&quot;:<span class="w"> </span>&quot;<span class="cp">${</span><span class="n">iss</span><span class="cp">}</span>&quot;
+echo<span class="w"> </span>'{
+<span class="w">    </span>"state_target":<span class="w"> </span>"rejected",
+<span class="w">    </span>"reason":<span class="w"> </span>"",
+<span class="w">    </span>"user":<span class="w"> </span>{
+<span class="w">        </span>"userinfo":<span class="w"> </span>{
+<span class="w">            </span>"sub":<span class="w"> </span>"<span class="cp">${</span><span class="n">sub</span><span class="cp">}</span>",
+<span class="w">            </span>"iss":<span class="w"> </span>"<span class="cp">${</span><span class="n">iss</span><span class="cp">}</span>"
 <span class="w">        </span>}
 <span class="w">    </span>}
-}&#39;<span class="w"> </span>|<span class="w"> </span>feudal-adapter
+}'<span class="w"> </span>|<span class="w"> </span>feudal-adapter
 ====
 
 Best,

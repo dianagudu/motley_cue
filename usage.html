@@ -3,17 +3,18 @@
 <html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Usage &#8212; motley_cue</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=7d08decb" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=6c7590d8" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/css/fonts.css?v=09a796e2" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=8fd29722" />
     <script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=7af948fa"></script>
     <link rel="icon" href="_static/motley-cue.ico"/>
@@ -35,7 +36,7 @@
   </head><body>
   <div class="document">
     
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <p class="logo">
   <a href="index.html">
@@ -52,7 +53,7 @@
 
 
 <p>
-<iframe src="https://ghbtns.com/github-btn.html?user=dianagudu&repo=motley_cue&type=watch&count=true&size=large&v=2"
+<iframe src="https://ghbtns.com/github-btn.html?user=ssh-oidc&repo=motley_cue&type=watch&count=true&size=large&v=2"
   allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
 </p>
 
@@ -60,7 +61,16 @@
 
 
 
-<h3>Navigation</h3>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
@@ -86,16 +96,6 @@
   </ul></li>
 </ul>
 </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -120,7 +120,7 @@
 <p>First, you’ll need an OIDC AccessToken to authenticate.</p>
 <p>You might want to check out the <a class="reference external" href="https://github.com/indigo-dc/oidc-agent">oidc-agent</a> for that. It is a daemon that can provide valid access tokens from any number of configured OIDC Providers (OPs).</p>
 <p>Once you have <code class="docutils literal notranslate"><span class="pre">oidc-agent</span></code> running, configure an account for your preferred OP. For example, you can generate an account configuration for the <a class="reference external" href="https://aai.egi.eu/oidc">EGI AAI</a>  named <code class="docutils literal notranslate"><span class="pre">egi</span></code> as follows:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oidc-gen<span class="w"> </span>--pub<span class="w"> </span>--iss<span class="w"> </span>https://aai.egi.eu/oidc<span class="w"> </span>--scope<span class="w"> </span><span class="s2">&quot;openid profile email offline_access eduperson_entitlement eduperson_scoped_affiliation eduperson_unique_id&quot;</span><span class="w"> </span>egi
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oidc-gen<span class="w"> </span>--pub<span class="w"> </span>--iss<span class="w"> </span>https://aai.egi.eu/oidc<span class="w"> </span>--scope<span class="w"> </span><span class="s2">"openid profile email offline_access eduperson_entitlement eduperson_scoped_affiliation eduperson_unique_id"</span><span class="w"> </span>egi
 </pre></div>
 </div>
 <p>Then you can retrieve an access token with:</p>
@@ -137,47 +137,47 @@
 <ul class="simple">
 <li><p>deploy a local account:</p></li>
 </ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>http<span class="w"> </span>http://localhost:8080/user/deploy<span class="w">  </span><span class="s2">&quot;Authorization: Bearer `oidc-token egi`&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>http<span class="w"> </span>http://localhost:8080/user/deploy<span class="w">  </span><span class="s2">"Authorization: Bearer `oidc-token egi`"</span>
 <span class="o">{</span>
-<span class="w">  </span><span class="s2">&quot;credentials&quot;</span>:<span class="w"> </span><span class="o">{</span>
-<span class="w">    </span><span class="s2">&quot;commandline&quot;</span>:<span class="w"> </span><span class="s2">&quot;ssh local_username001@localhost&quot;</span>,
-<span class="w">    </span><span class="s2">&quot;description&quot;</span>:<span class="w"> </span><span class="s2">&quot;Local SSH Test Service&quot;</span>,
-<span class="w">    </span><span class="s2">&quot;login_help&quot;</span>:<span class="w"> </span><span class="s2">&quot;Login via `mccli ssh {login_host}`.&quot;</span>,
-<span class="w">    </span><span class="s2">&quot;ssh_host&quot;</span>:<span class="w"> </span><span class="s2">&quot;localhost&quot;</span>,
-<span class="w">    </span><span class="s2">&quot;ssh_user&quot;</span>:<span class="w"> </span><span class="s2">&quot;local_username001&quot;</span>
+<span class="w">  </span><span class="s2">"credentials"</span>:<span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="s2">"commandline"</span>:<span class="w"> </span><span class="s2">"ssh local_username001@localhost"</span>,
+<span class="w">    </span><span class="s2">"description"</span>:<span class="w"> </span><span class="s2">"Local SSH Test Service"</span>,
+<span class="w">    </span><span class="s2">"login_help"</span>:<span class="w"> </span><span class="s2">"Login via `mccli ssh {login_host}`."</span>,
+<span class="w">    </span><span class="s2">"ssh_host"</span>:<span class="w"> </span><span class="s2">"localhost"</span>,
+<span class="w">    </span><span class="s2">"ssh_user"</span>:<span class="w"> </span><span class="s2">"local_username001"</span>
 <span class="w">  </span><span class="o">}</span>,
-<span class="w">  </span><span class="s2">&quot;message&quot;</span>:<span class="w"> </span><span class="s2">&quot;User was created and was added to groups group1,group2.&quot;</span>,
-<span class="w">  </span><span class="s2">&quot;state&quot;</span>:<span class="w"> </span><span class="s2">&quot;deployed&quot;</span>
+<span class="w">  </span><span class="s2">"message"</span>:<span class="w"> </span><span class="s2">"User was created and was added to groups group1,group2."</span>,
+<span class="w">  </span><span class="s2">"state"</span>:<span class="w"> </span><span class="s2">"deployed"</span>
 <span class="o">}</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>query the status of the local account, including your local username:</p></li>
 </ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>http<span class="w"> </span>http://localhost:8080/user/get_status<span class="w">  </span><span class="s2">&quot;Authorization: Bearer `oidc-token egi`&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>http<span class="w"> </span>http://localhost:8080/user/get_status<span class="w">  </span><span class="s2">"Authorization: Bearer `oidc-token egi`"</span>
 <span class="o">{</span>
-<span class="w">  </span><span class="s2">&quot;message&quot;</span>:<span class="w"> </span><span class="s2">&quot;username local_username001&quot;</span>,
-<span class="w">  </span><span class="s2">&quot;state&quot;</span>:<span class="w"> </span><span class="s2">&quot;deployed&quot;</span>
+<span class="w">  </span><span class="s2">"message"</span>:<span class="w"> </span><span class="s2">"username local_username001"</span>,
+<span class="w">  </span><span class="s2">"state"</span>:<span class="w"> </span><span class="s2">"deployed"</span>
 <span class="o">}</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>verify if a given username matches the local account mapped to your remote identity</p></li>
 </ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>http<span class="w"> </span>http://localhost:8080/verify_user<span class="se">\?</span>username<span class="se">\=</span>local_username001<span class="w">  </span><span class="s2">&quot;Authorization: Bearer `oidc-token egi`&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>http<span class="w"> </span>http://localhost:8080/verify_user<span class="se">\?</span>username<span class="se">\=</span>local_username001<span class="w">  </span><span class="s2">"Authorization: Bearer `oidc-token egi`"</span>
 <span class="o">{</span>
-<span class="w">  </span><span class="s2">&quot;state&quot;</span>:<span class="w"> </span><span class="s2">&quot;deployed&quot;</span>,
-<span class="w">  </span><span class="s2">&quot;verified&quot;</span>:<span class="w"> </span><span class="nb">true</span>
+<span class="w">  </span><span class="s2">"state"</span>:<span class="w"> </span><span class="s2">"deployed"</span>,
+<span class="w">  </span><span class="s2">"verified"</span>:<span class="w"> </span><span class="nb">true</span>
 <span class="o">}</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>suspend your local account (e.g. if you suspect your account has been compromised):</p></li>
 </ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>http<span class="w"> </span>http://localhost:8080/user/suspend<span class="w"> </span><span class="s2">&quot;Authorization: Bearer `oidc-token egi`&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>http<span class="w"> </span>http://localhost:8080/user/suspend<span class="w"> </span><span class="s2">"Authorization: Bearer `oidc-token egi`"</span>
 <span class="o">{</span>
-<span class="w">  </span><span class="s2">&quot;message&quot;</span>:<span class="w"> </span><span class="s2">&quot;User &#39;c23***@https%3A%2F%2Faai.egi.eu%2Foidc%2F&#39; was suspended.&quot;</span>,
-<span class="w">  </span><span class="s2">&quot;state&quot;</span>:<span class="w"> </span><span class="s2">&quot;suspended&quot;</span>
+<span class="w">  </span><span class="s2">"message"</span>:<span class="w"> </span><span class="s2">"User 'c23***@https%3A%2F%2Faai.egi.eu%2Foidc%2F' was suspended."</span>,
+<span class="w">  </span><span class="s2">"state"</span>:<span class="w"> </span><span class="s2">"suspended"</span>
 <span class="o">}</span>
 </pre></div>
 </div>

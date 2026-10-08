@@ -3,17 +3,18 @@
 <html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>feudal_adapter.conf &#8212; motley_cue</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=7d08decb" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=6c7590d8" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/fonts.css?v=09a796e2" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8fd29722" />
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=7af948fa"></script>
     <link rel="icon" href="../_static/motley-cue.ico"/>
@@ -35,7 +36,7 @@
   </head><body>
   <div class="document">
     
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <p class="logo">
   <a href="../index.html">
@@ -52,7 +53,7 @@
 
 
 <p>
-<iframe src="https://ghbtns.com/github-btn.html?user=dianagudu&repo=motley_cue&type=watch&count=true&size=large&v=2"
+<iframe src="https://ghbtns.com/github-btn.html?user=ssh-oidc&repo=motley_cue&type=watch&count=true&size=large&v=2"
   allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
 </p>
 
@@ -60,7 +61,16 @@
 
 
 
-<h3>Navigation</h3>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
@@ -69,6 +79,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../running.html#production">Production</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../running.html#gunicorn">gunicorn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../running.html#systemd">systemd</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../running.html#caddy">caddy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../running.html#nginx">nginx</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../running.html#config-files">Config files</a></li>
 </ul>
@@ -94,16 +105,6 @@
   </ul></li>
 </ul>
 </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -135,7 +136,7 @@
 
 <span class="c1">### backend_supports_preferring_existing_user -- default: False</span>
 <span class="c1"># In case the backend can detect a username issued to a federated</span>
-<span class="c1"># identifier, setting this to &quot;True&quot; will overwrite the incoming</span>
+<span class="c1"># identifier, setting this to "True" will overwrite the incoming</span>
 <span class="c1"># preferred_username. </span>
 <span class="c1">#backend_supports_preferring_existing_user = False</span>
 
@@ -171,15 +172,15 @@
 <span class="c1">### Messages section</span>
 <span class="c1"># Here we select which information will be logged</span>
 
-<span class="c1">### log_file -- default: /var/log/feudal/adapter.log</span>
-<span class="na">log_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/var/log/motley_cue/feudal.log</span>
+<span class="c1">### log_file -- default: syslog</span>
+<span class="c1"># log_file = /var/log/motley_cue/feudal.log</span>
 
 <span class="c1">### log_level -- default: WARNING</span>
 <span class="c1"># INFO will show a few lines inidicating changes to users and groups</span>
-<span class="na">log_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">INFO</span>
+<span class="na">log_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">WARNING</span>
 
 <span class="c1">### log_to_console -- default: only when environment variable $LOG is set</span>
-<span class="c1"># If set to False: don&#39;t log to console, even if $LOG is set.</span>
+<span class="c1"># If set to False: don't log to console, even if $LOG is set.</span>
 <span class="c1"># If set to True: log to console, regardless of $LOG.</span>
 <span class="c1">#log_to_console = True</span>
 
@@ -259,59 +260,6 @@
 <span class="c1"># api_key = </span>
 
 
-<span class="k">[assurance]</span>
-<span class="c1">#####################</span>
-<span class="c1">### Assurance Section </span>
-<span class="c1"># here we configure the assurance requirements that users must fulfill</span>
-
-<span class="c1">### prefix </span>
-<span class="c1"># The common prefix of the assurance claims used.</span>
-<span class="c1"># This is prepended to every value that does not start with &#39;http[s]://&#39;</span>
-<span class="c1">#</span>
-<span class="na">prefix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">https://refeds.org/assurance/</span>
-
-<span class="c1">### require</span>
-<span class="c1"># Specify the required assurance of a user to be let into the system.</span>
-<span class="c1"># This can be an arbitrarly complex boolean expression of claims that need to be</span>
-<span class="c1"># satisfied.</span>
-<span class="c1"># Supported operatiors are:</span>
-<span class="c1"># - &#39;&amp;&#39; logical and</span>
-<span class="c1"># - &#39;|&#39; logical or</span>
-<span class="c1"># - &#39;(&#39; and &#39;)&#39; for parenthesis.</span>
-<span class="c1"># Each terminal is a string(-suffix), which might be contained in the users</span>
-<span class="c1"># eduperson_assurance.</span>
-<span class="c1"># Special terminals are:</span>
-<span class="c1"># - &#39;+&#39; any claim</span>
-<span class="c1"># - &#39;*&#39; always satisfied.</span>
-<span class="c1">#</span>
-<span class="c1"># Examples for the REFEDS Assurance Framework: (for reference and details see https://refeds.org/assurance)</span>
-<span class="c1"># require = profile/espresso   -&gt; Require that all users have the espresso profile</span>
-<span class="c1"># require = *                  -&gt; Allow any user, regargdless of their assurance</span>
-<span class="c1"># require = +                  -&gt; Allow any user, as long as they have an assurance claim</span>
-<span class="c1"># require = profile/espresso |                   -&gt; Photo-ID was verified against an up-to-date goverment database</span>
-<span class="c1">#    IAP/medium &amp;                               -&gt; Photo-ID was verified by a trained professional</span>
-<span class="c1">#           ID/eppn-unique-no-reassign |           AND the eppn is unique and won&#39;t be reassigned</span>
-<span class="c1">#    IAP/low                                    -&gt; User has an account at a university</span>
-<span class="c1">#           ID/eppn-unique-no-reassign |           AND the eppn is unique and won&#39;t be reassigned</span>
-<span class="c1">#    https://aai.egi.eu/LoA#Substantial |       -&gt; Photo-ID was verified by a trained professional</span>
-<span class="c1">#    profile/cappuccino                         -&gt; Photo-ID was verified by a trained professional</span>
-<span class="c1">#                                                  AND the eppn is unique and won&#39;t be reassigned</span>
-<span class="na">require</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">profile/espresso |</span>
-<span class="w">    </span><span class="na">IAP/medium &amp; ID/eppn-unique-no-reassign |</span>
-<span class="w">    </span><span class="na">IAP/low &amp; ID/eppn-unique-no-reassign |</span>
-<span class="w">    </span><span class="na">https</span><span class="o">:</span><span class="s">//aai.egi.eu/LoA</span><span class="c1">#Substantial |</span>
-<span class="w">    </span><span class="na">profile/cappuccino</span>
-
-<span class="c1">### verified_undeploy  --  default: false</span>
-<span class="c1"># Block undeployment for disallowed users. Useful to forbid a user removing an</span>
-<span class="c1"># account after he lost authorisation for the service</span>
-<span class="c1">#verified_undeploy = False</span>
-
-<span class="c1">### skip  --  default: no</span>
-<span class="c1"># Skip assurance checking and assume assurance is sufficient.</span>
-<span class="c1"># USE WITH CARE AND ONLY IF YOU KNOW WHAT YOU ARE DOING!!!</span>
-<span class="na">skip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Yes, do as I say!</span>
-
 <span class="c1">###################################</span>
 <span class="c1">### Username Generator</span>
 <span class="c1">#</span>
@@ -334,14 +282,14 @@
 <span class="c1">#             - preferred_username claim (if present)</span>
 <span class="c1">#             - combine a varying number of letters of given_name + family_name</span>
 <span class="c1">#             - email-address if all else fails</span>
-<span class="c1"># - pooled:   Pooled implements the pool-account behaviour known from &quot;the grid&quot;</span>
+<span class="c1"># - pooled:   Pooled implements the pool-account behaviour known from "the grid"</span>
 <span class="c1">#             I.e. we use the primary group name and append the digits, in the</span>
 <span class="c1">#             order of incoming users.</span>
 <span class="c1">#             Unfortunately, with OIDC group names may be much longer.</span>
 <span class="c1">#             Therefore, a specific prefix may be configured.</span>
 <span class="c1">#</span>
-<span class="c1">#mode = friendly</span>
-<span class="na">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">pooled</span>
+<span class="na">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">friendly</span>
+<span class="c1"># mode = pooled</span>
 
 <span class="c1">### pool_prefx  --  default: primary group name of the user</span>
 <span class="c1">#pool_prefix = pool</span>
@@ -371,17 +319,17 @@
 <span class="c1">### policy -- default: all</span>
 <span class="c1"># The policy defines which (or how many) groups are created.</span>
 <span class="c1"># These policies are currently supported</span>
-<span class="c1"># - all:        Create all available groups in user&#39;s metadata,</span>
+<span class="c1"># - all:        Create all available groups in user's metadata,</span>
 <span class="c1">#               automatically mapped to a unix-name</span>
 <span class="c1"># - listed:     Create only those groups that are specified in the</span>
-<span class="c1">#               config-variable &quot;supported_entitlements&quot;</span>
+<span class="c1">#               config-variable "supported_entitlements"</span>
 <span class="c1">#</span>
 <span class="na">policy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">all</span>
 
 <span class="c1">### supported_entitlements</span>
 <span class="c1"># A list of the subset of entitlements that will actually be created. The </span>
-<span class="c1"># entitlements will be mapped to groups, depending on the &quot;method&quot; and </span>
-<span class="c1"># &quot;map&quot; parameters (see below).</span>
+<span class="c1"># entitlements will be mapped to groups, depending on the "method" and </span>
+<span class="c1"># "map" parameters (see below).</span>
 <span class="c1"># Regular expressions are supported.</span>
 <span class="c1">#</span>
 <span class="c1"># supported_entitlements =</span>
@@ -404,7 +352,7 @@
 <span class="c1"># The method used for mapping entitlement names to group names</span>
 <span class="c1"># - classic: The default way until version v1 (Aug 2023)</span>
 <span class="c1"># - regex:  Define a list of regular expressions to map entitlements to </span>
-<span class="c1">#           group names using the configuration variable &quot;mapping&quot;</span>
+<span class="c1">#           group names using the configuration variable "mapping"</span>
 <span class="c1">#           - Comments are stripped before matching</span>
 <span class="c1">#           - regular expressions are supported (but may yield unexpected</span>
 <span class="c1">#             results.</span>
@@ -416,7 +364,7 @@
 <span class="na">method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">classic</span>
 <span class="c1"># method = regex</span>
 <span class="c1"># mapping =</span>
-<span class="c1">#     # ^.* -&gt; group # map all entitlements to group &quot;group&quot;</span>
+<span class="c1">#     # ^.* -&gt; group # map all entitlements to group "group"</span>
 <span class="c1">#     :role=(owner|member) -&gt; # remove all role=member and role=owner entries</span>
 <span class="c1">#     :role=v.* -&gt; :vmop # All groups starting with v map to vmop (for the sake of example)</span>
 <span class="c1">#     :role= -&gt; : # all other roles: map to :</span>
@@ -434,9 +382,9 @@
 
 <span class="k">[login_info]</span>
 <span class="c1"># Static information displayed to the user when deployed to a service.</span>
-<span class="c1"># Each key and value field will be shown to the user in the &quot;Credentials&quot;</span>
+<span class="c1"># Each key and value field will be shown to the user in the "Credentials"</span>
 <span class="c1"># screen.</span>
-<span class="c1"># ssh_host defaults to &quot;localhost&quot; when missing</span>
+<span class="c1"># ssh_host defaults to "localhost" when missing</span>
 <span class="c1"># ssh_user is usually filled by the backend</span>
 <span class="c1"># all other information is optional and can be extended with any desired information</span>
 <span class="c1">#</span>
@@ -455,11 +403,32 @@
 <span class="c1"># Configuration for the local_unix backend</span>
 
 <span class="c1">### shell  --  default: /bin/sh</span>
-<span class="c1"># The unix shell to use</span>
+<span class="c1"># The unix shell to use. This is the "full" assurance tier / default shell.</span>
 <span class="na">shell</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/bin/bash</span>
 
+<span class="c1">### shell_limited / shell_restricted  --  default: /sbin/nologin</span>
+<span class="c1"># Login shells for the lower assurance tiers. motley_cue evaluates each user's</span>
+<span class="c1"># assurance/MFA claims (see the assurance_based_shell_* options in the</span>
+<span class="c1"># [DEFAULT] / [authorisation.*] sections of motley_cue.conf) and passes a shell</span>
+<span class="c1"># tier (full/limited/restricted); feudal maps it here.</span>
+<span class="c1"># The two shells below ship with motley_cue:</span>
+<span class="c1">#   mc-rbash   -- permits only a safe whitelist of commands (ls, id, whoami, ...)</span>
+<span class="c1">#   mc-message -- prints an explanatory message and exits</span>
+<span class="c1"># They only take effect once the tiers are enabled in motley_cue.conf; with the</span>
+<span class="c1"># shipped defaults every authorised user resolves to "full" and gets `shell`.</span>
+<span class="na">shell_limited</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/etc/motley_cue/shells/mc-rbash</span>
+<span class="na">shell_restricted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/etc/motley_cue/shells/mc-message</span>
+<span class="c1">#</span>
+<span class="c1"># NOTE: the shell tiers are currently only applied by the local_unix backend.</span>
+<span class="c1"># The same shells would work for the ldap backends too, but there the login</span>
+<span class="c1"># shell is written into the directory and must exist (and be executable, and</span>
+<span class="c1"># usually be listed in /etc/shells) on every target system the user logs in to</span>
+<span class="c1"># -- not just on the host running motley_cue. Note also that /etc may be</span>
+<span class="c1"># mounted noexec on some hosts; in that case install the shells elsewhere,</span>
+<span class="c1"># e.g. under /usr/lib/motley-cue/shells/, and adjust the paths above.</span>
+
 <span class="c1">### home_base -- default: /home</span>
-<span class="c1"># The base directory for users&#39; home directories</span>
+<span class="c1"># The base directory for users' home directories</span>
 <span class="c1"># home_base = /home</span>
 
 <span class="c1"># deploy_user_ssh_keys -- default: yes</span>

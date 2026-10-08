@@ -3,17 +3,18 @@
 <html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>motley cue &#8212; motley_cue</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=7d08decb" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=6c7590d8" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/css/fonts.css?v=09a796e2" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=8fd29722" />
     <script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=7af948fa"></script>
     <link rel="icon" href="_static/motley-cue.ico"/>
@@ -34,7 +35,7 @@
   </head><body>
   <div class="document">
     
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <p class="logo">
   <a href="#">
@@ -51,7 +52,7 @@
 
 
 <p>
-<iframe src="https://ghbtns.com/github-btn.html?user=dianagudu&repo=motley_cue&type=watch&count=true&size=large&v=2"
+<iframe src="https://ghbtns.com/github-btn.html?user=ssh-oidc&repo=motley_cue&type=watch&count=true&size=large&v=2"
   allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
 </p>
 
@@ -104,11 +105,11 @@
 <dt>This is a service for mapping OIDC identities to local identities.</dt><dd><p><strong>M</strong>apper <strong>O</strong>idc <strong>T</strong>o <strong>L</strong>ocal id<strong>E</strong>ntit<strong>Y</strong> with lo<strong>C</strong>al <strong>U</strong>ser manag<strong>E</strong>ment</p>
 </dd>
 </dl>
-<p>For SSH integration, see <a class="reference external" href="https://github.com/EOSC-Synergy/ssh-oidc">SSH OIDC</a>.</p>
+<p>For SSH integration, see the <a class="reference external" href="https://ssh-oidc-doc.data.kit.edu/">SSH-OIDC documentation</a>.</p>
 <p>For client-side software, see <a class="reference external" href="https://mccli.readthedocs.io/">mccli</a>.</p>
 <section id="compatibility">
 <h2>Compatibility<a class="headerlink" href="#compatibility" title="Link to this heading">¶</a></h2>
-<p>motley_cue works with Python 3 (&gt;= 3.7), and only on Linux.</p>
+<p>motley_cue works with Python 3 (&gt;= 3.10), and only on Linux.</p>
 </section>
 <section id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">¶</a></h2>
@@ -124,6 +125,7 @@
 <li class="toctree-l2"><a class="reference internal" href="configuration.html#configuration-templates">Configuration templates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html#config-files-search-paths">Config files search paths</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html#authorisation-configuration">Authorisation configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#assurance-based-shell-tiers">Assurance-based shell tiers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html#account-creation-configuration">Account creation configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html#additional-configurations">Additional configurations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html#privacy-policy">Privacy policy</a></li>
@@ -141,11 +143,14 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ssh-integration.html">SSH Integration</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="ssh-integration.html#pam">PAM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ssh-integration.html#oinit-ssh-certificates">oinit (SSH certificates)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ssh-integration.html#client">Client</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">For developers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="development.html#building-the-linux-packages">Building the Linux packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html#branching-model">Branching model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html#releasing">Releasing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html#documentation-versions">Documentation versions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="development.html#docker-for-ssh-oidc">Docker for SSH-OIDC</a></li>
 </ul>
 </li>
@@ -161,8 +166,8 @@ method, this part of the documentation is for you.</p>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 </ul>
 </div>
-<p>motley_cue is developed on <a class="reference external" href="https://github.com/dianagudu/motley_cue">Github</a>.
-Please report <a class="reference external" href="https://github.com/dianagudu/motley_cue/issues">issues</a> there as well.</p>
+<p>motley_cue is developed on <a class="reference external" href="https://github.com/ssh-oidc/motley_cue">Github</a>.
+Please report <a class="reference external" href="https://github.com/ssh-oidc/motley_cue/issues">issues</a> there as well.</p>
 </section>
 </section>
 <section id="indices-and-tables">

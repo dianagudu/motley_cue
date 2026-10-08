@@ -3,24 +3,25 @@
 <html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>gunicorn.conf.py &#8212; motley_cue</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=7d08decb" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=6c7590d8" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/fonts.css?v=09a796e2" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8fd29722" />
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=7af948fa"></script>
     <link rel="icon" href="../_static/motley-cue.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Usage" href="../usage.html" />
-    <link rel="prev" title="nginx.motley_cue" href="nginx_motley_cue.html" />
+    <link rel="prev" title="motley-cue.service" href="motley_cue_service.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -35,7 +36,7 @@
   </head><body>
   <div class="document">
     
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <p class="logo">
   <a href="../index.html">
@@ -52,7 +53,7 @@
 
 
 <p>
-<iframe src="https://ghbtns.com/github-btn.html?user=dianagudu&repo=motley_cue&type=watch&count=true&size=large&v=2"
+<iframe src="https://ghbtns.com/github-btn.html?user=ssh-oidc&repo=motley_cue&type=watch&count=true&size=large&v=2"
   allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
 </p>
 
@@ -60,7 +61,16 @@
 
 
 
-<h3>Navigation</h3>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
@@ -69,6 +79,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../running.html#production">Production</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../running.html#gunicorn">gunicorn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../running.html#systemd">systemd</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../running.html#caddy">caddy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../running.html#nginx">nginx</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../running.html#config-files">Config files</a></li>
 </ul>
@@ -88,22 +99,12 @@
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="../running.html">Running</a><ul>
-      <li>Previous: <a href="nginx_motley_cue.html" title="previous chapter">nginx.motley_cue</a></li>
+      <li>Previous: <a href="motley_cue_service.html" title="previous chapter">motley-cue.service</a></li>
       <li>Next: <a href="../usage.html" title="next chapter">Usage</a></li>
   </ul></li>
   </ul></li>
 </ul>
 </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -126,21 +127,21 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="n">workers_per_core_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;WORKERS_PER_CORE&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
-<span class="n">max_workers_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MAX_WORKERS&quot;</span><span class="p">)</span>
+<span class="n">workers_per_core_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"WORKERS_PER_CORE"</span><span class="p">,</span> <span class="s2">"1"</span><span class="p">)</span>
+<span class="n">max_workers_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"MAX_WORKERS"</span><span class="p">)</span>
 <span class="n">use_max_workers</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">if</span> <span class="n">max_workers_str</span><span class="p">:</span>
     <span class="n">use_max_workers</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_workers_str</span><span class="p">)</span>
-<span class="n">web_concurrency_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;WEB_CONCURRENCY&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="n">web_concurrency_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"WEB_CONCURRENCY"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-<span class="n">host</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOST&quot;</span><span class="p">,</span> <span class="s2">&quot;0.0.0.0&quot;</span><span class="p">)</span>
-<span class="n">port</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PORT&quot;</span><span class="p">,</span> <span class="s2">&quot;80&quot;</span><span class="p">)</span>
-<span class="n">bind_env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;BIND&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<span class="n">use_loglevel</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;LOG_LEVEL_GUNICORN&quot;</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">)</span>
+<span class="n">host</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"HOST"</span><span class="p">,</span> <span class="s2">"0.0.0.0"</span><span class="p">)</span>
+<span class="n">port</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"PORT"</span><span class="p">,</span> <span class="s2">"80"</span><span class="p">)</span>
+<span class="n">bind_env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"BIND"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="n">use_loglevel</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"LOG_LEVEL_GUNICORN"</span><span class="p">,</span> <span class="s2">"info"</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">bind_env</span><span class="p">:</span>
     <span class="n">use_bind</span> <span class="o">=</span> <span class="n">bind_env</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">use_bind</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">use_bind</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s2">"</span>
 
 <span class="n">cores</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
 <span class="n">workers_per_core</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">workers_per_core_str</span><span class="p">)</span>
@@ -152,22 +153,22 @@
     <span class="n">web_concurrency</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">default_web_concurrency</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">use_max_workers</span><span class="p">:</span>
         <span class="n">web_concurrency</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">web_concurrency</span><span class="p">,</span> <span class="n">use_max_workers</span><span class="p">)</span>
-<span class="n">accesslog_var</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;ACCESS_LOG&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+<span class="n">accesslog_var</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"ACCESS_LOG"</span><span class="p">,</span> <span class="s2">"-"</span><span class="p">)</span>
 <span class="n">use_accesslog</span> <span class="o">=</span> <span class="n">accesslog_var</span> <span class="ow">or</span> <span class="kc">None</span>
-<span class="n">errorlog_var</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;ERROR_LOG&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+<span class="n">errorlog_var</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"ERROR_LOG"</span><span class="p">,</span> <span class="s2">"-"</span><span class="p">)</span>
 <span class="n">use_errorlog</span> <span class="o">=</span> <span class="n">errorlog_var</span> <span class="ow">or</span> <span class="kc">None</span>
-<span class="n">graceful_timeout_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;GRACEFUL_TIMEOUT&quot;</span><span class="p">,</span> <span class="s2">&quot;120&quot;</span><span class="p">)</span>
-<span class="n">timeout_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;TIMEOUT&quot;</span><span class="p">,</span> <span class="s2">&quot;120&quot;</span><span class="p">)</span>
-<span class="n">keepalive_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;KEEP_ALIVE&quot;</span><span class="p">,</span> <span class="s2">&quot;5&quot;</span><span class="p">)</span>
-<span class="n">max_requests_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MAX_REQUESTS&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
-<span class="n">max_requests_jitter_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MAX_REQUESTS_JITTER&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
+<span class="n">graceful_timeout_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"GRACEFUL_TIMEOUT"</span><span class="p">,</span> <span class="s2">"120"</span><span class="p">)</span>
+<span class="n">timeout_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"TIMEOUT"</span><span class="p">,</span> <span class="s2">"120"</span><span class="p">)</span>
+<span class="n">keepalive_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"KEEP_ALIVE"</span><span class="p">,</span> <span class="s2">"5"</span><span class="p">)</span>
+<span class="n">max_requests_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"MAX_REQUESTS"</span><span class="p">,</span> <span class="s2">"0"</span><span class="p">)</span>
+<span class="n">max_requests_jitter_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"MAX_REQUESTS_JITTER"</span><span class="p">,</span> <span class="s2">"0"</span><span class="p">)</span>
 
 <span class="c1"># Gunicorn config variables</span>
 <span class="n">loglevel</span> <span class="o">=</span> <span class="n">use_loglevel</span>
 <span class="n">workers</span> <span class="o">=</span> <span class="n">web_concurrency</span>
 <span class="n">bind</span> <span class="o">=</span> <span class="n">use_bind</span>
 <span class="n">errorlog</span> <span class="o">=</span> <span class="n">use_errorlog</span>
-<span class="n">worker_tmp_dir</span> <span class="o">=</span> <span class="s2">&quot;/dev/shm&quot;</span>
+<span class="n">worker_tmp_dir</span> <span class="o">=</span> <span class="s2">"/dev/shm"</span>
 <span class="n">accesslog</span> <span class="o">=</span> <span class="n">use_accesslog</span>
 <span class="n">graceful_timeout</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">graceful_timeout_str</span><span class="p">)</span>
 <span class="n">timeout</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">timeout_str</span><span class="p">)</span>
@@ -177,21 +178,21 @@
 
 <span class="c1"># For debugging and testing</span>
 <span class="n">log_data</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;loglevel&quot;</span><span class="p">:</span> <span class="n">loglevel</span><span class="p">,</span>
-    <span class="s2">&quot;workers&quot;</span><span class="p">:</span> <span class="n">workers</span><span class="p">,</span>
-    <span class="s2">&quot;bind&quot;</span><span class="p">:</span> <span class="n">bind</span><span class="p">,</span>
-    <span class="s2">&quot;graceful_timeout&quot;</span><span class="p">:</span> <span class="n">graceful_timeout</span><span class="p">,</span>
-    <span class="s2">&quot;timeout&quot;</span><span class="p">:</span> <span class="n">timeout</span><span class="p">,</span>
-    <span class="s2">&quot;keepalive&quot;</span><span class="p">:</span> <span class="n">keepalive</span><span class="p">,</span>
-    <span class="s2">&quot;errorlog&quot;</span><span class="p">:</span> <span class="n">errorlog</span><span class="p">,</span>
-    <span class="s2">&quot;accesslog&quot;</span><span class="p">:</span> <span class="n">accesslog</span><span class="p">,</span>
-    <span class="s2">&quot;max_requests&quot;</span><span class="p">:</span> <span class="n">max_requests</span><span class="p">,</span>
-    <span class="s2">&quot;max_requests_jitter&quot;</span><span class="p">:</span> <span class="n">max_requests_jitter</span><span class="p">,</span>
+    <span class="s2">"loglevel"</span><span class="p">:</span> <span class="n">loglevel</span><span class="p">,</span>
+    <span class="s2">"workers"</span><span class="p">:</span> <span class="n">workers</span><span class="p">,</span>
+    <span class="s2">"bind"</span><span class="p">:</span> <span class="n">bind</span><span class="p">,</span>
+    <span class="s2">"graceful_timeout"</span><span class="p">:</span> <span class="n">graceful_timeout</span><span class="p">,</span>
+    <span class="s2">"timeout"</span><span class="p">:</span> <span class="n">timeout</span><span class="p">,</span>
+    <span class="s2">"keepalive"</span><span class="p">:</span> <span class="n">keepalive</span><span class="p">,</span>
+    <span class="s2">"errorlog"</span><span class="p">:</span> <span class="n">errorlog</span><span class="p">,</span>
+    <span class="s2">"accesslog"</span><span class="p">:</span> <span class="n">accesslog</span><span class="p">,</span>
+    <span class="s2">"max_requests"</span><span class="p">:</span> <span class="n">max_requests</span><span class="p">,</span>
+    <span class="s2">"max_requests_jitter"</span><span class="p">:</span> <span class="n">max_requests_jitter</span><span class="p">,</span>
     <span class="c1"># Additional, non-gunicorn variables</span>
-    <span class="s2">&quot;workers_per_core&quot;</span><span class="p">:</span> <span class="n">workers_per_core</span><span class="p">,</span>
-    <span class="s2">&quot;use_max_workers&quot;</span><span class="p">:</span> <span class="n">use_max_workers</span><span class="p">,</span>
-    <span class="s2">&quot;host&quot;</span><span class="p">:</span> <span class="n">host</span><span class="p">,</span>
-    <span class="s2">&quot;port&quot;</span><span class="p">:</span> <span class="n">port</span><span class="p">,</span>
+    <span class="s2">"workers_per_core"</span><span class="p">:</span> <span class="n">workers_per_core</span><span class="p">,</span>
+    <span class="s2">"use_max_workers"</span><span class="p">:</span> <span class="n">use_max_workers</span><span class="p">,</span>
+    <span class="s2">"host"</span><span class="p">:</span> <span class="n">host</span><span class="p">,</span>
+    <span class="s2">"port"</span><span class="p">:</span> <span class="n">port</span><span class="p">,</span>
 <span class="p">}</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">log_data</span><span class="p">))</span>
 </pre></div>
@@ -206,7 +207,7 @@
     <ul>
         <li>
           &larr;
-          <a href="nginx_motley_cue.html" title="Previous document">nginx.motley_cue</a>
+          <a href="motley_cue_service.html" title="Previous document">motley-cue.service</a>
         </li>
         <li>
           <a href="../usage.html" title="Next document">Usage</a>

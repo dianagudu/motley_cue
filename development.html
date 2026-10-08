@@ -3,17 +3,18 @@
 <html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>For developers &#8212; motley_cue</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=7d08decb" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=6c7590d8" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/css/fonts.css?v=09a796e2" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=8fd29722" />
     <script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=7af948fa"></script>
     <link rel="icon" href="_static/motley-cue.ico"/>
@@ -35,7 +36,7 @@
   </head><body>
   <div class="document">
     
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <p class="logo">
   <a href="index.html">
@@ -52,7 +53,7 @@
 
 
 <p>
-<iframe src="https://ghbtns.com/github-btn.html?user=dianagudu&repo=motley_cue&type=watch&count=true&size=large&v=2"
+<iframe src="https://ghbtns.com/github-btn.html?user=ssh-oidc&repo=motley_cue&type=watch&count=true&size=large&v=2"
   allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
 </p>
 
@@ -60,7 +61,16 @@
 
 
 
-<h3>Navigation</h3>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
@@ -68,7 +78,13 @@
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ssh-integration.html">SSH Integration</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">For developers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#building-the-linux-packages">Building the Linux packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#branching-model">Branching model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#releasing">Releasing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#when-to-bump">When to bump</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#release-checklist">Release checklist</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#documentation-versions">Documentation versions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#docker-for-ssh-oidc">Docker for SSH-OIDC</a></li>
 </ul>
 </li>
@@ -86,16 +102,6 @@
   </ul></li>
 </ul>
 </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -114,29 +120,84 @@
             
   <section id="for-developers">
 <span id="development"></span><h1>For developers<a class="headerlink" href="#for-developers" title="Link to this heading">¶</a></h1>
-<section id="building-the-linux-packages">
-<h2>Building the Linux packages<a class="headerlink" href="#building-the-linux-packages" title="Link to this heading">¶</a></h2>
-<p>To build the Linux packages, a Makefile is provided, which uses docker
-for building:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>dockerised_&lt;name&gt;
+<section id="branching-model">
+<h2>Branching model<a class="headerlink" href="#branching-model" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">prerel</span></code> is the development branch. All day-to-day work lands here.</p></li>
+<li><p>Feature and fix branches branch off <code class="docutils literal notranslate"><span class="pre">prerel</span></code> and merge back into
+<code class="docutils literal notranslate"><span class="pre">prerel</span></code>, preferably via pull request, with green CI.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">master</span></code> is the release branch. It advances only via release pull
+requests <code class="docutils literal notranslate"><span class="pre">prerel</span></code> → <code class="docutils literal notranslate"><span class="pre">master</span></code>, opened once a release is ready — never
+by direct pushes. (The last such release PR was <code class="docutils literal notranslate"><span class="pre">v0.7.1</span></code>; <code class="docutils literal notranslate"><span class="pre">master</span></code>
+has since advanced outside that flow, which is why this rule is now
+written down.)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">vX.Y.Z</span></code> tags are created manually on <code class="docutils literal notranslate"><span class="pre">master</span></code> after the release PR
+is merged.</p></li>
+</ul>
+</section>
+<section id="releasing">
+<h2>Releasing<a class="headerlink" href="#releasing" title="Link to this heading">¶</a></h2>
+<p>The version is tracked in three places, kept in sync by <code class="docutils literal notranslate"><span class="pre">bump2version</span></code>
+(configured in <code class="docutils literal notranslate"><span class="pre">.bumpversion.cfg</span></code>):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">motley_cue/VERSION</span></code> (Python package version)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">debian/changelog</span></code> (top entry, Debian package version)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rpm/motley-cue.spec</span></code> (<code class="docutils literal notranslate"><span class="pre">Version:</span></code>, RPM package version)</p></li>
+</ul>
+<section id="when-to-bump">
+<h3>When to bump<a class="headerlink" href="#when-to-bump" title="Link to this heading">¶</a></h3>
+<p>Bump once per release, on <code class="docutils literal notranslate"><span class="pre">prerel</span></code>, after all feature work is merged and
+CI is green — as the final commit before, or the first commit inside, the
+release pull request:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bump2version</span> <span class="p">[</span><span class="n">patch</span><span class="o">|</span><span class="n">minor</span><span class="o">|</span><span class="n">major</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>where <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span></code> can be one of:</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">patch</span></code> for bug fixes, dependency updates and CI/test-only changes,
+<code class="docutils literal notranslate"><span class="pre">minor</span></code> for new backwards-compatible functionality, and <code class="docutils literal notranslate"><span class="pre">major</span></code> for
+breaking changes. Deciding at release time means the bump level is chosen
+with full knowledge of the release contents. Do not bump when starting a
+feature branch (every branch would edit the same single-line files and
+conflict on merge, and prerel builds would carry the new version before
+the release scope is known) and not after every merge to <code class="docutils literal notranslate"><span class="pre">prerel</span></code>
+(which makes the version creep without releases).</p>
+<p>Rules:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">dockerised_deb_debian_bullseye</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dockerised_deb_debian_bookworm</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dockerised_deb_ubuntu_bionic</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dockerised_deb_ubuntu_focal</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dockerised_rpm_centos7</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dockerised_rpm_centos8</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dockerised_rpm_centos_stream</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dockerised_rpm_opensuse15.3</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dockerised_rpm_opensuse_tumbleweed</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dockerised_rpm_rocky8</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dockerised_rpm_rocky8.5</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dockerised_all_packages</span></code> (to build all of the above)</p></li>
+<li><p>Never hand-edit the version strings. Hand edits desynchronise
+<code class="docutils literal notranslate"><span class="pre">.bumpversion.cfg</span></code> and the tool stops working.</p></li>
+<li><p>The tool never tags (<code class="docutils literal notranslate"><span class="pre">tag</span> <span class="pre">=</span> <span class="pre">False</span></code>). <code class="docutils literal notranslate"><span class="pre">vX.Y.Z</span></code> tags are created
+manually on <code class="docutils literal notranslate"><span class="pre">master</span></code> when a release is published (see below).</p></li>
+<li><p>Prerelease numbering (<code class="docutils literal notranslate"><span class="pre">0.8.6~prN</span></code>) is fully automatic: GitLab CI
+rewrites the version at build time via
+<code class="docutils literal notranslate"><span class="pre">.gitlab-ci-scripts/set-prerelease-version.sh</span></code>. Nothing to do manually.</p></li>
 </ul>
-<p>The resulting files are copied out of the build container to the <code class="docutils literal notranslate"><span class="pre">../results</span></code> folder.</p>
+</section>
+<section id="release-checklist">
+<h3>Release checklist<a class="headerlink" href="#release-checklist" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p>All feature pull requests merged to <code class="docutils literal notranslate"><span class="pre">prerel</span></code>, CI green.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bump2version</span> <span class="pre">[patch|minor|major]</span></code> on <code class="docutils literal notranslate"><span class="pre">prerel</span></code> (commits
+automatically).</p></li>
+<li><p>Open pull request <code class="docutils literal notranslate"><span class="pre">prerel</span></code> → <code class="docutils literal notranslate"><span class="pre">master</span></code> titled <code class="docutils literal notranslate"><span class="pre">vX.Y.Z</span></code>, review,
+merge.</p></li>
+<li><p>Create tag <code class="docutils literal notranslate"><span class="pre">vX.Y.Z</span></code> on <code class="docutils literal notranslate"><span class="pre">master</span></code> and push it.</p></li>
+<li><p>Create a release on GitHub from the tag, with release notes describing
+the changes since the previous release.</p></li>
+</ol>
+</section>
+</section>
+<section id="documentation-versions">
+<h2>Documentation versions<a class="headerlink" href="#documentation-versions" title="Link to this heading">¶</a></h2>
+<p>This documentation is published on <a class="reference external" href="https://motley-cue.readthedocs.io/">Read the Docs</a>, which builds each version
+separately:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/en/latest/</span></code> tracks <code class="docutils literal notranslate"><span class="pre">master</span></code> (released documentation),</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/en/prerel/</span></code> tracks <code class="docutils literal notranslate"><span class="pre">prerel</span></code> (upcoming documentation),</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/en/stable/</span></code> tracks the latest <code class="docutils literal notranslate"><span class="pre">vX.Y.Z</span></code> tag.</p></li>
+</ul>
+<p>Document new <code class="docutils literal notranslate"><span class="pre">prerel</span></code> features directly on <code class="docutils literal notranslate"><span class="pre">prerel</span></code> — they show up
+under <code class="docutils literal notranslate"><span class="pre">/en/prerel/</span></code> before the release, while <code class="docutils literal notranslate"><span class="pre">/en/latest/</span></code> keeps
+showing <code class="docutils literal notranslate"><span class="pre">master</span></code>. Rebuilds happen automatically on every push; nothing
+needs to be configured in this repository for that.</p>
 </section>
 <section id="docker-for-ssh-oidc">
 <h2>Docker for SSH-OIDC<a class="headerlink" href="#docker-for-ssh-oidc" title="Link to this heading">¶</a></h2>
