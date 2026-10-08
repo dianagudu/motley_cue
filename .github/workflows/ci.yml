@@ -4,43 +4,39 @@ name: CI
 on: [push]
 
 jobs:
-  tests-37:
-    runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        python-version: ["3.7"]
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install tox tox-gh-actions
-      - run: tox
-        name: Linting and testing with tox
   tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        include:
+          - python-version: "3.15"
+            experimental: true
+            allow-prereleases: true
+    continue-on-error: ${{ matrix.experimental || false }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
+          allow-prereleases: ${{ matrix.allow-prereleases || false }}
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsasl2-dev libldap2-dev
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install tox tox-gh-actions
+          python -m pip install "tox>=4" "tox-gh-actions>=3.5.0"
       - run: tox
         name: Linting and testing with tox
-      # Main doesn't have a PR for comments so skip that branch
-      # We don't want multiple comments about code coverage, just just run it once on 3.10
-      - if: ${{ github.ref != 'refs/heads/master' && matrix.python-version == '3.10' }}
-        uses: romeovs/lcov-reporter-action@v0.3.1
+      # Upload coverage artifact for inspection (replaces unmaintained
+      # romeovs/lcov-reporter-action). Runs once on latest stable 3.14.
+      - if: ${{ !matrix.experimental && matrix.python-version == '3.14' }}
+        uses: actions/upload-artifact@v6
         with:
-          lcov-file: ./coverage.lcov
+          name: coverage-lcov
+          path: ./coverage.lcov
+          if-no-files-found: ignore

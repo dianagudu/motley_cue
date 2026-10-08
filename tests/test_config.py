@@ -1,4 +1,5 @@
 from motley_cue.mapper.config import Configuration
+import os
 import pytest
 from dataclasses import fields
 
@@ -100,14 +101,14 @@ def test_docs_url(test_config, config_parser, docs_url):
         (
             CONFIG_NOT_SUPPORTED,
             True,
-            "memory",
+            "sqlite",
             "/var/lib/motley_cue/tokenmap.db",
             "/var/lib/motley_cue/motley_cue.key",
         ),
         (
             CONFIG_OTP_NOT_SUPPORTED,
             False,
-            "memory",
+            "sqlite",
             "/var/lib/motley_cue/tokenmap.db",
             "/var/lib/motley_cue/motley_cue.key",
         ),
@@ -120,12 +121,32 @@ def test_docs_url(test_config, config_parser, docs_url):
         ),
     ],
 )
-def test_otp(test_config, config_parser, use_otp, backend, db_location, keyfile):
+def test_otp(test_config, config_parser, use_otp, backend, db_location, keyfile, monkeypatch):
+    # system paths below only apply to root; pin euid so the test is
+    # independent of the user running it (see test_otp_non_root_fallback)
+    monkeypatch.setattr(os, "geteuid", lambda: 0)
     otp_config = test_config.Config(config_parser).otp
     assert otp_config.use_otp == use_otp
     assert otp_config.backend == backend
     assert otp_config.db_location == db_location
     assert otp_config.keyfile == keyfile
+
+
+def test_otp_non_root_fallback(test_config, tmp_path, monkeypatch):
+    """A non-root process cannot write /var/lib: defaults left untouched
+    fall back to a user-owned directory, while explicitly configured paths
+    are honoured as-is."""
+    monkeypatch.setattr(os, "geteuid", lambda: 1000)
+    monkeypatch.setenv("HOME", str(tmp_path))
+    user_dir = tmp_path / ".config" / "motley_cue"
+
+    otp_config = test_config.Config(CONFIG_NOT_SUPPORTED).otp
+    assert otp_config.db_location == str(user_dir / "tokenmap.db")
+    assert otp_config.keyfile == str(user_dir / "motley_cue.key")
+
+    otp_config = test_config.Config(CONFIG_OTP_SUPPORTED).otp
+    assert otp_config.db_location == "/run/motley_cue/tokenmap.db"
+    assert otp_config.keyfile == "/run/motley_cue/motley_cue.key"
 
 
 ### F7: two config sections must not silently collapse onto one OP

@@ -2,10 +2,10 @@ Source: motley-cue
 Section: contrib/python
 Priority: extra
 Maintainer: Marcus Hardt <marcus@hardt-it.de>
-Homepage: https://github.com/dianagudu/motley_cue
+Homepage: https://github.com/ssh-oidc/motley_cue
 Standards-Version: 4.5.0
-Vcs-Git: https://github.com/dianagudu/motley_cue.git
-Vcs-Browser: https://github.com/dianagudu/motley_cue
+Vcs-Git: https://github.com/ssh-oidc/motley_cue.git
+Vcs-Browser: https://github.com/ssh-oidc/motley_cue
 Rules-Requires-Root: no
 Build-Depends: debhelper-compat (= 11),
                fakeroot,
