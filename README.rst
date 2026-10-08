@@ -28,7 +28,7 @@ motley cue
 This is a service for mapping OIDC identities to local identities.
     **M**\ apper **O**\ idc **T**\ o **L**\ ocal id\ **E**\ ntit\ **Y** with lo\ **C**\ al **U**\ ser manag\ **E**\ ment
 
-For SSH integration, see `SSH OIDC <https://github.com/EOSC-Synergy/ssh-oidc>`_.
+For SSH integration, see the `SSH-OIDC documentation <https://ssh-oidc-doc.data.kit.edu/>`_.
 
 For client-side software, see `mccli <https://mccli.readthedocs.io/>`_.
 
