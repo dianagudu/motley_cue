@@ -63,9 +63,19 @@ Release checklist
    automatically).
 3. Open pull request ``prerel`` → ``master`` titled ``vX.Y.Z``, review,
    merge.
-4. Create tag ``vX.Y.Z`` on ``master`` and push it.
+4. Create tag ``vX.Y.Z`` on ``master`` and push it — but only once the
+   GitLab pipeline for the merge (step 3) is fully green, **including the
+   integration tests** (see below).
 5. Create a release on GitHub from the tag, with release notes describing
    the changes since the previous release.
+
+.. important::
+
+   Never tag before the GitLab integration tests pass. Merging to
+   ``master`` starts the GitLab pipeline automatically via the mirror, but
+   pushing the tag triggers the PyPI publish, which cannot be undone
+   cleanly — tagging a broken ``master`` publishes a broken release. Wait
+   for builds *and* integration tests, then tag.
 
 Documentation versions
 ----------------------

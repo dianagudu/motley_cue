@@ -15,6 +15,10 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
+    # gh-pages publishing pushes a branch, which needs write permission
+    # (the default token is read-only under the organisation's settings)
+    permissions:
+      contents: write
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -33,6 +37,11 @@ jobs:
         run: |
           # install pip=>20.1 to use "pip cache dir"
           python3 -m pip install --upgrade pip
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsasl2-dev libldap2-dev
 
       - name: Install dependencies
         run: |
